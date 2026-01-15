@@ -62,15 +62,19 @@
                     </div>
                     <div class="col-md-8">
                         <div class="row text-center">
-                            <div class="col-4">
+                            <div class="col-3">
                                 <small>Nivel</small>
                                 <h5 class="mb-0" id="headerNivel">1</h5>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
+                                <small>Energía</small>
+                                <h5 class="mb-0 text-danger" id="headerEnergia">6</h5>
+                            </div>
+                            <div class="col-3">
                                 <small>Oro</small>
                                 <h5 class="mb-0 text-warning" id="headerOro">0</h5>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <small>Hoy</small>
                                 <h5 class="mb-0 text-success" id="headerMisionesHoy">0</h5>
                             </div>
@@ -230,7 +234,12 @@
         // Actualizar header
         function actualizarHeader() {
             const resumen = window.game.obtenerResumenPersonaje();
+            const estado = window.game.obtenerEstado();
+            const energia = estado.personaje.energia || 0;
+            const energiaMax = estado.personaje.energiaMaxima || 6;
+            
             document.getElementById('headerNivel').textContent = resumen.nivel;
+            document.getElementById('headerEnergia').innerHTML = `${energia}/${energiaMax} ❤️`;
             document.getElementById('headerOro').textContent = resumen.oro;
             document.getElementById('headerMisionesHoy').textContent = resumen.estadisticasHoy.misiones;
         }
@@ -243,9 +252,12 @@
                 'epica': 'border-warning'
             };
             
+            const estado = window.game.obtenerEstado();
+            const energiaActual = estado.personaje.energia || 0;
             const misionActiva = window.game.obtenerMisionActiva();
             const esActiva = misionActiva && misionActiva.misionId === mision.id;
             const hayOtraActiva = misionActiva && misionActiva.misionId !== mision.id;
+            const sinEnergia = energiaActual < 2 && !esActiva;
             
             let botonHTML = '';
             let cardClase = '';
@@ -255,7 +267,7 @@
                 cardClase = 'mision-en-progreso';
                 botonHTML = `
                     <button class="btn btn-success w-100 mb-2" onclick="completarMisionDirecta(${mision.id})">
-                        <i class="bi bi-check-lg"></i> Completar
+                        <i class="bi bi-check-lg"></i> Completar (-2 ❤️)
                     </button>
                     <button class="btn btn-outline-danger w-100 btn-sm" onclick="cancelarMision()">
                         <i class="bi bi-x-lg"></i> Cancelar
@@ -269,11 +281,19 @@
                         <i class="bi bi-lock"></i> Otra misión en curso
                     </button>
                 `;
+            } else if (sinEnergia) {
+                // Sin energía suficiente
+                cardClase = 'mision-deshabilitada';
+                botonHTML = `
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="bi bi-heart-fill"></i> Sin energía (necesitas 2 ❤️)
+                    </button>
+                `;
             } else {
                 // Disponible para iniciar
                 botonHTML = `
                     <button class="btn btn-primary w-100" onclick="iniciarMision(${mision.id})">
-                        <i class="bi bi-play-fill"></i> Iniciar Misión
+                        <i class="bi bi-play-fill"></i> Iniciar Misión (-2 ❤️)
                     </button>
                 `;
             }
@@ -288,6 +308,9 @@
                             <p class="card-text small text-muted">${mision.descripcion}</p>
                             
                             <div class="mision-recompensas mb-3">
+                                <span class="badge bg-danger me-2">
+                                    <i class="bi bi-heart-fill"></i> 2 Energía
+                                </span>
                                 <span class="badge bg-info me-2">
                                     <i class="bi bi-star-fill"></i> ${mision.xp} XP
                                 </span>

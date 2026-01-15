@@ -37,6 +37,14 @@ function iniciarMision(misionId) {
         return { exito: false, mensaje: "Misión no encontrada" };
     }
     
+    // Verificar energía suficiente
+    if (!window.storage.tieneSuficienteEnergia()) {
+        return { 
+            exito: false, 
+            mensaje: "No tienes suficiente energía (necesitas 2 ❤️). Espera a mañana o sube de nivel para recuperarla." 
+        };
+    }
+    
     const resultado = window.storage.iniciarMision(misionId, mision.nombre, mision.icono);
     
     if (!resultado.exito) {

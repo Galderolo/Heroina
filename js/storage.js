@@ -12,7 +12,8 @@ const DEFAULT_DATA = {
         nivel: 1,
         xp: 0,
         oro: 0,
-        energia: 5
+        energia: 6,
+        energiaMaxima: 6
     },
     misionActiva: null, // { misionId, nombre, icono, fechaInicio }
     historial: {
@@ -50,11 +51,19 @@ function cargarDatos() {
             // Actualizar última conexión
             datosParseados.estadisticas.ultimaConexion = new Date().toISOString();
             
-            // Resetear misiones de hoy si es un nuevo día
+            // Resetear misiones de hoy y energía si es un nuevo día
             const hoy = new Date().toDateString();
-            const ultimaMision = datosParseados.historial.misionesCompletadas[datosParseados.historial.misionesCompletadas.length - 1];
-            if (ultimaMision && new Date(ultimaMision.fecha).toDateString() !== hoy) {
+            const ultimaConexion = new Date(datosParseados.estadisticas.ultimaConexion).toDateString();
+            
+            if (ultimaConexion !== hoy) {
                 datosParseados.estadisticas.misionesHoy = 0;
+                // Restaurar energía completa al nuevo día
+                datosParseados.personaje.energia = datosParseados.personaje.energiaMaxima || 6;
+            }
+            
+            // Asegurar que energiaMaxima existe (para datos antiguos)
+            if (!datosParseados.personaje.energiaMaxima) {
+                datosParseados.personaje.energiaMaxima = 6;
             }
             
             return datosParseados;
@@ -100,6 +109,12 @@ function añadirXPyOro(xp, oro) {
         datos.personaje.nivel = nuevoNivel;
         datos.personaje.xp = 0; // Resetear XP al subir de nivel
         datos.historial.nivelesAlcanzados.push(nuevoNivel);
+        
+        // Bonus: +2 vidas al subir de nivel
+        datos.personaje.energia = Math.min(
+            datos.personaje.energia + 2, 
+            datos.personaje.energiaMaxima
+        );
     }
     
     guardarDatos(datos);
@@ -238,13 +253,23 @@ function obtenerMisionActiva() {
     return datos.misionActiva;
 }
 
-// Completar misión activa
+// Completar misión activa (consume energía)
 function completarMisionActiva() {
     const datos = cargarDatos();
     const misionActiva = datos.misionActiva;
+    
+    // Consumir 2 de energía al completar
+    datos.personaje.energia = Math.max(0, datos.personaje.energia - 2);
+    
     datos.misionActiva = null;
     guardarDatos(datos);
     return misionActiva;
+}
+
+// Verificar si tiene suficiente energía
+function tieneSuficienteEnergia() {
+    const datos = cargarDatos();
+    return datos.personaje.energia >= 2;
 }
 
 // Exportar funciones
@@ -262,5 +287,6 @@ window.storage = {
     iniciarMision,
     cancelarMisionActiva,
     obtenerMisionActiva,
-    completarMisionActiva
+    completarMisionActiva,
+    tieneSuficienteEnergia
 };

@@ -105,12 +105,9 @@
                             <i class="bi bi-heart-fill fs-1 text-danger"></i>
                             <h4 class="mt-2">Energía</h4>
                             <p class="fs-3" id="energiaPersonaje">
-                                <span class="corazon">❤️</span>
-                                <span class="corazon">❤️</span>
-                                <span class="corazon">❤️</span>
-                                <span class="corazon">❤️</span>
-                                <span class="corazon">❤️</span>
+                                <!-- Se actualizará dinámicamente -->
                             </p>
+                            <small class="text-muted">Cada misión cuesta 2 ❤️</small>
                         </div>
                     </div>
                 </div>
@@ -297,6 +294,21 @@
             
             // Actualizar oro
             document.getElementById('oroPersonaje').textContent = resumen.oro;
+            
+            // Actualizar energía (corazones)
+            const energia = estado.personaje.energia || 0;
+            const energiaMax = estado.personaje.energiaMaxima || 6;
+            let corazonesHTML = '';
+            
+            for (let i = 0; i < energiaMax; i++) {
+                if (i < energia) {
+                    corazonesHTML += '<span class="corazon corazon-lleno">❤️</span>';
+                } else {
+                    corazonesHTML += '<span class="corazon corazon-vacio">🤍</span>';
+                }
+            }
+            
+            document.getElementById('energiaPersonaje').innerHTML = corazonesHTML;
             
             // Actualizar avatar
             if (resumen.avatar) {
