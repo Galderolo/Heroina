@@ -62,20 +62,24 @@
                     </div>
                     <div class="col-md-8">
                         <div class="row text-center">
-                            <div class="col-3">
+                            <div class="col-3 col-md-2">
                                 <small>Nivel</small>
                                 <h5 class="mb-0" id="headerNivel">1</h5>
                             </div>
-                            <div class="col-3">
+                            <div class="col-3 col-md-3">
                                 <small>Energía</small>
-                                <h5 class="mb-0 text-danger" id="headerEnergia">6</h5>
+                                <h5 class="mb-0 text-primary" id="headerEnergia">6</h5>
                             </div>
-                            <div class="col-3">
+                            <div class="col-3 col-md-2">
+                                <small>Vidas</small>
+                                <h5 class="mb-0 text-danger" id="headerVidas">❤️❤️❤️</h5>
+                            </div>
+                            <div class="col-3 col-md-2">
                                 <small>Oro</small>
                                 <h5 class="mb-0 text-warning" id="headerOro">0</h5>
                             </div>
-                            <div class="col-3">
-                                <small>Hoy</small>
+                            <div class="col-12 col-md-3 mt-2 mt-md-0">
+                                <small>Misiones Hoy</small>
                                 <h5 class="mb-0 text-success" id="headerMisionesHoy">0</h5>
                             </div>
                         </div>
@@ -237,9 +241,21 @@
             const estado = window.game.obtenerEstado();
             const energia = estado.personaje.energia || 0;
             const energiaMax = estado.personaje.energiaMaxima || 6;
+            const vidas = estado.personaje.vidas !== undefined ? estado.personaje.vidas : 3;
             
             document.getElementById('headerNivel').textContent = resumen.nivel;
-            document.getElementById('headerEnergia').innerHTML = `${energia}/${energiaMax} ❤️`;
+            document.getElementById('headerEnergia').innerHTML = `${energia}/${energiaMax} ⚡`;
+            
+            // Mostrar vidas con corazones
+            let vidasHTML = '';
+            for (let i = 0; i < vidas; i++) {
+                vidasHTML += '❤️';
+            }
+            if (vidas === 0) {
+                vidasHTML = '💔';
+            }
+            document.getElementById('headerVidas').innerHTML = vidasHTML || '💔';
+            
             document.getElementById('headerOro').textContent = resumen.oro;
             document.getElementById('headerMisionesHoy').textContent = resumen.estadisticasHoy.misiones;
         }
@@ -267,11 +283,20 @@
                 cardClase = 'mision-en-progreso';
                 botonHTML = `
                     <button class="btn btn-success w-100 mb-2" onclick="completarMisionDirecta(${mision.id})">
-                        <i class="bi bi-check-lg"></i> Completar (-2 ❤️)
+                        <i class="bi bi-check-circle-fill"></i> ¡Completada!
                     </button>
-                    <button class="btn btn-outline-danger w-100 btn-sm" onclick="cancelarMision()">
-                        <i class="bi bi-x-lg"></i> Cancelar
-                    </button>
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn btn-danger w-100 btn-sm" onclick="fracasarMision()">
+                                <i class="bi bi-x-circle-fill"></i> Fracasó (-1 ❤️)
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary w-100 btn-sm" onclick="cancelarMision()">
+                                <i class="bi bi-arrow-counterclockwise"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
                 `;
             } else if (hayOtraActiva) {
                 // Hay otra misión activa, deshabilitar
@@ -286,14 +311,14 @@
                 cardClase = 'mision-deshabilitada';
                 botonHTML = `
                     <button class="btn btn-secondary w-100" disabled>
-                        <i class="bi bi-heart-fill"></i> Sin energía (necesitas 2 ❤️)
+                        <i class="bi bi-lightning-charge"></i> Sin energía (necesitas 2 ⚡)
                     </button>
                 `;
             } else {
                 // Disponible para iniciar
                 botonHTML = `
                     <button class="btn btn-primary w-100" onclick="iniciarMision(${mision.id})">
-                        <i class="bi bi-play-fill"></i> Iniciar Misión (-2 ❤️)
+                        <i class="bi bi-play-fill"></i> Iniciar Misión (-2 ⚡)
                     </button>
                 `;
             }
@@ -308,8 +333,8 @@
                             <p class="card-text small text-muted">${mision.descripcion}</p>
                             
                             <div class="mision-recompensas mb-3">
-                                <span class="badge bg-danger me-2">
-                                    <i class="bi bi-heart-fill"></i> 2 Energía
+                                <span class="badge bg-primary me-2">
+                                    <i class="bi bi-lightning-charge-fill"></i> 2 Energía
                                 </span>
                                 <span class="badge bg-info me-2">
                                     <i class="bi bi-star-fill"></i> ${mision.xp} XP
@@ -375,10 +400,38 @@
         
         // Cancelar misión
         function cancelarMision() {
-            if (confirm('¿Estás seguro de que quieres cancelar esta misión?')) {
+            if (confirm('¿Cancelar la misión?\n\nNo pierdes nada, pero tampoco ganas.')) {
                 window.game.cancelarMisionActiva();
                 cargarMisiones();
+                actualizarHeader();
             }
+        }
+        
+        // Fracasar en misión
+        function fracasarMision() {
+            if (!confirm('⚠️ ¿Seguro que la misión FRACASÓ?\n\nSe perderá 1 vida ❤️ y 2 de energía ⚡')) {
+                return;
+            }
+            
+            const resultado = window.game.fracasarMisionActiva();
+            
+            if (!resultado.exito) {
+                alert(resultado.mensaje);
+                return;
+            }
+            
+            // Mostrar mensaje
+            if (resultado.sinVidas) {
+                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\n\n⚠️ ¡NO QUEDAN VIDAS! Ten más cuidado.`);
+            } else {
+                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\nVidas restantes: ${resultado.vidasRestantes}`);
+            }
+            
+            // Recargar
+            setTimeout(() => {
+                cargarMisiones();
+                actualizarHeader();
+            }, 500);
         }
         
         // Completar misión directamente (cuando ya está activa)

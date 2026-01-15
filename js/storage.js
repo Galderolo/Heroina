@@ -12,8 +12,10 @@ const DEFAULT_DATA = {
         nivel: 1,
         xp: 0,
         oro: 0,
-        energia: 6,
-        energiaMaxima: 6
+        energia: 6,        // Energía para hacer misiones
+        energiaMaxima: 6,
+        vidas: 6,          // Corazones (vidas)
+        vidasMaximas: 6
     },
     misionActiva: null, // { misionId, nombre, icono, fechaInicio }
     historial: {
@@ -64,6 +66,12 @@ function cargarDatos() {
             // Asegurar que energiaMaxima existe (para datos antiguos)
             if (!datosParseados.personaje.energiaMaxima) {
                 datosParseados.personaje.energiaMaxima = 6;
+            }
+            
+            // Asegurar que vidas existen (para datos antiguos)
+            if (datosParseados.personaje.vidas === undefined) {
+                datosParseados.personaje.vidas = 6;
+                datosParseados.personaje.vidasMaximas = 6;
             }
             
             return datosParseados;
@@ -253,7 +261,7 @@ function obtenerMisionActiva() {
     return datos.misionActiva;
 }
 
-// Completar misión activa (consume energía)
+// Completar misión activa exitosamente (consume energía)
 function completarMisionActiva() {
     const datos = cargarDatos();
     const misionActiva = datos.misionActiva;
@@ -266,10 +274,40 @@ function completarMisionActiva() {
     return misionActiva;
 }
 
+// Fracasar en misión activa (pierde vida y energía)
+function fracasarMisionActiva() {
+    const datos = cargarDatos();
+    const misionActiva = datos.misionActiva;
+    
+    // Perder 1 vida
+    datos.personaje.vidas = Math.max(0, datos.personaje.vidas - 1);
+    
+    // También consume energía (se intentó la misión)
+    datos.personaje.energia = Math.max(0, datos.personaje.energia - 2);
+    
+    datos.misionActiva = null;
+    guardarDatos(datos);
+    return {
+        misionActiva,
+        vidasRestantes: datos.personaje.vidas
+    };
+}
+
 // Verificar si tiene suficiente energía
 function tieneSuficienteEnergia() {
     const datos = cargarDatos();
     return datos.personaje.energia >= 2;
+}
+
+// Recuperar una vida (por recompensa o nivel)
+function recuperarVida() {
+    const datos = cargarDatos();
+    datos.personaje.vidas = Math.min(
+        datos.personaje.vidas + 1,
+        datos.personaje.vidasMaximas
+    );
+    guardarDatos(datos);
+    return datos.personaje.vidas;
 }
 
 // Exportar funciones
@@ -288,5 +326,7 @@ window.storage = {
     cancelarMisionActiva,
     obtenerMisionActiva,
     completarMisionActiva,
-    tieneSuficienteEnergia
+    fracasarMisionActiva,
+    tieneSuficienteEnergia,
+    recuperarVida
 };

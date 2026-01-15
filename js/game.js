@@ -72,7 +72,7 @@ function obtenerMisionActiva() {
     return window.storage.obtenerMisionActiva();
 }
 
-// Completar misión (ahora completa la misión activa)
+// Completar misión exitosamente
 function completarMisionActiva() {
     const misionActiva = window.storage.obtenerMisionActiva();
     
@@ -93,12 +93,40 @@ function completarMisionActiva() {
     
     return {
         exito: true,
+        tipo: 'completada',
         mision,
         xpGanada: mision.xp,
         oroGanado: mision.oro,
         subioNivel: resultado.subioNivel,
         nivelNuevo: resultado.nivelNuevo,
         titulo: resultado.titulo
+    };
+}
+
+// Fracasar en misión (pierde vida)
+function fracasarMisionActiva() {
+    const misionActiva = window.storage.obtenerMisionActiva();
+    
+    if (!misionActiva) {
+        return { exito: false, mensaje: "No hay ninguna misión en progreso" };
+    }
+    
+    const mision = MISIONES.find(m => m.id === misionActiva.misionId);
+    
+    if (!mision) {
+        return { exito: false, mensaje: "Misión no encontrada" };
+    }
+    
+    // Marcar como fracasada
+    const resultado = window.storage.fracasarMisionActiva();
+    gameState = window.storage.cargarDatos();
+    
+    return {
+        exito: true,
+        tipo: 'fracasada',
+        mision,
+        vidasRestantes: resultado.vidasRestantes,
+        sinVidas: resultado.vidasRestantes === 0
     };
 }
 
@@ -265,6 +293,7 @@ window.game = {
     cancelarMisionActiva,
     obtenerMisionActiva,
     completarMisionActiva,
+    fracasarMisionActiva,
     comprarRecompensa,
     obtenerProgresoNivel,
     obtenerMisionesPorTipo,
