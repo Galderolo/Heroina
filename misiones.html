@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heroína del Hogar - Misiones</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-adventure">
+        <div class="container-fluid">
+            <a class="navbar-brand fantasy-font" href="index.html">
+                <i class="bi bi-shield-fill"></i> Heroína del Hogar
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="bi bi-person-circle"></i> Mi Personaje
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="misiones.html">
+                            <i class="bi bi-list-check"></i> Misiones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="tienda.html">
+                            <i class="bi bi-shop"></i> Tienda
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container my-4">
+        <!-- Header con Recursos -->
+        <div class="card recursos-header shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <h4 class="fantasy-font mb-0">
+                            <i class="bi bi-list-check"></i> Mis Misiones
+                        </h4>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <small>Nivel</small>
+                                <h5 class="mb-0" id="headerNivel">1</h5>
+                            </div>
+                            <div class="col-4">
+                                <small>Oro</small>
+                                <h5 class="mb-0 text-warning" id="headerOro">0</h5>
+                            </div>
+                            <div class="col-4">
+                                <small>Hoy</small>
+                                <h5 class="mb-0 text-success" id="headerMisionesHoy">0</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="mb-4">
+            <div class="btn-group w-100" role="group">
+                <button type="button" class="btn btn-outline-primary active" onclick="filtrarMisiones('todas')">
+                    Todas
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="filtrarMisiones('diaria')">
+                    Diarias
+                </button>
+                <button type="button" class="btn btn-outline-info" onclick="filtrarMisiones('ayuda')">
+                    Ayuda
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="filtrarMisiones('epica')">
+                    Épicas
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de Misiones Diarias -->
+        <div id="misionesDiarias" class="misiones-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-sunrise"></i> Misiones Diarias
+            </h5>
+            <div id="listaDiarias" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Lista de Misiones de Ayuda -->
+        <div id="misionesAyuda" class="misiones-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-heart-fill"></i> Misiones de Ayuda
+            </h5>
+            <div id="listaAyuda" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Lista de Misiones Épicas -->
+        <div id="misionesEpicas" class="misiones-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-trophy-fill"></i> Misiones Épicas
+            </h5>
+            <div id="listaEpicas" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="modalConfirmacion" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-check-circle"></i> Completar Misión</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h5 class="mb-3" id="modalMisionNombre"></h5>
+                    <p class="fs-6">¿Esta misión ha sido completada?</p>
+                    <div class="alert alert-info">
+                        <small><i class="bi bi-info-circle"></i> Solo marca como completada si realmente se hizo la tarea</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> No, Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="confirmarMision()">
+                        <i class="bi bi-check-lg"></i> Sí, Completar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recompensa -->
+    <div class="modal fade" id="modalRecompensa" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <span class="mision-icono-grande" id="modalRecompensaIcono">✨</span>
+                    </div>
+                    <h3 class="fantasy-font mb-3">¡Misión Completada!</h3>
+                    <h5 id="modalRecompensaMision" class="mb-4"></h5>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="recompensa-box">
+                                <i class="bi bi-star-fill fs-1 text-info"></i>
+                                <p class="mb-0 mt-2">XP Ganada</p>
+                                <h3 class="text-info" id="modalRecompensaXP">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="recompensa-box">
+                                <i class="bi bi-coin fs-1 text-warning"></i>
+                                <p class="mb-0 mt-2">Oro Ganado</p>
+                                <h3 class="text-warning" id="modalRecompensaOro">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary btn-lg mt-4" data-bs-dismiss="modal">
+                        ¡Genial!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Subida de Nivel -->
+    <div class="modal fade" id="modalSubidaNivel" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-trophy-fill fs-1 text-warning"></i>
+                    <h2 class="fantasy-font mt-3">¡Subiste de Nivel!</h2>
+                    <p class="fs-4">Ahora eres nivel <span id="modalNuevoNivel"></span></p>
+                    <div class="alert alert-success">
+                        <h5>Nuevo Título Desbloqueado:</h5>
+                        <p class="fs-5 fw-bold mb-0" id="modalNuevoTitulo"></p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal">
+                        ¡Genial!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Scripts del juego -->
+    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/game.js"></script>
+    
+    <!-- Script de la página -->
+    <script>
+        let misionSeleccionada = null;
+        
+        // Actualizar header
+        function actualizarHeader() {
+            const resumen = window.game.obtenerResumenPersonaje();
+            document.getElementById('headerNivel').textContent = resumen.nivel;
+            document.getElementById('headerOro').textContent = resumen.oro;
+            document.getElementById('headerMisionesHoy').textContent = resumen.estadisticasHoy.misiones;
+        }
+        
+        // Crear tarjeta de misión
+        function crearTarjetaMision(mision) {
+            const colorClase = {
+                'diaria': 'border-success',
+                'ayuda': 'border-info',
+                'epica': 'border-warning'
+            };
+            
+            const misionActiva = window.game.obtenerMisionActiva();
+            const esActiva = misionActiva && misionActiva.misionId === mision.id;
+            const hayOtraActiva = misionActiva && misionActiva.misionId !== mision.id;
+            
+            let botonHTML = '';
+            let cardClase = '';
+            
+            if (esActiva) {
+                // Esta es la misión activa
+                cardClase = 'mision-en-progreso';
+                botonHTML = `
+                    <button class="btn btn-success w-100 mb-2" onclick="completarMisionDirecta(${mision.id})">
+                        <i class="bi bi-check-lg"></i> Completar
+                    </button>
+                    <button class="btn btn-outline-danger w-100 btn-sm" onclick="cancelarMision()">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                `;
+            } else if (hayOtraActiva) {
+                // Hay otra misión activa, deshabilitar
+                cardClase = 'mision-deshabilitada';
+                botonHTML = `
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="bi bi-lock"></i> Otra misión en curso
+                    </button>
+                `;
+            } else {
+                // Disponible para iniciar
+                botonHTML = `
+                    <button class="btn btn-primary w-100" onclick="iniciarMision(${mision.id})">
+                        <i class="bi bi-play-fill"></i> Iniciar Misión
+                    </button>
+                `;
+            }
+            
+            return `
+                <div class="col-md-6 col-lg-4 mb-3 mision-item" data-tipo="${mision.tipo}">
+                    <div class="card h-100 mision-card ${colorClase[mision.tipo]} ${cardClase}">
+                        <div class="card-body">
+                            ${esActiva ? '<div class="badge bg-warning text-dark mb-2"><i class="bi bi-hourglass-split"></i> En Progreso</div>' : ''}
+                            <div class="mision-icono mb-2">${mision.icono}</div>
+                            <h6 class="card-title fw-bold">${mision.nombre}</h6>
+                            <p class="card-text small text-muted">${mision.descripcion}</p>
+                            
+                            <div class="mision-recompensas mb-3">
+                                <span class="badge bg-info me-2">
+                                    <i class="bi bi-star-fill"></i> ${mision.xp} XP
+                                </span>
+                                <span class="badge bg-warning">
+                                    <i class="bi bi-coin"></i> ${mision.oro} Oro
+                                </span>
+                            </div>
+                            
+                            ${botonHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Cargar misiones
+        function cargarMisiones() {
+            const diarias = MISIONES.filter(m => m.tipo === 'diaria');
+            const ayuda = MISIONES.filter(m => m.tipo === 'ayuda');
+            const epicas = MISIONES.filter(m => m.tipo === 'epica');
+            
+            document.getElementById('listaDiarias').innerHTML = diarias.map(crearTarjetaMision).join('');
+            document.getElementById('listaAyuda').innerHTML = ayuda.map(crearTarjetaMision).join('');
+            document.getElementById('listaEpicas').innerHTML = epicas.map(crearTarjetaMision).join('');
+        }
+        
+        // Filtrar misiones
+        function filtrarMisiones(tipo) {
+            const secciones = document.querySelectorAll('.misiones-seccion');
+            const botones = document.querySelectorAll('.btn-group .btn');
+            
+            // Actualizar botones activos
+            botones.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tipo === 'todas') {
+                secciones.forEach(s => s.style.display = 'block');
+            } else {
+                secciones.forEach(s => s.style.display = 'none');
+                if (tipo === 'diaria') {
+                    document.getElementById('misionesDiarias').style.display = 'block';
+                } else if (tipo === 'ayuda') {
+                    document.getElementById('misionesAyuda').style.display = 'block';
+                } else if (tipo === 'epica') {
+                    document.getElementById('misionesEpicas').style.display = 'block';
+                }
+            }
+        }
+        
+        // Iniciar misión
+        function iniciarMision(misionId) {
+            const resultado = window.game.iniciarMision(misionId);
+            
+            if (!resultado.exito) {
+                alert(resultado.mensaje);
+                return;
+            }
+            
+            // Recargar misiones para mostrar el nuevo estado
+            cargarMisiones();
+        }
+        
+        // Cancelar misión
+        function cancelarMision() {
+            if (confirm('¿Estás seguro de que quieres cancelar esta misión?')) {
+                window.game.cancelarMisionActiva();
+                cargarMisiones();
+            }
+        }
+        
+        // Completar misión directamente (cuando ya está activa)
+        function completarMisionDirecta(misionId) {
+            const mision = MISIONES.find(m => m.id === misionId);
+            misionSeleccionada = mision;
+            
+            document.getElementById('modalMisionNombre').textContent = mision.nombre;
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+            modal.show();
+        }
+        
+        // Confirmar misión
+        function confirmarMision() {
+            if (!misionSeleccionada) return;
+            
+            const resultado = window.game.completarMisionActiva();
+            
+            if (!resultado.exito) {
+                alert(resultado.mensaje);
+                return;
+            }
+            
+            // Cerrar modal de confirmación
+            const modalConfirmacion = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion'));
+            modalConfirmacion.hide();
+            
+            // Mostrar recompensa
+            setTimeout(() => {
+                mostrarRecompensa(resultado);
+                
+                // Si subió de nivel, mostrar modal después
+                if (resultado.subioNivel) {
+                    setTimeout(() => {
+                        mostrarSubidaNivel(resultado);
+                    }, 2000);
+                }
+            }, 300);
+            
+            // Recargar
+            setTimeout(() => {
+                cargarMisiones();
+                actualizarHeader();
+            }, 500);
+            
+            misionSeleccionada = null;
+        }
+        
+        // Mostrar recompensa
+        function mostrarRecompensa(resultado) {
+            document.getElementById('modalRecompensaIcono').textContent = resultado.mision.icono;
+            document.getElementById('modalRecompensaMision').textContent = resultado.mision.nombre;
+            document.getElementById('modalRecompensaXP').textContent = '+' + resultado.xpGanada;
+            document.getElementById('modalRecompensaOro').textContent = '+' + resultado.oroGanado;
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalRecompensa'));
+            modal.show();
+            
+            // Efecto de confeti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+        
+        // Mostrar subida de nivel
+        function mostrarSubidaNivel(resultado) {
+            document.getElementById('modalNuevoNivel').textContent = resultado.nivelNuevo;
+            document.getElementById('modalNuevoTitulo').textContent = resultado.titulo;
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalSubidaNivel'));
+            modal.show();
+            
+            // Confeti dorado más intenso
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#FFD700', '#FFA500', '#FF8C00']
+            });
+        }
+        
+        // Cargar al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarMisiones();
+            actualizarHeader();
+        });
+    </script>
+</body>
+</html>

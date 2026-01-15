@@ -1,0 +1,581 @@
+/* ============================================
+   ESTILOS PERSONALIZADOS - HEROÍNA DEL HOGAR
+   Temática: Aventura
+   ============================================ */
+
+:root {
+    /* Paleta de colores aventura */
+    --color-primary: #2d6a4f;
+    --color-secondary: #40916c;
+    --color-accent: #95d5b2;
+    --color-gold: #d4a574;
+    --color-dark: #1b4332;
+    --color-light: #d8f3dc;
+    
+    /* Colores de rareza */
+    --color-comun: #52b788;
+    --color-raro: #3a86ff;
+    --color-epico: #ffd60a;
+    --color-legendario: #ff006e;
+}
+
+/* Tipografía */
+body {
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #d8f3dc 0%, #95d5b2 100%);
+    min-height: 100vh;
+}
+
+.fantasy-font {
+    font-family: 'MedievalSharp', cursive;
+    letter-spacing: 1px;
+}
+
+/* Navbar */
+.navbar.bg-adventure {
+    background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-primary) 100%) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-link {
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+    color: var(--color-gold) !important;
+}
+
+/* Cards generales */
+.card {
+    border-radius: 15px;
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Card del personaje */
+.character-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 3px solid var(--color-gold);
+}
+
+.character-card .card-body {
+    padding: 2rem;
+}
+
+/* Avatar */
+.avatar-container {
+    position: relative;
+}
+
+.avatar-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid var(--color-gold);
+    object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Título del personaje */
+.titulo-container {
+    margin: 1rem 0;
+}
+
+.bg-gold {
+    background: linear-gradient(135deg, #d4a574 0%, #c89666 100%) !important;
+    color: #fff !important;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.text-gold {
+    color: var(--color-gold) !important;
+}
+
+/* Nivel y progreso */
+.nivel-container h3 {
+    color: var(--color-dark);
+    margin-bottom: 1rem;
+}
+
+.progress {
+    border-radius: 15px;
+    background-color: #e9ecef;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    border-radius: 15px;
+    font-size: 1rem;
+    transition: width 0.6s ease;
+}
+
+/* Recursos */
+.recurso-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.recurso-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.recurso-card h4 {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.corazon {
+    font-size: 1.5rem;
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Estadísticas */
+.stats-card .card-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
+    border-radius: 15px 15px 0 0 !important;
+    font-weight: bold;
+}
+
+/* Botones de acción */
+.action-btn {
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+/* Header de recursos */
+.recursos-header {
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+/* Section titles */
+.section-title {
+    color: var(--color-dark);
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--color-gold);
+}
+
+.misiones-seccion,
+.recompensas-seccion {
+    margin-bottom: 2rem;
+}
+
+/* Tarjetas de misión */
+.mision-card {
+    border-width: 2px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.mision-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+.mision-card.border-success {
+    border-color: var(--color-comun) !important;
+}
+
+.mision-card.border-info {
+    border-color: var(--color-raro) !important;
+}
+
+.mision-card.border-warning {
+    border-color: var(--color-epico) !important;
+}
+
+/* Misión en progreso */
+.mision-en-progreso {
+    background: linear-gradient(135deg, #fff3cd 0%, #fffaeb 100%) !important;
+    border-color: #ffc107 !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4) !important;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.6);
+    }
+}
+
+/* Misión deshabilitada */
+.mision-deshabilitada {
+    opacity: 0.5;
+    filter: grayscale(30%);
+}
+
+.mision-deshabilitada:hover {
+    transform: none;
+}
+
+/* Card de misión activa */
+.mision-activa-card {
+    border: 3px solid #ffc107;
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: #ffc107;
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+    }
+    50% {
+        border-color: #ffb300;
+        box-shadow: 0 0 25px rgba(255, 193, 7, 0.5);
+    }
+}
+
+.mision-activa-icono {
+    font-size: 4rem;
+    text-align: center;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.mision-icono {
+    font-size: 3rem;
+    text-align: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.mision-icono-grande {
+    font-size: 5rem;
+    display: inline-block;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.mision-recompensas .badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+}
+
+/* Tarjetas de recompensa */
+.recompensa-card {
+    border-width: 2px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.recompensa-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+.recompensa-card.border-success {
+    border-color: var(--color-comun) !important;
+}
+
+.recompensa-card.border-info {
+    border-color: var(--color-raro) !important;
+}
+
+.recompensa-card.border-warning {
+    border-color: var(--color-epico) !important;
+}
+
+.recompensa-card.border-danger {
+    border-color: var(--color-legendario) !important;
+}
+
+.recompensa-bloqueada {
+    opacity: 0.6;
+    filter: grayscale(50%);
+}
+
+.recompensa-icono {
+    font-size: 3rem;
+    text-align: center;
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.recompensa-icono-grande {
+    font-size: 5rem;
+    display: inline-block;
+}
+
+.recompensa-precio .badge {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Modales */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1rem 2rem 2rem 2rem;
+}
+
+/* Caja de recompensa */
+.recompensa-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 0.5rem 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* Efectos de botones */
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffd60a 0%, #ffc300 100%);
+    border: none;
+    color: #000;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #ffc300 0%, #ffb700 100%);
+    color: #000;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3a86ff 0%, #2667ff 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2667ff 0%, #0047ff 100%);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff006e 0%, #d90056 100%);
+    border: none;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #d90056 0%, #b0003f 100%);
+}
+
+/* Badges personalizados */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Animación de brillos */
+@keyframes shine {
+    0% { box-shadow: 0 0 5px rgba(255,215,0,0.5); }
+    50% { box-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.6); }
+    100% { box-shadow: 0 0 5px rgba(255,215,0,0.5); }
+}
+
+.shine {
+    animation: shine 2s ease-in-out infinite;
+}
+
+/* Efectos de confeti personalizados */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .avatar-img {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .mision-icono,
+    .recompensa-icono {
+        font-size: 2.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+    }
+    
+    .action-btn {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .character-card .card-body {
+        padding: 1rem;
+    }
+    
+    .recurso-card h4 {
+        font-size: 0.8rem;
+    }
+    
+    .corazon {
+        font-size: 1.2rem;
+    }
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Loading state */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Estados de alerta personalizados */
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d8f3dc 0%, #95d5b2 100%);
+    color: var(--color-dark);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+    color: #664d03;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #cfe2ff 0%, #9ec5fe 100%);
+    color: #084298;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+}

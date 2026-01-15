@@ -1,0 +1,124 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║          🏰 HEROÍNA DEL HOGAR - INSTRUCCIONES RÁPIDAS 🏰     ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+
+📖 CÓMO INICIAR LA APLICACIÓN
+═══════════════════════════════════════════════════════════════
+
+1️⃣  Abre una terminal/consola
+
+2️⃣  Navega a la carpeta del proyecto:
+    cd /home/david/Escritorio/Rol
+
+3️⃣  Ejecuta el servidor:
+    python3 server.py
+
+4️⃣  Verás un mensaje con las direcciones de acceso
+
+
+📱 CÓMO ACCEDER DESDE MÓVIL
+═══════════════════════════════════════════════════════════════
+
+1️⃣  El servidor mostrará una IP, por ejemplo:
+    http://192.168.1.100:8000
+
+2️⃣  En tu móvil/tablet:
+    - Asegúrate de estar en la MISMA WiFi que el PC
+    - Abre el navegador (Chrome, Safari, Firefox...)
+    - Escribe la dirección IP que apareció en el servidor
+
+3️⃣  ¡Listo! Ya puedes usar la aplicación
+
+
+🎮 PRIMERA VEZ - CONFIGURACIÓN
+═══════════════════════════════════════════════════════════════
+
+1️⃣  Haz clic en el nombre "Heroína" para cambiarlo
+
+2️⃣  (Opcional) Haz clic en "Cambiar Foto" para subir una imagen
+
+3️⃣  ¡Empieza a completar misiones!
+
+
+✅ COMPLETAR MISIONES
+═══════════════════════════════════════════════════════════════
+
+1️⃣  Ve a la sección "Misiones"
+
+2️⃣  Cuando la niña complete una tarea, pulsa "Completar"
+
+3️⃣  Confirma que la misión está hecha
+
+4️⃣  ¡Verás la recompensa de XP y Oro!
+
+
+🛒 COMPRAR RECOMPENSAS
+═══════════════════════════════════════════════════════════════
+
+1️⃣  Ve a la "Tienda"
+
+2️⃣  Busca algo que tenga suficiente oro
+
+3️⃣  Pulsa "Comprar" y confirma
+
+4️⃣  ¡Disfruta de la recompensa!
+
+
+🔧 DETENER EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+En la terminal donde se ejecuta el servidor:
+    Presiona Ctrl+C
+
+
+⚠️  IMPORTANTE
+═══════════════════════════════════════════════════════════════
+
+✓ El PC y el móvil deben estar en la MISMA red WiFi
+✓ Los datos se guardan en el navegador automáticamente
+✓ Si usas varios dispositivos, cada uno tendrá su copia
+✓ Recomendado: usa un único dispositivo (tablet familiar)
+
+
+💡 CONSEJOS
+═══════════════════════════════════════════════════════════════
+
+• Deja el servidor corriendo mientras uses la app
+• Guarda la dirección IP en favoritos del móvil
+• Celebra cada logro con la niña
+• Ajusta las recompensas según sus preferencias
+
+
+❓ ¿PROBLEMAS?
+═══════════════════════════════════════════════════════════════
+
+• No puedo acceder desde el móvil
+  → Verifica que estén en la misma WiFi
+  → Comprueba el firewall del PC
+
+• Los datos no se guardan
+  → No uses modo incógnito
+  → Habilita las cookies
+
+• El servidor no arranca
+  → Verifica que Python 3 esté instalado
+  → Comprueba que el puerto 8000 esté libre
+
+
+📚 MÁS INFORMACIÓN
+═══════════════════════════════════════════════════════════════
+
+Lee el archivo README.md para información detallada sobre:
+  • Todas las misiones disponibles
+  • Lista completa de títulos
+  • Catálogo de recompensas
+  • Personalización avanzada
+
+
+═══════════════════════════════════════════════════════════════
+            ¡Que disfrutes gamificando las tareas!
+                    Hecho con ❤️ para tu familia
+═══════════════════════════════════════════════════════════════

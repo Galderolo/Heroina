@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heroína del Hogar - Mi Personaje</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-adventure">
+        <div class="container-fluid">
+            <a class="navbar-brand fantasy-font" href="index.html">
+                <i class="bi bi-shield-fill"></i> Heroína del Hogar
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">
+                            <i class="bi bi-person-circle"></i> Mi Personaje
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="misiones.html">
+                            <i class="bi bi-list-check"></i> Misiones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="tienda.html">
+                            <i class="bi bi-shop"></i> Tienda
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container my-4">
+        <!-- Card del Personaje -->
+        <div class="card character-card shadow-lg mb-4">
+            <div class="card-body text-center">
+                <!-- Avatar -->
+                <div class="avatar-container mb-3">
+                    <img id="avatarImage" src="img/avatar.jpg" alt="Avatar" class="avatar-img" onerror="this.src='https://via.placeholder.com/150?text=👧'">
+                    <button class="btn btn-sm btn-outline-secondary mt-2" onclick="cambiarAvatar()">
+                        <i class="bi bi-camera"></i> Cambiar Foto
+                    </button>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                </div>
+
+                <!-- Nombre del Personaje -->
+                <h2 class="fantasy-font mb-2">
+                    <span id="nombrePersonaje">Heroína</span>
+                    <button class="btn btn-sm btn-link" onclick="cambiarNombre()">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </h2>
+
+                <!-- Título -->
+                <div class="titulo-container mb-3">
+                    <span class="badge bg-gold fs-6" id="tituloPersonaje">
+                        <i class="bi bi-award"></i> Aprendiz del Orden
+                    </span>
+                </div>
+
+                <!-- Nivel -->
+                <div class="nivel-container mb-3">
+                    <h3 class="fantasy-font">
+                        Nivel <span id="nivelPersonaje">1</span>
+                    </h3>
+                    <div class="progress" style="height: 30px;">
+                        <div id="barraXP" class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                             role="progressbar" style="width: 0%">
+                            <span id="textoXP" class="fw-bold">0 / 10 XP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recursos -->
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <div class="recurso-card">
+                            <i class="bi bi-coin fs-1 text-warning"></i>
+                            <h4 class="mt-2">Oro</h4>
+                            <p class="fs-3 fw-bold text-gold" id="oroPersonaje">0</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="recurso-card">
+                            <i class="bi bi-heart-fill fs-1 text-danger"></i>
+                            <h4 class="mt-2">Energía</h4>
+                            <p class="fs-3" id="energiaPersonaje">
+                                <span class="corazon">❤️</span>
+                                <span class="corazon">❤️</span>
+                                <span class="corazon">❤️</span>
+                                <span class="corazon">❤️</span>
+                                <span class="corazon">❤️</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Misión en Progreso -->
+        <div class="card mision-activa-card shadow mb-4" id="misionActivaCard" style="display: none;">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Misión en Progreso</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="mision-activa-icono mb-3" id="misionActivaIcono">⚔️</div>
+                <h4 class="fw-bold mb-3" id="misionActivaNombre">Nombre de la misión</h4>
+                <p class="text-muted mb-3">
+                    <i class="bi bi-clock"></i> Iniciada hace <span id="misionActivaTiempo">unos momentos</span>
+                </p>
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-success w-100" onclick="completarMisionActiva()">
+                            <i class="bi bi-check-lg"></i> Completar
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-danger w-100" onclick="cancelarMisionActiva()">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas de Hoy -->
+        <div class="card stats-card shadow mb-4">
+            <div class="card-header bg-adventure text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Estadísticas de Hoy</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <i class="bi bi-check-circle fs-2 text-success"></i>
+                        <p class="mb-0 mt-2">Misiones</p>
+                        <h4 class="fw-bold" id="misionesHoy">0</h4>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-star fs-2 text-info"></i>
+                        <p class="mb-0 mt-2">XP Ganada</p>
+                        <h4 class="fw-bold" id="xpHoy">0</h4>
+                    </div>
+                    <div class="col-4">
+                        <i class="bi bi-coin fs-2 text-warning"></i>
+                        <p class="mb-0 mt-2">Oro Ganado</p>
+                        <h4 class="fw-bold" id="oroHoy">0</h4>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <p class="mb-0">
+                        <i class="bi bi-fire"></i> Racha: <span class="fw-bold" id="rachaPersonaje">0</span> días
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas Totales -->
+        <div class="card stats-card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Estadísticas Totales</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <i class="bi bi-trophy fs-2 text-success"></i>
+                        <p class="mb-0 mt-2 small">Misiones Completadas</p>
+                        <h5 class="fw-bold" id="totalMisiones">0</h5>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <i class="bi bi-star-fill fs-2 text-info"></i>
+                        <p class="mb-0 mt-2 small">XP Total Ganada</p>
+                        <h5 class="fw-bold" id="totalXP">0</h5>
+                    </div>
+                    <div class="col-6">
+                        <i class="bi bi-coin fs-2 text-warning"></i>
+                        <p class="mb-0 mt-2 small">Oro Total Ganado</p>
+                        <h5 class="fw-bold" id="totalOro">0</h5>
+                    </div>
+                    <div class="col-6">
+                        <i class="bi bi-bag-check fs-2 text-danger"></i>
+                        <p class="mb-0 mt-2 small">Oro Gastado</p>
+                        <h5 class="fw-bold" id="totalGastado">0</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <a href="misiones.html" class="btn btn-primary btn-lg w-100 action-btn">
+                    <i class="bi bi-list-check"></i> Ver Misiones
+                </a>
+            </div>
+            <div class="col-md-6 mb-3">
+                <a href="tienda.html" class="btn btn-warning btn-lg w-100 action-btn">
+                    <i class="bi bi-shop"></i> Ir a la Tienda
+                </a>
+            </div>
+        </div>
+
+        <!-- Botón de Reiniciar (oculto, solo para administración) -->
+        <div class="text-center mt-4">
+            <button class="btn btn-sm btn-outline-danger" onclick="confirmarReinicio()">
+                <i class="bi bi-arrow-clockwise"></i> Reiniciar Progreso
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Subida de Nivel -->
+    <div class="modal fade" id="modalSubidaNivel" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-trophy-fill fs-1 text-warning"></i>
+                    <h2 class="fantasy-font mt-3">¡Subiste de Nivel!</h2>
+                    <p class="fs-4">Ahora eres nivel <span id="modalNuevoNivel"></span></p>
+                    <div class="alert alert-success">
+                        <h5>Nuevo Título Desbloqueado:</h5>
+                        <p class="fs-5 fw-bold mb-0" id="modalNuevoTitulo"></p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal">
+                        ¡Genial!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Scripts del juego -->
+    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/game.js"></script>
+    
+    <!-- Script de la página -->
+    <script>
+        // Calcular tiempo transcurrido
+        function calcularTiempoTranscurrido(fechaInicio) {
+            const ahora = new Date();
+            const inicio = new Date(fechaInicio);
+            const minutos = Math.floor((ahora - inicio) / 1000 / 60);
+            
+            if (minutos < 1) return "unos momentos";
+            if (minutos === 1) return "1 minuto";
+            if (minutos < 60) return `${minutos} minutos`;
+            
+            const horas = Math.floor(minutos / 60);
+            if (horas === 1) return "1 hora";
+            return `${horas} horas`;
+        }
+        
+        // Cargar datos del personaje
+        function cargarPersonaje() {
+            const resumen = window.game.obtenerResumenPersonaje();
+            const estado = window.game.obtenerEstado();
+            
+            // Actualizar nombre
+            document.getElementById('nombrePersonaje').textContent = resumen.nombre;
+            
+            // Actualizar título
+            document.getElementById('tituloPersonaje').innerHTML = 
+                `<i class="bi bi-award"></i> ${resumen.titulo}`;
+            
+            // Actualizar nivel
+            document.getElementById('nivelPersonaje').textContent = resumen.nivel;
+            
+            // Actualizar barra de XP
+            const { xpActual, xpNecesaria, porcentaje } = resumen.progreso;
+            document.getElementById('barraXP').style.width = porcentaje + '%';
+            document.getElementById('textoXP').textContent = `${xpActual} / ${xpNecesaria} XP`;
+            
+            // Actualizar oro
+            document.getElementById('oroPersonaje').textContent = resumen.oro;
+            
+            // Actualizar avatar
+            if (resumen.avatar) {
+                document.getElementById('avatarImage').src = resumen.avatar;
+            }
+            
+            // Estadísticas de hoy
+            document.getElementById('misionesHoy').textContent = resumen.estadisticasHoy.misiones;
+            document.getElementById('xpHoy').textContent = resumen.estadisticasHoy.xp;
+            document.getElementById('oroHoy').textContent = resumen.estadisticasHoy.oro;
+            document.getElementById('rachaPersonaje').textContent = resumen.racha;
+            
+            // Estadísticas totales
+            document.getElementById('totalMisiones').textContent = estado.estadisticas.totalMisiones;
+            document.getElementById('totalXP').textContent = estado.estadisticas.totalXP;
+            document.getElementById('totalOro').textContent = estado.estadisticas.totalOro;
+            document.getElementById('totalGastado').textContent = estado.estadisticas.totalGastado;
+            
+            // Mostrar misión activa si existe
+            const misionActiva = window.game.obtenerMisionActiva();
+            if (misionActiva) {
+                document.getElementById('misionActivaCard').style.display = 'block';
+                document.getElementById('misionActivaIcono').textContent = misionActiva.icono;
+                document.getElementById('misionActivaNombre').textContent = misionActiva.nombre;
+                document.getElementById('misionActivaTiempo').textContent = 
+                    calcularTiempoTranscurrido(misionActiva.fechaInicio);
+            } else {
+                document.getElementById('misionActivaCard').style.display = 'none';
+            }
+        }
+        
+        // Completar misión activa
+        function completarMisionActiva() {
+            const resultado = window.game.completarMisionActiva();
+            
+            if (!resultado.exito) {
+                alert(resultado.mensaje);
+                return;
+            }
+            
+            // Mostrar recompensa
+            mostrarRecompensa(resultado);
+            
+            // Si subió de nivel
+            if (resultado.subioNivel) {
+                setTimeout(() => {
+                    mostrarSubidaNivel(resultado);
+                }, 2000);
+            }
+            
+            // Recargar
+            setTimeout(() => {
+                cargarPersonaje();
+            }, 500);
+        }
+        
+        // Cancelar misión activa
+        function cancelarMisionActiva() {
+            if (confirm('¿Estás seguro de que quieres cancelar esta misión?')) {
+                window.game.cancelarMisionActiva();
+                cargarPersonaje();
+            }
+        }
+        
+        // Mostrar recompensa
+        function mostrarRecompensa(resultado) {
+            // Usar el modal si existe, o mostrar alerta
+            alert(`¡Misión completada!\n\n+${resultado.xpGanada} XP\n+${resultado.oroGanado} Oro`);
+            
+            // Confeti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+        
+        // Mostrar subida de nivel
+        function mostrarSubidaNivel(resultado) {
+            const modal = new bootstrap.Modal(document.getElementById('modalSubidaNivel'));
+            document.getElementById('modalNuevoNivel').textContent = resultado.nivelNuevo;
+            document.getElementById('modalNuevoTitulo').textContent = resultado.titulo;
+            modal.show();
+            
+            // Confeti dorado
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#FFD700', '#FFA500', '#FF8C00']
+            });
+        }
+        
+        // Cambiar nombre
+        function cambiarNombre() {
+            const nombreActual = document.getElementById('nombrePersonaje').textContent;
+            const nuevoNombre = prompt('¿Cómo se llama tu heroína?', nombreActual);
+            
+            if (nuevoNombre && nuevoNombre.trim()) {
+                window.game.configurarPersonaje(nuevoNombre.trim());
+                cargarPersonaje();
+            }
+        }
+        
+        // Cambiar avatar
+        function cambiarAvatar() {
+            document.getElementById('avatarInput').click();
+        }
+        
+        document.getElementById('avatarInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    const avatarBase64 = await window.game.subirAvatar(file);
+                    document.getElementById('avatarImage').src = avatarBase64;
+                } catch (error) {
+                    alert('Error al subir la imagen');
+                }
+            }
+        });
+        
+        // Confirmar reinicio
+        function confirmarReinicio() {
+            if (confirm('⚠️ ¿Estás seguro de que quieres borrar TODO el progreso? Esta acción NO se puede deshacer.')) {
+                window.game.reiniciarJuego();
+                location.reload();
+            }
+        }
+        
+        // Cargar al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarPersonaje();
+            
+            // Actualizar tiempo de misión activa cada minuto
+            setInterval(() => {
+                const misionActiva = window.game.obtenerMisionActiva();
+                if (misionActiva) {
+                    document.getElementById('misionActivaTiempo').textContent = 
+                        calcularTiempoTranscurrido(misionActiva.fechaInicio);
+                }
+            }, 60000); // Cada 60 segundos
+        });
+    </script>
+</body>
+</html>

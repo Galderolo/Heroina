@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heroína del Hogar - Tienda de Recompensas</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-adventure">
+        <div class="container-fluid">
+            <a class="navbar-brand fantasy-font" href="index.html">
+                <i class="bi bi-shield-fill"></i> Heroína del Hogar
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="bi bi-person-circle"></i> Mi Personaje
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="misiones.html">
+                            <i class="bi bi-list-check"></i> Misiones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="tienda.html">
+                            <i class="bi bi-shop"></i> Tienda
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container my-4">
+        <!-- Header con Recursos -->
+        <div class="card recursos-header shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <h4 class="fantasy-font mb-0">
+                            <i class="bi bi-shop"></i> Tienda de Recompensas
+                        </h4>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <small>Nivel</small>
+                                <h5 class="mb-0" id="headerNivel">1</h5>
+                            </div>
+                            <div class="col-4">
+                                <small>Oro Disponible</small>
+                                <h5 class="mb-0 text-warning" id="headerOro">0</h5>
+                            </div>
+                            <div class="col-4">
+                                <small>Compradas</small>
+                                <h5 class="mb-0 text-success" id="headerCompradas">0</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="mb-4">
+            <div class="btn-group w-100" role="group">
+                <button type="button" class="btn btn-outline-primary active" onclick="filtrarRecompensas('todas')">
+                    Todas
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="filtrarRecompensas('pequeña')">
+                    Pequeñas
+                </button>
+                <button type="button" class="btn btn-outline-info" onclick="filtrarRecompensas('media')">
+                    Medias
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="filtrarRecompensas('grande')">
+                    Grandes
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="filtrarRecompensas('epica')">
+                    Épicas
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de Recompensas Pequeñas -->
+        <div id="recompensasPequenas" class="recompensas-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-gift"></i> Recompensas Pequeñas
+            </h5>
+            <div id="listaPequenas" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Lista de Recompensas Medias -->
+        <div id="recompensasMedias" class="recompensas-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-gift-fill"></i> Recompensas Medias
+            </h5>
+            <div id="listaMedias" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Lista de Recompensas Grandes -->
+        <div id="recompensasGrandes" class="recompensas-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-star-fill"></i> Recompensas Grandes
+            </h5>
+            <div id="listaGrandes" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Lista de Recompensas Épicas -->
+        <div id="recompensasEpicas" class="recompensas-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-trophy-fill"></i> Recompensas Épicas
+            </h5>
+            <div id="listaEpicas" class="row">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Compra -->
+    <div class="modal fade" id="modalConfirmacion" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Compra</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <span class="recompensa-icono-grande" id="modalRecompensaIcono">🎁</span>
+                    </div>
+                    <h5 id="modalRecompensaNombre" class="text-center mb-3"></h5>
+                    <p id="modalRecompensaDescripcion" class="text-center text-muted"></p>
+                    <div class="alert alert-warning text-center">
+                        <h4>
+                            <i class="bi bi-coin"></i> <span id="modalRecompensaPrecio"></span> Oro
+                        </h4>
+                    </div>
+                    <p class="text-center">¿Quieres canjear esta recompensa?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="confirmarCompra()">
+                        <i class="bi bi-bag-check"></i> Comprar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Compra Exitosa -->
+    <div class="modal fade" id="modalExito" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-check-circle-fill fs-1 text-success"></i>
+                    <h2 class="fantasy-font mt-3">¡Compra Exitosa!</h2>
+                    <div class="mb-3">
+                        <span class="recompensa-icono-grande" id="modalExitoIcono">🎁</span>
+                    </div>
+                    <h5 id="modalExitoNombre" class="mb-3"></h5>
+                    <div class="alert alert-info">
+                        <p class="mb-0">¡Ahora puedes disfrutar de tu recompensa!</p>
+                    </div>
+                    <p class="text-muted">
+                        Oro restante: <span class="fw-bold text-warning" id="modalExitoOroRestante"></span>
+                    </p>
+                    <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal">
+                        ¡Genial!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Scripts del juego -->
+    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/game.js"></script>
+    
+    <!-- Script de la página -->
+    <script>
+        let recompensaSeleccionada = null;
+        
+        // Actualizar header
+        function actualizarHeader() {
+            const resumen = window.game.obtenerResumenPersonaje();
+            const compradas = window.storage.obtenerRecompensasCompradas();
+            
+            document.getElementById('headerNivel').textContent = resumen.nivel;
+            document.getElementById('headerOro').textContent = resumen.oro;
+            document.getElementById('headerCompradas').textContent = compradas.length;
+        }
+        
+        // Crear tarjeta de recompensa
+        function crearTarjetaRecompensa(recompensa, estado) {
+            const colorClase = {
+                'pequeña': 'border-success',
+                'media': 'border-info',
+                'grande': 'border-warning',
+                'epica': 'border-danger'
+            };
+            
+            const bloqueada = !estado.desbloqueada;
+            const sinOro = estado.desbloqueada && !estado.puedeComprar;
+            
+            let botonHTML = '';
+            if (bloqueada) {
+                botonHTML = `
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="bi bi-lock-fill"></i> Nivel ${recompensa.nivelRequerido}
+                    </button>
+                `;
+            } else if (sinOro) {
+                botonHTML = `
+                    <button class="btn btn-outline-warning w-100" disabled>
+                        <i class="bi bi-coin"></i> No tienes oro suficiente
+                    </button>
+                `;
+            } else {
+                botonHTML = `
+                    <button class="btn btn-warning w-100" onclick="prepararCompra(${recompensa.id})">
+                        <i class="bi bi-bag-check"></i> Comprar
+                    </button>
+                `;
+            }
+            
+            const cardClase = bloqueada ? 'recompensa-bloqueada' : '';
+            
+            return `
+                <div class="col-md-6 col-lg-4 mb-3 recompensa-item" data-categoria="${recompensa.categoria}">
+                    <div class="card h-100 recompensa-card ${colorClase[recompensa.categoria]} ${cardClase}">
+                        <div class="card-body">
+                            <div class="recompensa-icono mb-2">${recompensa.icono}</div>
+                            <h6 class="card-title fw-bold">${recompensa.nombre}</h6>
+                            <p class="card-text small text-muted">${recompensa.descripcion}</p>
+                            
+                            <div class="recompensa-precio mb-3">
+                                <span class="badge bg-warning text-dark fs-6">
+                                    <i class="bi bi-coin"></i> ${recompensa.precio} Oro
+                                </span>
+                                ${bloqueada ? `<span class="badge bg-secondary ms-2"><i class="bi bi-lock"></i> Nivel ${recompensa.nivelRequerido}</span>` : ''}
+                            </div>
+                            
+                            ${botonHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Cargar recompensas
+        function cargarRecompensas() {
+            const recompensasConEstado = window.game.obtenerRecompensasDisponibles();
+            
+            const pequenas = recompensasConEstado.filter(r => r.categoria === 'pequeña');
+            const medias = recompensasConEstado.filter(r => r.categoria === 'media');
+            const grandes = recompensasConEstado.filter(r => r.categoria === 'grande');
+            const epicas = recompensasConEstado.filter(r => r.categoria === 'epica');
+            
+            document.getElementById('listaPequenas').innerHTML = pequenas.map(r => 
+                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            ).join('');
+            
+            document.getElementById('listaMedias').innerHTML = medias.map(r => 
+                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            ).join('');
+            
+            document.getElementById('listaGrandes').innerHTML = grandes.map(r => 
+                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            ).join('');
+            
+            document.getElementById('listaEpicas').innerHTML = epicas.map(r => 
+                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            ).join('');
+        }
+        
+        // Filtrar recompensas
+        function filtrarRecompensas(categoria) {
+            const secciones = document.querySelectorAll('.recompensas-seccion');
+            const botones = document.querySelectorAll('.btn-group .btn');
+            
+            // Actualizar botones activos
+            botones.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (categoria === 'todas') {
+                secciones.forEach(s => s.style.display = 'block');
+            } else {
+                secciones.forEach(s => s.style.display = 'none');
+                if (categoria === 'pequeña') {
+                    document.getElementById('recompensasPequenas').style.display = 'block';
+                } else if (categoria === 'media') {
+                    document.getElementById('recompensasMedias').style.display = 'block';
+                } else if (categoria === 'grande') {
+                    document.getElementById('recompensasGrandes').style.display = 'block';
+                } else if (categoria === 'epica') {
+                    document.getElementById('recompensasEpicas').style.display = 'block';
+                }
+            }
+        }
+        
+        // Preparar compra
+        function prepararCompra(recompensaId) {
+            const recompensa = RECOMPENSAS.find(r => r.id === recompensaId);
+            recompensaSeleccionada = recompensa;
+            
+            document.getElementById('modalRecompensaIcono').textContent = recompensa.icono;
+            document.getElementById('modalRecompensaNombre').textContent = recompensa.nombre;
+            document.getElementById('modalRecompensaDescripcion').textContent = recompensa.descripcion;
+            document.getElementById('modalRecompensaPrecio').textContent = recompensa.precio;
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+            modal.show();
+        }
+        
+        // Confirmar compra
+        function confirmarCompra() {
+            if (!recompensaSeleccionada) return;
+            
+            const resultado = window.game.comprarRecompensa(recompensaSeleccionada.id);
+            
+            // Cerrar modal de confirmación
+            const modalConfirmacion = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion'));
+            modalConfirmacion.hide();
+            
+            if (resultado.exito) {
+                // Mostrar modal de éxito
+                setTimeout(() => {
+                    mostrarExito(resultado.recompensa);
+                }, 300);
+                
+                // Recargar recompensas y header
+                setTimeout(() => {
+                    cargarRecompensas();
+                    actualizarHeader();
+                }, 1000);
+            } else {
+                alert(resultado.mensaje);
+            }
+            
+            recompensaSeleccionada = null;
+        }
+        
+        // Mostrar compra exitosa
+        function mostrarExito(recompensa) {
+            const estado = window.game.obtenerEstado();
+            
+            document.getElementById('modalExitoIcono').textContent = recompensa.icono;
+            document.getElementById('modalExitoNombre').textContent = recompensa.nombre;
+            document.getElementById('modalExitoOroRestante').textContent = estado.personaje.oro + ' oro';
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+            modal.show();
+            
+            // Efecto de confeti
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#FFD700', '#FFA500', '#FF6347']
+            });
+        }
+        
+        // Cargar al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarRecompensas();
+            actualizarHeader();
+        });
+    </script>
+</body>
+</html>
