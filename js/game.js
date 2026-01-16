@@ -397,6 +397,16 @@ function getCharacterSummary() {
     };
 }
 
+function validateCharacterExists() {
+    const data = loadData();
+    
+    if (!data.character.name || data.character.name.trim() === '') {
+        window.location.href = 'index.html';
+        return false;
+    }
+    return true;
+}
+
 window.game = {
     initializeGame,
     getState,
@@ -417,7 +427,8 @@ window.game = {
     calculateStreak,
     resetGame,
     uploadAvatar,
-    getCharacterSummary
+    getCharacterSummary,
+    validateCharacterExists
 };
 
 document.addEventListener('DOMContentLoaded', () => {

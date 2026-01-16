@@ -37,6 +37,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" id="installPWA" style="display: none;">
+                        <a class="nav-link" href="#" id="installButton">
+                            <i class="bi bi-download"></i> Instalar
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="index.html">
                             <i class="bi bi-person-circle"></i> Mi Personaje
@@ -90,23 +95,23 @@
 
         <!-- Filtros -->
         <div class="mb-4">
-            <div class="btn-group w-100" role="group">
-                <button type="button" class="btn btn-outline-primary active" onclick="filtrarRecompensas('todas')">
+            <div class="btn-group w-100 shop-filters-group" role="group">
+                <button type="button" class="btn btn-outline-primary active shop-filter-btn" onclick="filtrarRecompensas('todas')">
                     Todas
                 </button>
-                <button type="button" class="btn btn-outline-purple" onclick="filtrarRecompensas('potion')">
-                    🧪 Pociones
+                <button type="button" class="btn btn-outline-purple shop-filter-btn" onclick="filtrarRecompensas('potion')">
+                    Pociones
                 </button>
-                <button type="button" class="btn btn-outline-success" onclick="filtrarRecompensas('pequeña')">
+                <button type="button" class="btn btn-outline-success shop-filter-btn" onclick="filtrarRecompensas('pequeña')">
                     Pequeñas
                 </button>
-                <button type="button" class="btn btn-outline-info" onclick="filtrarRecompensas('media')">
+                <button type="button" class="btn btn-outline-info shop-filter-btn" onclick="filtrarRecompensas('media')">
                     Medias
                 </button>
-                <button type="button" class="btn btn-outline-warning" onclick="filtrarRecompensas('grande')">
+                <button type="button" class="btn btn-outline-warning shop-filter-btn" onclick="filtrarRecompensas('grande')">
                     Grandes
                 </button>
-                <button type="button" class="btn btn-outline-danger" onclick="filtrarRecompensas('epica')">
+                <button type="button" class="btn btn-outline-danger shop-filter-btn" onclick="filtrarRecompensas('epica')">
                     Épicas
                 </button>
             </div>
@@ -451,6 +456,9 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
+            if (!window.game.validateCharacterExists()) {
+                return;
+            }
             cargarRecompensas();
             actualizarHeader();
         });
@@ -469,6 +477,41 @@
                     });
             });
         }
+    </script>
+
+    <!-- PWA Install Button -->
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPWA').style.display = 'block';
+        });
+
+        document.getElementById('installButton')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            if (!deferredPrompt) {
+                return;
+            }
+            
+            deferredPrompt.prompt();
+            
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('Usuario aceptó instalar PWA');
+            }
+            
+            deferredPrompt = null;
+            document.getElementById('installPWA').style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('installPWA').style.display = 'none';
+            deferredPrompt = null;
+        });
     </script>
 </body>
 </html>

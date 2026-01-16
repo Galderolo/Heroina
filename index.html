@@ -37,6 +37,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" id="installPWA" style="display: none;">
+                        <a class="nav-link" href="#" id="installButton">
+                            <i class="bi bi-download"></i> Instalar
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="index.html">
                             <i class="bi bi-person-circle"></i> Mi Personaje
@@ -180,7 +185,7 @@
 
                 <!-- Recursos -->
                 <div class="row mt-4">
-                    <div class="col-4">
+                    <div class="col-12 col-sm-4 mb-3 mb-sm-0">
                         <div class="recurso-card">
                             <i class="bi bi-coin fs-1 text-warning"></i>
                             <h4 class="mt-2">Oro</h4>
@@ -188,7 +193,7 @@
                             <small style="color: #a0a0a0;">Lo puedes gastar en la tienda</small>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-12 col-sm-4 mb-3 mb-sm-0">
                         <div class="recurso-card">
                             <i class="bi bi-lightning-charge-fill fs-1 text-primary"></i>
                             <h4 class="mt-2">Energía</h4>
@@ -196,7 +201,7 @@
                             <small style="color: #a0a0a0;">Misiones: 1 ⚡</small>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-12 col-sm-4 mb-3 mb-sm-0">
                         <div class="recurso-card">
                             <i class="bi bi-heart-fill fs-1 text-danger"></i>
                             <h4 class="mt-2">Vidas</h4>
@@ -774,6 +779,41 @@
                     });
             });
         }
+    </script>
+
+    <!-- PWA Install Button -->
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPWA').style.display = 'block';
+        });
+
+        document.getElementById('installButton')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            if (!deferredPrompt) {
+                return;
+            }
+            
+            deferredPrompt.prompt();
+            
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('Usuario aceptó instalar PWA');
+            }
+            
+            deferredPrompt = null;
+            document.getElementById('installPWA').style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('installPWA').style.display = 'none';
+            deferredPrompt = null;
+        });
     </script>
 </body>
 </html>
