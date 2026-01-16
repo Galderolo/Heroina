@@ -482,7 +482,7 @@ const REWARDS = [
         id: 23,
         name: "Poción de Energía",
         description: "Restaura 2 puntos de energía",
-        price: 150,
+        price: 120,
         category: "potion",
         icon: "⚡",
         requiredLevel: 3,
