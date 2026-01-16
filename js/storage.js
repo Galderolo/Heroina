@@ -60,27 +60,38 @@ function loadData() {
         const data = localStorage.getItem(STORAGE_KEY);
         if (data) {
             const parsedData = JSON.parse(data);
-            parsedData.stats.lastConnection = new Date().toISOString();
             
             const today = new Date().toDateString();
-            const lastConnection = new Date(parsedData.stats.lastConnection).toDateString();
+            const lastConnection = parsedData.stats.lastConnection ? 
+                new Date(parsedData.stats.lastConnection).toDateString() : 
+                '';
             
+            let dataChanged = false;
             if (lastConnection !== today) {
                 parsedData.stats.missionsToday = 0;
                 parsedData.character.energy = parsedData.character.maxEnergy || 6;
+                parsedData.stats.lastConnection = new Date().toISOString();
+                dataChanged = true;
             }
             
             if (!parsedData.character.maxEnergy) {
                 parsedData.character.maxEnergy = 6;
+                dataChanged = true;
             }
             
             if (parsedData.character.lives === undefined) {
                 parsedData.character.lives = 6;
                 parsedData.character.maxLives = 6;
+                dataChanged = true;
             }
             
             if (!parsedData.inventory) {
                 parsedData.inventory = { potions: [] };
+                dataChanged = true;
+            }
+            
+            if (dataChanged) {
+                setTimeout(() => saveData(parsedData), 100);
             }
             
             if (!validateData(parsedData)) {
@@ -98,14 +109,19 @@ function loadData() {
 }
 
 function validateData(data) {
-    if (!data || typeof data !== 'object') return false;
-    if (!data.character || typeof data.character !== 'object') return false;
-    if (!data.history || typeof data.history !== 'object') return false;
-    if (!data.stats || typeof data.stats !== 'object') return false;
-    if (typeof data.character.level !== 'number') return false;
-    if (typeof data.character.xp !== 'number') return false;
-    if (typeof data.character.gold !== 'number') return false;
-    return true;
+    try {
+        if (!data || typeof data !== 'object') return false;
+        if (!data.character || typeof data.character !== 'object') return false;
+        if (!data.history || typeof data.history !== 'object') return false;
+        if (!data.stats || typeof data.stats !== 'object') return false;
+        if (typeof data.character.level !== 'number') return false;
+        if (typeof data.character.xp !== 'number') return false;
+        if (typeof data.character.gold !== 'number') return false;
+        return true;
+    } catch (error) {
+        console.error('Validation error:', error);
+        return false;
+    }
 }
 
 function resetData() {
