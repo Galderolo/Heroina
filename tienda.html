@@ -74,19 +74,18 @@
                         </h4>
                     </div>
                     <div class="col-md-8">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <small>Nivel</small>
-                                <h5 class="mb-0" id="headerNivel">1</h5>
-                            </div>
-                            <div class="col-4">
-                                <small>Oro Disponible</small>
-                                <h5 class="mb-0 text-warning" id="headerOro">0</h5>
-                            </div>
-                            <div class="col-4">
-                                <small>Compradas</small>
-                                <h5 class="mb-0 text-success" id="headerCompradas">0</h5>
-                            </div>
+                        <div class="stats-compact">
+                            <span class="stat-item">
+                                <small>Nivel</small> <strong id="headerNivel">1</strong>
+                            </span>
+                            <span class="stat-separator">|</span>
+                            <span class="stat-item">
+                                <small>Oro</small> <strong class="text-warning" id="headerOro">0 <i class="bi bi-coin text-warning"></i></strong>
+                            </span>
+                            <span class="stat-separator">|</span>
+                            <span class="stat-item">
+                                <small>Compradas</small> <strong class="text-success" id="headerCompradas">0</strong>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -278,7 +277,7 @@
             const purchased = window.storage.getPurchasedRewards();
             
             document.getElementById('headerNivel').textContent = summary.level;
-            document.getElementById('headerOro').textContent = summary.gold;
+            document.getElementById('headerOro').innerHTML = `${summary.gold} <i class="bi bi-coin text-warning"></i>`;
             document.getElementById('headerCompradas').textContent = purchased.length;
         }
         

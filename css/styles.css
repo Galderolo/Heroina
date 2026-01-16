@@ -1066,13 +1066,7 @@ h1, h2, h3, h4, h5, h6, p, span {
     }
 }
 
-/* Header de recursos - ESTILOS ANTIGUOS (ya no se usan, ahora usamos stats-compact) */
-/*
-.recursos-header h5 {
-    white-space: nowrap;
-    color: #e0e0e0 !important;
-}
-
+/* Header de recursos - estilos básicos generales */
 .recursos-header small {
     color: #c0c0c0 !important;
 }
@@ -1083,21 +1077,6 @@ h1, h2, h3, h4, h5, h6, p, span {
 .recursos-header .text-success {
     opacity: 1 !important;
 }
-
-@media (min-width: 576px) and (max-width: 991px) {
-    .recursos-header h5 {
-        font-size: 1.1rem;
-    }
-    
-    .recursos-header small {
-        font-size: 0.8rem;
-    }
-    
-    .recursos-header .row {
-        row-gap: 0.5rem;
-    }
-}
-*/
 
 /* Botón Scroll to Top */
 .scroll-to-top {
