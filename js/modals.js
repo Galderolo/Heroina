@@ -82,17 +82,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function showReward(xpGained, goldGained, levelUp = null) {
+function showReward(xpGained, goldGained, levelUp = null, missionIcon = null, missionName = null) {
     const modal = document.getElementById('customReward');
     const detailsEl = document.getElementById('rewardDetails');
+    const titleEl = document.getElementById('rewardTitle');
+    const animationEl = document.querySelector('.reward-animation');
+    
+    if (missionIcon && animationEl) {
+        animationEl.textContent = missionIcon;
+        animationEl.style.fontSize = '4rem';
+    }
+    
+    if (missionName && titleEl) {
+        titleEl.innerHTML = `¡Misión Completada!<br><small style="font-size: 1.2rem; color: #c0c0c0;">${missionName}</small>`;
+    } else if (titleEl) {
+        titleEl.textContent = '¡Misión Completada!';
+    }
     
     let detailsHTML = `
         <div style="display: flex; justify-content: center; gap: 2rem; font-size: 1.5rem;">
             <div>
-                <div style="color: #00d4ff;">✨ +${xpGained} XP</div>
+                <i class="bi bi-star-fill" style="color: #00d4ff;"></i> <span style="color: #00d4ff;">+${xpGained} XP</span>
             </div>
             <div>
-                <div style="color: #ffd700;">🪙 +${goldGained} Oro</div>
+                <i class="bi bi-coin" style="color: #ffd700;"></i> <span style="color: #ffd700;">+${goldGained} Oro</span>
             </div>
         </div>
     `;

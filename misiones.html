@@ -301,38 +301,56 @@
             
             const state = window.game.getState();
             const currentEnergy = state.character.energy || 0;
-            const activeMission = window.game.getActiveMission();
-            const isActive = activeMission && activeMission.missionId === mission.id;
-            const hasOtherActive = activeMission && activeMission.missionId !== mission.id;
+            const activeMissions = window.game.getActiveMissions();
+            const isActive = activeMissions && activeMissions.some(m => m.missionId === mission.id);
+            const hasMaxActive = activeMissions && activeMissions.length >= 3;
             const noEnergy = currentEnergy < 1 && !isActive;
             
             let buttonHTML = '';
             let cardClass = '';
             
             if (isActive) {
+                const activeMission = activeMissions.find(m => m.missionId === mission.id);
+                const hoursElapsed = (new Date() - new Date(activeMission.startDate)) / (1000 * 60 * 60);
+                const hoursRemaining = 12 - hoursElapsed;
+                
+                let warningHTML = '';
+                if (hoursRemaining <= 2 && hoursRemaining > 0) {
+                    warningHTML = `<div class="alert alert-danger alert-sm mb-2">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        ⚠️ Quedan ${Math.ceil(hoursRemaining)} horas o fracasará automáticamente
+                    </div>`;
+                } else if (hoursRemaining <= 0) {
+                    warningHTML = `<div class="alert alert-danger alert-sm mb-2">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        ⚠️ Esta misión ha expirado y fracasará pronto
+                    </div>`;
+                }
+                
                 cardClass = 'mision-en-progreso';
                 buttonHTML = `
+                    ${warningHTML}
                     <button class="btn btn-success w-100 mb-2" onclick="completarMisionDirecta(${mission.id})">
                         <i class="bi bi-check-circle-fill"></i> ¡Completada!
                     </button>
                     <div class="row">
                         <div class="col-6">
-                            <button class="btn btn-danger w-100 btn-sm" onclick="fracasarMision()">
+                            <button class="btn btn-danger w-100 btn-sm" onclick="fracasarMision(${mission.id})">
                                 <i class="bi bi-x-circle-fill"></i> Fracasó (-1 ❤️)
                             </button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-outline-secondary w-100 btn-sm" onclick="cancelarMision()">
+                            <button class="btn btn-outline-secondary w-100 btn-sm" onclick="cancelarMision(${mission.id})">
                                 <i class="bi bi-arrow-counterclockwise"></i> Cancelar
                             </button>
                         </div>
                     </div>
                 `;
-            } else if (hasOtherActive) {
+            } else if (hasMaxActive) {
                 cardClass = 'mision-deshabilitada';
                 buttonHTML = `
                     <button class="btn btn-secondary w-100" disabled>
-                        <i class="bi bi-lock"></i> Otra misión en curso
+                        <i class="bi bi-lock"></i> Máximo de misiones alcanzado (3/3)
                     </button>
                 `;
             } else if (noEnergy) {
@@ -472,7 +490,7 @@
         function confirmarMision() {
             if (!misionSeleccionada) return;
             
-            const result = window.game.completeActiveMission();
+            const result = window.game.completeActiveMission(misionSeleccionada.id);
             
             if (!result.success) {
                 showError(result.message);
@@ -501,19 +519,13 @@
         }
         
         function mostrarRecompensa(result) {
-            document.getElementById('modalRecompensaIcono').textContent = result.mission.icon;
-            document.getElementById('modalRecompensaMision').textContent = result.mission.name;
-            document.getElementById('modalRecompensaXP').textContent = '+' + result.xpGained;
-            document.getElementById('modalRecompensaOro').textContent = '+' + result.goldGained;
-            
-            const modal = new bootstrap.Modal(document.getElementById('modalRecompensa'));
-            modal.show();
-            
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
+            showReward(
+                result.xpGained, 
+                result.goldGained, 
+                result.leveledUp ? result : null,
+                result.mission.icon,
+                result.mission.name
+            );
         }
         
         function mostrarSubidaNivel(result) {
@@ -535,6 +547,16 @@
             if (!window.game.validateCharacterExists()) {
                 return;
             }
+            
+            // Verificar misiones expiradas
+            const expired = window.game.checkExpiredMissions();
+            if (expired.length > 0) {
+                showError(
+                    `${expired.length} misión(es) han expirado después de 12 horas y han fracasado automáticamente. Se ha perdido 1 vida por cada una.`,
+                    '⚠️ Misiones Expiradas'
+                );
+            }
+            
             cargarMisiones();
             actualizarHeader();
         });

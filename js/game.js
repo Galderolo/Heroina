@@ -50,30 +50,31 @@ function startMission(missionId) {
     };
 }
 
-function cancelActiveMission() {
-    const result = window.storage.cancelActiveMission();
+function cancelActiveMission(missionId) {
+    const result = window.storage.cancelActiveMission(missionId);
     gameState = window.storage.loadData();
     return result;
 }
 
-function getActiveMission() {
-    return window.storage.getActiveMission();
+function getActiveMissions() {
+    return window.storage.getActiveMissions();
 }
 
-function completeActiveMission() {
-    const activeMission = window.storage.getActiveMission();
+function completeActiveMission(missionId) {
+    const activeMissions = window.storage.getActiveMissions();
+    const activeMission = activeMissions.find(m => m.missionId === missionId);
     
     if (!activeMission) {
-        return { success: false, message: "No hay ninguna misión en progreso" };
+        return { success: false, message: "Misión no encontrada" };
     }
     
-    const mission = MISSIONS.find(m => m.id === activeMission.missionId);
+    const mission = MISSIONS.find(m => m.id === missionId);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
     }
     
-    window.storage.completeActiveMission();
+    window.storage.completeActiveMission(missionId);
     const result = window.storage.registerCompletedMission(mission.id, mission.xp, mission.gold);
     gameState = window.storage.loadData();
     
@@ -87,6 +88,10 @@ function completeActiveMission() {
         newLevel: result.newLevel,
         title: result.title
     };
+}
+
+function checkExpiredMissions() {
+    return window.storage.checkAndFailExpiredMissions();
 }
 
 function purchasePotion(potionId) {
@@ -159,20 +164,21 @@ function getPotionInventory() {
     return window.storage.getPotionsInventory();
 }
 
-function failActiveMission() {
-    const activeMission = window.storage.getActiveMission();
+function failActiveMission(missionId) {
+    const activeMissions = window.storage.getActiveMissions();
+    const activeMission = activeMissions.find(m => m.missionId === missionId);
     
     if (!activeMission) {
-        return { success: false, message: "No hay ninguna misión en progreso" };
+        return { success: false, message: "Misión no encontrada" };
     }
     
-    const mission = MISSIONS.find(m => m.id === activeMission.missionId);
+    const mission = MISSIONS.find(m => m.id === missionId);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
     }
     
-    const result = window.storage.failActiveMission();
+    const result = window.storage.failActiveMission(missionId);
     gameState = window.storage.loadData();
     
     return {
@@ -413,9 +419,10 @@ window.game = {
     configureCharacter,
     startMission,
     cancelActiveMission,
-    getActiveMission,
+    getActiveMissions,
     completeActiveMission,
     failActiveMission,
+    checkExpiredMissions,
     purchaseReward,
     purchasePotion,
     usePotion,

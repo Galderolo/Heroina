@@ -465,6 +465,23 @@ h1, h2, h3, h4, h5, h6, p, span {
     transform: none;
 }
 
+.mission-warning-expiring {
+    border-left: 4px solid #ff6b6b !important;
+    background: rgba(255, 107, 107, 0.1) !important;
+}
+
+.mission-time-warning {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.alert-sm {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
 .mision-activa-card {
     border: 3px solid var(--color-gold-bright);
     animation: pulse-border 2s ease-in-out infinite;

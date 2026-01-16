@@ -17,7 +17,7 @@ const DEFAULT_DATA = {
     inventory: {
         potions: []
     },
-    activeMission: null,
+    activeMissions: [],
     history: {
         completedMissions: [],
         purchasedRewards: [],
@@ -87,6 +87,16 @@ function loadData() {
             
             if (!parsedData.inventory) {
                 parsedData.inventory = { potions: [] };
+                dataChanged = true;
+            }
+            
+            // Migración: convertir activeMission antiguo a activeMissions array
+            if (parsedData.activeMission && !parsedData.activeMissions) {
+                parsedData.activeMissions = [parsedData.activeMission];
+                delete parsedData.activeMission;
+                dataChanged = true;
+            } else if (!parsedData.activeMissions) {
+                parsedData.activeMissions = [];
                 dataChanged = true;
             }
             
@@ -262,54 +272,88 @@ function isRewardPurchased(rewardId) {
 function startMission(missionId, name, icon) {
     const data = loadData();
     
-    if (data.activeMission) {
-        return { success: false, message: "Ya hay una misión en progreso" };
+    if (!data.activeMissions) {
+        data.activeMissions = [];
+    }
+    
+    if (data.activeMissions.length >= 3) {
+        return { success: false, message: "Ya tienes 3 misiones activas. Completa o cancela alguna primero." };
+    }
+    
+    if (data.activeMissions.some(m => m.missionId === missionId)) {
+        return { success: false, message: "Esta misión ya está en progreso" };
     }
     
     data.character.energy = Math.max(0, data.character.energy - 1);
     
-    data.activeMission = {
+    data.activeMissions.push({
         missionId,
         name,
         icon,
         startDate: new Date().toISOString()
-    };
+    });
     
     saveData(data);
     return { success: true, message: "Misión iniciada" };
 }
 
-function cancelActiveMission() {
+function cancelActiveMission(missionId) {
     const data = loadData();
-    data.activeMission = null;
+    if (!data.activeMissions) {
+        return { success: false, message: "No hay misiones activas" };
+    }
+    
+    const missionIndex = data.activeMissions.findIndex(m => m.missionId === missionId);
+    if (missionIndex === -1) {
+        return { success: false, message: "Misión no encontrada" };
+    }
+    
+    data.activeMissions.splice(missionIndex, 1);
     saveData(data);
     return { success: true, message: "Misión cancelada" };
 }
 
-function getActiveMission() {
+function getActiveMissions() {
     const data = loadData();
-    return data.activeMission;
+    return data.activeMissions || [];
 }
 
-function completeActiveMission() {
+function completeActiveMission(missionId) {
     const data = loadData();
-    const activeMission = data.activeMission;
+    if (!data.activeMissions) {
+        return null;
+    }
     
-    data.activeMission = null;
+    const missionIndex = data.activeMissions.findIndex(m => m.missionId === missionId);
+    if (missionIndex === -1) {
+        return null;
+    }
+    
+    const completedMission = data.activeMissions[missionIndex];
+    data.activeMissions.splice(missionIndex, 1);
+    
     saveData(data);
-    return activeMission;
+    return completedMission;
 }
 
-function failActiveMission() {
+function failActiveMission(missionId) {
     const data = loadData();
-    const activeMission = data.activeMission;
+    if (!data.activeMissions) {
+        return null;
+    }
     
+    const missionIndex = data.activeMissions.findIndex(m => m.missionId === missionId);
+    if (missionIndex === -1) {
+        return null;
+    }
+    
+    const failedMission = data.activeMissions[missionIndex];
+    data.activeMissions.splice(missionIndex, 1);
     data.character.lives = Math.max(0, data.character.lives - 1);
     
-    data.activeMission = null;
     saveData(data);
     return {
-        activeMission,
+        activeMission: failedMission,
         remainingLives: data.character.lives
     };
 }
@@ -387,6 +431,34 @@ function getPotionsInventory() {
     return data.inventory.potions || [];
 }
 
+function checkAndFailExpiredMissions() {
+    const data = loadData();
+    if (!data.activeMissions || data.activeMissions.length === 0) {
+        return [];
+    }
+    
+    const now = new Date();
+    const expiredMissions = [];
+    
+    data.activeMissions = data.activeMissions.filter(mission => {
+        const startDate = new Date(mission.startDate);
+        const hoursElapsed = (now - startDate) / (1000 * 60 * 60);
+        
+        if (hoursElapsed >= 12) {
+            expiredMissions.push(mission);
+            data.character.lives = Math.max(0, data.character.lives - 1);
+            return false;
+        }
+        return true;
+    });
+    
+    if (expiredMissions.length > 0) {
+        saveData(data);
+    }
+    
+    return expiredMissions;
+}
+
 window.storage = {
     saveData,
     loadData,
@@ -400,7 +472,7 @@ window.storage = {
     isRewardPurchased,
     startMission,
     cancelActiveMission,
-    getActiveMission,
+    getActiveMissions,
     completeActiveMission,
     failActiveMission,
     hasEnoughEnergy,
@@ -408,5 +480,6 @@ window.storage = {
     addPotionToInventory,
     usePotion,
     getPotionsInventory,
+    checkAndFailExpiredMissions,
     createCharacterWithClass
 };

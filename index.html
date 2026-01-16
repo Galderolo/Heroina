@@ -215,34 +215,13 @@
             </div>
         </div>
 
-        <!-- Misión en Progreso -->
-        <div class="card mision-activa-card shadow mb-4" id="misionActivaCard" style="display: none;">
+        <!-- Misiones en Progreso -->
+        <div class="card mision-activa-card shadow mb-4" id="activeMissionSection" style="display: none;">
             <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Misión en Progreso</h5>
+                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Misiones en Progreso</h5>
             </div>
-            <div class="card-body text-center">
-                <div class="mision-activa-icono mb-3" id="misionActivaIcono">⚔️</div>
-                <h4 class="fw-bold mb-3" id="misionActivaNombre">Nombre de la misión</h4>
-                <p style="color: #a0a0a0;" class="mb-3">
-                    <i class="bi bi-clock"></i> Iniciada hace <span id="misionActivaTiempo">unos momentos</span>
-                </p>
-                <div class="row">
-                    <div class="col-12 mb-2">
-                        <button class="btn btn-success w-100" onclick="completarMisionActiva()">
-                            <i class="bi bi-check-circle-fill"></i> ¡Completada!
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-danger w-100" onclick="fracasarMisionActiva()">
-                            <i class="bi bi-x-circle-fill"></i> Fracasó (-1 ❤️)
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-outline-secondary w-100" onclick="cancelarMisionActiva()">
-                            <i class="bi bi-arrow-counterclockwise"></i> Cancelar
-                        </button>
-                    </div>
-                </div>
+            <div class="card-body" id="activeMissionsList">
+                <!-- Se llenará dinámicamente -->
             </div>
         </div>
 
@@ -454,17 +433,7 @@
             document.getElementById('totalOro').textContent = state.stats.totalGold;
             document.getElementById('totalGastado').textContent = state.stats.totalSpent;
             
-            const activeMission = window.game.getActiveMission();
-            if (activeMission) {
-                document.getElementById('misionActivaCard').style.display = 'block';
-                document.getElementById('misionActivaIcono').textContent = activeMission.icon;
-                document.getElementById('misionActivaNombre').textContent = activeMission.name;
-                document.getElementById('misionActivaTiempo').textContent = 
-                    calcularTiempoTranscurrido(activeMission.startDate);
-            } else {
-                document.getElementById('misionActivaCard').style.display = 'none';
-            }
-            
+            cargarMisionesActivas();
             loadPotions();
         }
         
@@ -514,8 +483,8 @@
             cargarPersonaje();
         }
         
-        function completarMisionActiva() {
-            const result = window.game.completeActiveMission();
+        function completarMisionActiva(missionId) {
+            const result = window.game.completeActiveMission(missionId);
             
             if (!result.success) {
                 showError(result.message);
@@ -535,12 +504,12 @@
             }, 500);
         }
         
-        function fracasarMisionActiva() {
+        function fracasarMisionActiva(missionId) {
             showConfirm(
-                'Se perderá 1 vida ❤️ y 1 de energía ⚡',
+                'Se perderá 1 vida ❤️',
                 '⚠️ ¿Seguro que la misión FRACASÓ?',
                 () => {
-                    const result = window.game.failActiveMission();
+                    const result = window.game.failActiveMission(missionId);
                     
                     if (!result.success) {
                         showError(result.message);
@@ -556,19 +525,77 @@
             );
         }
         
-        function cancelarMisionActiva() {
+        function cancelarMisionActiva(missionId) {
             showConfirm(
                 'No pierdes nada, pero tampoco ganas.',
                 '¿Cancelar la misión?',
                 () => {
-                    window.game.cancelActiveMission();
+                    window.game.cancelActiveMission(missionId);
                     cargarPersonaje();
                 }
             );
         }
         
         function mostrarRecompensa(result) {
-            showReward(result.xpGained, result.goldGained, result.leveledUp ? result : null);
+            showReward(
+                result.xpGained, 
+                result.goldGained, 
+                result.leveledUp ? result : null,
+                result.mission.icon,
+                result.mission.name
+            );
+        }
+        
+        function calcularHorasTranscurridas(startDate) {
+            const start = new Date(startDate);
+            const now = new Date();
+            return (now - start) / (1000 * 60 * 60);
+        }
+        
+        function cargarMisionesActivas() {
+            const activeMissions = window.game.getActiveMissions();
+            const container = document.getElementById('activeMissionsList');
+            
+            if (!activeMissions || activeMissions.length === 0) {
+                document.getElementById('activeMissionSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('activeMissionSection').style.display = 'block';
+            container.innerHTML = '';
+            
+            activeMissions.forEach(mission => {
+                const hoursElapsed = calcularHorasTranscurridas(mission.startDate);
+                const hoursRemaining = 12 - hoursElapsed;
+                
+                const missionHTML = `
+                    <div class="mb-3 p-3 border rounded ${hoursRemaining <= 2 ? 'mission-warning-expiring' : ''}" style="background: rgba(22, 33, 62, 0.5);">
+                        <div class="d-flex align-items-center mb-2">
+                            <span style="font-size: 2rem; margin-right: 1rem;">${mission.icon}</span>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0" style="color: #e0e0e0;">${mission.name}</h6>
+                                <small style="color: #a0a0a0;">Iniciada hace ${calcularTiempoTranscurrido(mission.startDate)}</small>
+                                ${hoursRemaining <= 2 && hoursRemaining > 0 ? `<div class="mission-time-warning mt-1">⚠️ Quedan ${Math.ceil(hoursRemaining)} horas</div>` : ''}
+                                ${hoursRemaining <= 0 ? `<div class="mission-time-warning mt-1">⚠️ Esta misión ha expirado</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="completarMisionActiva(${mission.missionId})">
+                                <i class="bi bi-check-circle-fill"></i> Completada
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-danger btn-sm" onclick="fracasarMisionActiva(${mission.missionId})">
+                                    <i class="bi bi-x-circle-fill"></i> Fracasó
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="cancelarMisionActiva(${mission.missionId})">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += missionHTML;
+            });
         }
         
         function mostrarSubidaNivel(result) {
@@ -756,14 +783,20 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             checkCharacterExists();
+            
+            // Verificar misiones expiradas
+            const expired = window.game.checkExpiredMissions();
+            if (expired.length > 0) {
+                showError(
+                    `${expired.length} misión(es) han expirado después de 12 horas y han fracasado automáticamente. Se ha perdido 1 vida por cada una.`,
+                    '⚠️ Misiones Expiradas'
+                );
+            }
+            
             cargarPersonaje();
             
             setInterval(() => {
-                const activeMission = window.game.getActiveMission();
-                if (activeMission) {
-                    document.getElementById('misionActivaTiempo').textContent = 
-                        calcularTiempoTranscurrido(activeMission.startDate);
-                }
+                cargarMisionesActivas();
             }, 60000);
         });
     </script>
