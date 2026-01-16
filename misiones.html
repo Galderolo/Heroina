@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heroína del Hogar - Misiones</title>
+    <title>Heroes del Hogar - Misiones</title>
     
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-adventure">
         <div class="container-fluid">
             <a class="navbar-brand fantasy-font" href="index.html">
-                <i class="bi bi-shield-fill"></i> Heroína del Hogar
+                <i class="bi bi-shield-fill"></i> Heroes del Hogar
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -220,6 +220,40 @@
         </div>
     </div>
 
+    <!-- Modales Personalizados -->
+    <!-- Modal de Alerta -->
+    <div id="customAlert" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon" id="alertIcon">ℹ️</div>
+            <h3 id="alertTitle" style="color: #ffd700;">Aviso</h3>
+            <p id="alertMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <button class="custom-modal-btn" onclick="closeAlert()">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="customConfirm" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon">⚠️</div>
+            <h3 id="confirmTitle" style="color: #ffd700;">Confirmar</h3>
+            <p id="confirmMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <div class="custom-modal-buttons">
+                <button class="custom-modal-btn btn-confirm" id="confirmYes">Sí</button>
+                <button class="custom-modal-btn btn-cancel" id="confirmNo">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recompensa -->
+    <div id="customReward" class="custom-modal">
+        <div class="custom-modal-content reward-modal">
+            <div class="reward-animation">🎉</div>
+            <h2 id="rewardTitle" style="color: #ffd700; font-size: 2rem;">¡Misión Completada!</h2>
+            <div class="reward-details" id="rewardDetails" style="color: #e0e0e0; font-size: 1.3rem; margin: 1.5rem 0;"></div>
+            <button class="custom-modal-btn btn-success" onclick="closeReward()">¡Genial!</button>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -227,6 +261,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <!-- Scripts del juego -->
+    <script src="js/modals.js"></script>
     <script src="js/data.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/game.js"></script>
@@ -270,7 +305,7 @@
             const activeMission = window.game.getActiveMission();
             const isActive = activeMission && activeMission.missionId === mission.id;
             const hasOtherActive = activeMission && activeMission.missionId !== mission.id;
-            const noEnergy = currentEnergy < 2 && !isActive;
+            const noEnergy = currentEnergy < 1 && !isActive;
             
             let buttonHTML = '';
             let cardClass = '';
@@ -305,13 +340,13 @@
                 cardClass = 'mision-deshabilitada';
                 buttonHTML = `
                     <button class="btn btn-secondary w-100" disabled>
-                        <i class="bi bi-lightning-charge"></i> Sin energía (necesitas 2 ⚡)
+                        <i class="bi bi-lightning-charge"></i> Sin energía (necesitas 1 ⚡)
                     </button>
                 `;
             } else {
                 buttonHTML = `
                     <button class="btn btn-primary w-100" onclick="iniciarMision(${mission.id})">
-                        <i class="bi bi-play-fill"></i> Iniciar Misión (-2 ⚡)
+                        <i class="bi bi-play-fill"></i> Iniciar Misión (-1 ⚡)
                     </button>
                 `;
             }
@@ -323,11 +358,11 @@
                             ${isActive ? '<div class="badge bg-warning text-dark mb-2"><i class="bi bi-hourglass-split"></i> En Progreso</div>' : ''}
                             <div class="mision-icono mb-2">${mission.icon}</div>
                             <h6 class="card-title fw-bold">${mission.name}</h6>
-                            <p class="card-text small text-muted">${mission.description}</p>
+                            <p class="card-text small" style="color: #a0a0a0;">${mission.description}</p>
                             
                             <div class="mision-recompensas mb-3">
                                 <span class="badge bg-primary me-2">
-                                    <i class="bi bi-lightning-charge-fill"></i> 2 Energía
+                                    <i class="bi bi-lightning-charge-fill"></i> 1 Energía
                                 </span>
                                 <span class="badge bg-info me-2">
                                     <i class="bi bi-star-fill"></i> ${mission.xp} XP
@@ -379,7 +414,7 @@
             const result = window.game.startMission(missionId);
             
             if (!result.success) {
-                alert(result.message);
+                showError(result.message);
                 return;
             }
             
@@ -388,35 +423,41 @@
         }
         
         function cancelarMision() {
-            if (confirm('¿Cancelar la misión?\n\nNo pierdes nada, pero tampoco ganas.')) {
-                window.game.cancelActiveMission();
-                cargarMisiones();
-                actualizarHeader();
-            }
+            showConfirm(
+                'No pierdes nada, pero tampoco ganas.',
+                '¿Cancelar la misión?',
+                () => {
+                    window.game.cancelActiveMission();
+                    cargarMisiones();
+                    actualizarHeader();
+                }
+            );
         }
         
         function fracasarMision() {
-            if (!confirm('⚠️ ¿Seguro que la misión FRACASÓ?\n\nSe perderá 1 vida ❤️ y 2 de energía ⚡')) {
-                return;
-            }
-            
-            const result = window.game.failActiveMission();
-            
-            if (!result.success) {
-                alert(result.message);
-                return;
-            }
-            
-            if (result.noLives) {
-                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\n\n⚠️ ¡NO QUEDAN VIDAS! Ten más cuidado.`);
-            } else {
-                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\nVidas restantes: ${result.remainingLives}`);
-            }
-            
-            setTimeout(() => {
-                cargarMisiones();
-                actualizarHeader();
-            }, 500);
+            showConfirm(
+                'Se perderá 1 vida ❤️ y 1 de energía ⚡',
+                '⚠️ ¿Seguro que la misión FRACASÓ?',
+                () => {
+                    const result = window.game.failActiveMission();
+                    
+                    if (!result.success) {
+                        showError(result.message);
+                        return;
+                    }
+                    
+                    if (result.noLives) {
+                        showAlert('Has perdido una vida.\n\n⚠️ ¡NO QUEDAN VIDAS! Ten más cuidado.', '💔 ¡Misión fracasada!', '💔');
+                    } else {
+                        showAlert(`Has perdido una vida.\nVidas restantes: ${result.remainingLives}`, '💔 ¡Misión fracasada!', '💔');
+                    }
+                    
+                    setTimeout(() => {
+                        cargarMisiones();
+                        actualizarHeader();
+                    }, 500);
+                }
+            );
         }
         
         function completarMisionDirecta(missionId) {
@@ -435,7 +476,7 @@
             const result = window.game.completeActiveMission();
             
             if (!result.success) {
-                alert(result.message);
+                showError(result.message);
                 return;
             }
             

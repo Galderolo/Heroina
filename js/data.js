@@ -1,24 +1,75 @@
+const CLASSES = [
+    {
+        id: 'paladin',
+        name: 'Paladín',
+        description: 'Defensor del hogar, resistente y valiente',
+        icon: '🛡️',
+        stats: {
+            lives: 8,
+            maxLives: 8,
+            energy: 5,
+            maxEnergy: 5
+        }
+    },
+    {
+        id: 'ranger',
+        name: 'Ranger',
+        description: 'Explorador ágil y energético',
+        icon: '🏹',
+        stats: {
+            lives: 5,
+            maxLives: 5,
+            energy: 8,
+            maxEnergy: 8
+        }
+    },
+    {
+        id: 'mage',
+        name: 'Mago',
+        description: 'Estudioso del orden, equilibrado y sabio',
+        icon: '🔮',
+        stats: {
+            lives: 6,
+            maxLives: 6,
+            energy: 6,
+            maxEnergy: 6
+        }
+    },
+    {
+        id: 'warrior',
+        name: 'Guerrero',
+        description: 'Luchador fuerte, vidas altas y energía media',
+        icon: '⚔️',
+        stats: {
+            lives: 7,
+            maxLives: 7,
+            energy: 5,
+            maxEnergy: 5
+        }
+    }
+];
+
 const TITLES = [
-    { level: 1, title: "Aprendiz del Orden" },
-    { level: 2, title: "Guardiana de la Cama Sagrada" },
-    { level: 3, title: "Exploradora del Cuarto Perdido" },
-    { level: 4, title: "Amiga de los Cepillos Valientes" },
-    { level: 5, title: "Heroína del Agua Brillante" },
-    { level: 6, title: "Ayudante del Gran Chef" },
-    { level: 7, title: "Protectora de los Juguetes" },
-    { level: 8, title: "Señora del Cajón Misterioso" },
-    { level: 9, title: "Maestra de las Manos Limpias" },
-    { level: 10, title: "Vigilante del Reino Doméstico" },
-    { level: 11, title: "Arquitecta del Hogar Feliz" },
-    { level: 12, title: "Portadora de la Toalla Legendaria" },
-    { level: 13, title: "Defensora del Orden Secreto" },
-    { level: 14, title: "Campeona del Buen Hábito" },
-    { level: 15, title: "Dama de la Cocina Encantada" },
-    { level: 16, title: "Custodia del Baño Reluciente" },
-    { level: 17, title: "Guardián de las Cosas del Súper" },
-    { level: 18, title: "Heroína del Día Completado" },
-    { level: 19, title: "Maestra del Hogar Mágico" },
-    { level: 20, title: "Gran Guardiana del Reino del Orden" }
+    { level: 1, title: "Novato Doméstico" },
+    { level: 2, title: "Aprendiz del Orden" },
+    { level: 3, title: "Iniciado de las Tareas" },
+    { level: 4, title: "Guardián Junior" },
+    { level: 5, title: "Escudero del Hogar" },
+    { level: 6, title: "Caballero de la Limpieza" },
+    { level: 7, title: "Paladín de las Tareas" },
+    { level: 8, title: "Señor de la Organización" },
+    { level: 9, title: "Campeón del Orden" },
+    { level: 10, title: "Maestro de las Rutinas" },
+    { level: 11, title: "Comandante del Hogar" },
+    { level: 12, title: "Guardián Real" },
+    { level: 13, title: "Protector Épico" },
+    { level: 14, title: "Campeón Legendario" },
+    { level: 15, title: "Héroe del Dominio" },
+    { level: 16, title: "Guardián Supremo" },
+    { level: 17, title: "Gran Maestro" },
+    { level: 18, title: "Señor de la Guerra Doméstica" },
+    { level: 19, title: "Leyenda del Orden" },
+    { level: 20, title: "Titán del Hogar Perfecto" }
 ];
 
 const MISSIONS = [
@@ -404,6 +455,39 @@ const REWARDS = [
         category: "epica",
         icon: "🌟",
         requiredLevel: 18
+    },
+    {
+        id: 21,
+        name: "Poción de Vida Menor",
+        description: "Restaura 1 corazón de vida",
+        price: 100,
+        category: "potion",
+        icon: "🧪",
+        requiredLevel: 1,
+        effect: "restoreLife",
+        value: 1
+    },
+    {
+        id: 22,
+        name: "Super Poción",
+        description: "Restaura 2 corazones de vida",
+        price: 200,
+        category: "potion",
+        icon: "⚗️",
+        requiredLevel: 5,
+        effect: "restoreLife",
+        value: 2
+    },
+    {
+        id: 23,
+        name: "Poción de Energía",
+        description: "Restaura 2 puntos de energía",
+        price: 150,
+        category: "potion",
+        icon: "⚡",
+        requiredLevel: 3,
+        effect: "restoreEnergy",
+        value: 2
     }
 ];
 

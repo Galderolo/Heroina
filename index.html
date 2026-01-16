@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heroína del Hogar - Mi Personaje</title>
+    <title>Heroes del Hogar - Mi Personaje</title>
     
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-adventure">
         <div class="container-fluid">
             <a class="navbar-brand fantasy-font" href="index.html">
-                <i class="bi bi-shield-fill"></i> Heroína del Hogar
+                <i class="bi bi-shield-fill"></i> Heroes del Hogar
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -51,8 +51,65 @@
 
     <!-- Contenido Principal -->
     <div class="container my-4">
+        <!-- Pantalla de Creación de Personaje (oculta por defecto) -->
+        <div id="characterCreation" class="character-creation-container" style="display: none;">
+            <div class="card character-card shadow-lg mb-4">
+                <div class="card-body text-center">
+                    <h2 class="fantasy-font mb-4" style="color: #ffd700; font-size: 2.5rem;">
+                        ✨ ¡Crea Tu Héroe! ✨
+                    </h2>
+                    
+                    <!-- Paso 1: Avatar -->
+                    <div class="creation-step mb-4">
+                        <h4 style="color: #e0e0e0;">📸 Elige tu Avatar</h4>
+                        <div class="avatar-preview-creation">
+                            <img id="previewAvatar" src="https://via.placeholder.com/150?text=?" alt="Avatar" class="avatar-img">
+                            <button class="btn btn-outline-light mt-2" onclick="selectCreationAvatar()">
+                                <i class="bi bi-camera"></i> Subir Foto
+                            </button>
+                            <input type="file" id="creationAvatarInput" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 2: Nombre -->
+                    <div class="creation-step mb-4">
+                        <h4 style="color: #e0e0e0;">✍️ ¿Cómo te llamas?</h4>
+                        <input type="text" id="heroName" class="form-control form-control-lg text-center" 
+                               placeholder="Tu nombre de héroe" maxlength="20"
+                               style="background: rgba(255,255,255,0.1); border: 2px solid #ffd700; color: #e0e0e0;">
+                    </div>
+                    
+                    <!-- Paso 3: Género -->
+                    <div class="creation-step mb-4">
+                        <h4 style="color: #e0e0e0;">👤 Género</h4>
+                        <div class="gender-selection">
+                            <button class="btn gender-btn" data-gender="boy" onclick="selectGender('boy')">
+                                👦 Niño
+                            </button>
+                            <button class="btn gender-btn" data-gender="girl" onclick="selectGender('girl')">
+                                👧 Niña
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 4: Clase -->
+                    <div class="creation-step mb-4">
+                        <h4 style="color: #e0e0e0;">⚔️ Elige tu Clase</h4>
+                        <div class="class-selection row" id="classSelection">
+                            <!-- Se llenará dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-lg btn-success hero-action-btn" onclick="finalizeCharacterCreation()" 
+                            style="font-size: 1.5rem; padding: 15px 40px;">
+                        ⚡ ¡Comenzar Aventura! ⚡
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Card del Personaje -->
-        <div class="card character-card shadow-lg mb-4">
+        <div class="card character-card shadow-lg mb-4" id="characterCard">
             <div class="card-body text-center">
                 <!-- Avatar -->
                 <div class="avatar-container mb-3">
@@ -98,6 +155,7 @@
                             <i class="bi bi-coin fs-1 text-warning"></i>
                             <h4 class="mt-2">Oro</h4>
                             <p class="fs-3 fw-bold text-gold" id="oroPersonaje">0</p>
+                            <small style="color: #a0a0a0;">Lo puedes gastar en la tienda</small>
                         </div>
                     </div>
                     <div class="col-4">
@@ -105,7 +163,7 @@
                             <i class="bi bi-lightning-charge-fill fs-1 text-primary"></i>
                             <h4 class="mt-2">Energía</h4>
                             <p class="fs-3 fw-bold text-primary" id="energiaPersonaje">6/6</p>
-                            <small class="text-muted">Misiones: 2 ⚡</small>
+                            <small style="color: #a0a0a0;">Misiones: 1 ⚡</small>
                         </div>
                     </div>
                     <div class="col-4">
@@ -115,7 +173,7 @@
                             <p class="fs-3" id="vidasPersonaje">
                                 <!-- Se actualizará dinámicamente -->
                             </p>
-                            <small class="text-muted">Se pierden al fracasar</small>
+                            <small style="color: #a0a0a0;">Se pierden al fracasar</small>
                         </div>
                     </div>
                 </div>
@@ -130,7 +188,7 @@
             <div class="card-body text-center">
                 <div class="mision-activa-icono mb-3" id="misionActivaIcono">⚔️</div>
                 <h4 class="fw-bold mb-3" id="misionActivaNombre">Nombre de la misión</h4>
-                <p class="text-muted mb-3">
+                <p style="color: #a0a0a0;" class="mb-3">
                     <i class="bi bi-clock"></i> Iniciada hace <span id="misionActivaTiempo">unos momentos</span>
                 </p>
                 <div class="row">
@@ -153,8 +211,43 @@
             </div>
         </div>
 
+        <!-- Inventario de Pociones -->
+        <div class="inventory-section" id="inventory-section">
+            <h5 class="section-title">
+                <i class="bi bi-backpack"></i> Inventario de Pociones
+            </h5>
+            <div id="potionsList" class="row">
+            </div>
+        </div>
+
+        <!-- Acciones Principales -->
+        <div class="main-actions-section" id="mainActions">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <a href="misiones.html" class="card h-100 action-card border-warning">
+                        <div class="card-body text-center">
+                            <div class="action-icon mb-3">
+                                <i class="bi bi-list-check"></i>
+                            </div>
+                            <h4 class="fantasy-font">Misiones</h4>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <a href="tienda.html" class="card h-100 action-card border-warning">
+                        <div class="card-body text-center">
+                            <div class="action-icon mb-3">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <h4 class="fantasy-font">Tienda</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Estadísticas de Hoy -->
-        <div class="card stats-card shadow mb-4">
+        <div class="card stats-card shadow mb-4" id="statsToday">
             <div class="card-header bg-adventure text-white">
                 <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Estadísticas de Hoy</h5>
             </div>
@@ -185,7 +278,7 @@
         </div>
 
         <!-- Estadísticas Totales -->
-        <div class="card stats-card shadow mb-4">
+        <div class="card stats-card shadow mb-4" id="statsTotal">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0"><i class="bi bi-graph-up"></i> Estadísticas Totales</h5>
             </div>
@@ -212,20 +305,6 @@
                         <h5 class="fw-bold" id="totalGastado">0</h5>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Acciones Rápidas -->
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <a href="misiones.html" class="btn btn-primary btn-lg w-100 action-btn">
-                    <i class="bi bi-list-check"></i> Ver Misiones
-                </a>
-            </div>
-            <div class="col-md-6 mb-3">
-                <a href="tienda.html" class="btn btn-warning btn-lg w-100 action-btn">
-                    <i class="bi bi-shop"></i> Ir a la Tienda
-                </a>
             </div>
         </div>
 
@@ -257,6 +336,40 @@
         </div>
     </div>
 
+    <!-- Modales Personalizados -->
+    <!-- Modal de Alerta -->
+    <div id="customAlert" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon" id="alertIcon">ℹ️</div>
+            <h3 id="alertTitle" style="color: #ffd700;">Aviso</h3>
+            <p id="alertMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <button class="custom-modal-btn" onclick="closeAlert()">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="customConfirm" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon">⚠️</div>
+            <h3 id="confirmTitle" style="color: #ffd700;">Confirmar</h3>
+            <p id="confirmMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <div class="custom-modal-buttons">
+                <button class="custom-modal-btn btn-confirm" id="confirmYes">Sí</button>
+                <button class="custom-modal-btn btn-cancel" id="confirmNo">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recompensa -->
+    <div id="customReward" class="custom-modal">
+        <div class="custom-modal-content reward-modal">
+            <div class="reward-animation">🎉</div>
+            <h2 id="rewardTitle" style="color: #ffd700; font-size: 2rem;">¡Misión Completada!</h2>
+            <div class="reward-details" id="rewardDetails" style="color: #e0e0e0; font-size: 1.3rem; margin: 1.5rem 0;"></div>
+            <button class="custom-modal-btn btn-success" onclick="closeReward()">¡Genial!</button>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -264,6 +377,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <!-- Scripts del juego -->
+    <script src="js/modals.js"></script>
     <script src="js/data.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/game.js"></script>
@@ -341,13 +455,61 @@
             } else {
                 document.getElementById('misionActivaCard').style.display = 'none';
             }
+            
+            loadPotions();
+        }
+        
+        function loadPotions() {
+            const inventory = window.game.getPotionInventory();
+            const potionsList = document.getElementById('potionsList');
+            
+            if (!inventory || inventory.length === 0) {
+                potionsList.innerHTML = '<div class="col-12 text-center" style="color: #a0a0a0;"><p>No tienes pociones. ¡Cómpralas en la tienda!</p></div>';
+                return;
+            }
+            
+            potionsList.innerHTML = inventory.map(item => {
+                const potion = REWARDS.find(r => r.id === item.id);
+                return `
+                    <div class="col-md-4 mb-3">
+                        <div class="potion-card text-center">
+                            <div style="font-size: 3rem;">${potion.icon}</div>
+                            <h6 class="fw-bold mt-2">${potion.name}</h6>
+                            <p class="small mb-2" style="color: #a0a0a0;">${potion.description}</p>
+                            <p class="fw-bold mb-2">Cantidad: ${item.quantity}</p>
+                            <button class="btn btn-sm btn-primary w-100" onclick="usarPocion(${item.id})">
+                                <i class="bi bi-hand-index"></i> Usar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function usarPocion(potionId) {
+            const result = window.game.usePotion(potionId);
+            
+            if (!result.success) {
+                showError(result.message);
+                return;
+            }
+            
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.6 },
+                colors: ['#a855f7', '#8b5cf6', '#7c3aed']
+            });
+            
+            showSuccess(result.message, '✨ ¡Poción Usada!');
+            cargarPersonaje();
         }
         
         function completarMisionActiva() {
             const result = window.game.completeActiveMission();
             
             if (!result.success) {
-                alert(result.message);
+                showError(result.message);
                 return;
             }
             
@@ -365,39 +527,39 @@
         }
         
         function fracasarMisionActiva() {
-            if (!confirm('⚠️ ¿Seguro que la misión FRACASÓ?\n\nSe perderá 1 vida ❤️ y 2 de energía ⚡')) {
-                return;
-            }
-            
-            const result = window.game.failActiveMission();
-            
-            if (!result.success) {
-                alert(result.message);
-                return;
-            }
-            
-            mostrarFracaso(result);
-            
-            setTimeout(() => {
-                cargarPersonaje();
-            }, 500);
+            showConfirm(
+                'Se perderá 1 vida ❤️ y 1 de energía ⚡',
+                '⚠️ ¿Seguro que la misión FRACASÓ?',
+                () => {
+                    const result = window.game.failActiveMission();
+                    
+                    if (!result.success) {
+                        showError(result.message);
+                        return;
+                    }
+                    
+                    mostrarFracaso(result);
+                    
+                    setTimeout(() => {
+                        cargarPersonaje();
+                    }, 500);
+                }
+            );
         }
         
         function cancelarMisionActiva() {
-            if (confirm('¿Cancelar la misión?\n\nNo pierdes nada, pero tampoco ganas.')) {
-                window.game.cancelActiveMission();
-                cargarPersonaje();
-            }
+            showConfirm(
+                'No pierdes nada, pero tampoco ganas.',
+                '¿Cancelar la misión?',
+                () => {
+                    window.game.cancelActiveMission();
+                    cargarPersonaje();
+                }
+            );
         }
         
         function mostrarRecompensa(result) {
-            alert(`¡Misión completada!\n\n+${result.xpGained} XP\n+${result.goldGained} Oro`);
-            
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
+            showReward(result.xpGained, result.goldGained, result.leveledUp ? result : null);
         }
         
         function mostrarSubidaNivel(result) {
@@ -418,9 +580,9 @@
             const remainingLives = result.remainingLives;
             
             if (result.noLives) {
-                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\n\n⚠️ ¡NO QUEDAN VIDAS! Ten más cuidado.`);
+                showAlert('Has perdido una vida.\n\n⚠️ ¡NO QUEDAN VIDAS! Ten más cuidado.', '💔 ¡Misión fracasada!', '💔');
             } else {
-                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\nVidas restantes: ${remainingLives}`);
+                showAlert(`Has perdido una vida.\nVidas restantes: ${remainingLives}`, '💔 ¡Misión fracasada!', '💔');
             }
         }
         
@@ -444,21 +606,145 @@
                 try {
                     const avatarBase64 = await window.game.uploadAvatar(file);
                     document.getElementById('avatarImage').src = avatarBase64;
-                    alert('¡Foto actualizada correctamente!');
+                    showSuccess('¡Foto actualizada correctamente!');
                 } catch (error) {
-                    alert(error.message || 'Error al subir la imagen');
+                    showError(error.message || 'Error al subir la imagen');
                 }
             }
         });
         
         function confirmarReinicio() {
-            if (confirm('⚠️ ¿Estás seguro de que quieres borrar TODO el progreso? Esta acción NO se puede deshacer.')) {
-                window.game.resetGame();
-                location.reload();
+            showConfirm(
+                'Esta acción NO se puede deshacer. Se borrará TODO el progreso.',
+                '⚠️ Reiniciar Progreso',
+                () => {
+                    window.game.resetGame();
+                    location.reload();
+                }
+            );
+        }
+        
+        let selectedGenderValue = '';
+        let selectedClassValue = '';
+        let creationAvatarBase64 = null;
+        
+        function selectCreationAvatar() {
+            document.getElementById('creationAvatarInput').click();
+        }
+        
+        document.getElementById('creationAvatarInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    const avatarBase64 = await window.game.uploadAvatar(file);
+                    document.getElementById('previewAvatar').src = avatarBase64;
+                    creationAvatarBase64 = avatarBase64;
+                } catch (error) {
+                    showError(error.message || 'Error al subir la imagen');
+                }
+            }
+        });
+        
+        function selectGender(gender) {
+            selectedGenderValue = gender;
+            document.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-gender="${gender}"]`).classList.add('selected');
+        }
+        
+        function selectClass(classId) {
+            selectedClassValue = classId;
+            document.querySelectorAll('.class-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-class="${classId}"]`).classList.add('selected');
+        }
+        
+        function loadClassSelection() {
+            const container = document.getElementById('classSelection');
+            const classes = CLASSES;
+            
+            container.innerHTML = classes.map(cls => `
+                <div class="col-md-6 mb-3">
+                    <div class="class-card" data-class="${cls.id}" onclick="selectClass('${cls.id}')">
+                        <div class="class-icon">${cls.icon}</div>
+                        <h5 class="class-name">${cls.name}</h5>
+                        <p class="class-description">${cls.description}</p>
+                        <div class="class-stats">
+                            <span>❤️ ${cls.stats.lives}</span>
+                            <span>⚡ ${cls.stats.energy}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function finalizeCharacterCreation() {
+            const name = document.getElementById('heroName').value.trim();
+            
+            if (!name) {
+                showError('Por favor, introduce tu nombre', 'Nombre Requerido');
+                return;
+            }
+            
+            if (!selectedGenderValue) {
+                showError('Por favor, selecciona tu género', 'Género Requerido');
+                return;
+            }
+            
+            if (!selectedClassValue) {
+                showError('Por favor, selecciona tu clase', 'Clase Requerida');
+                return;
+            }
+            
+            const result = window.storage.createCharacterWithClass(
+                name,
+                selectedGenderValue,
+                selectedClassValue,
+                creationAvatarBase64
+            );
+            
+            if (result.success) {
+                confetti({
+                    particleCount: 200,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#FFD700', '#FFA500', '#FF8C00']
+                });
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showError(result.message);
+            }
+        }
+        
+        function checkCharacterExists() {
+            const state = window.game.getState();
+            
+            if (!state.character.name || state.character.name === "") {
+                document.getElementById('characterCreation').style.display = 'block';
+                document.getElementById('characterCard').style.display = 'none';
+                document.getElementById('mainActions').style.display = 'none';
+                document.getElementById('statsToday').style.display = 'none';
+                document.getElementById('statsTotal').style.display = 'none';
+                document.getElementById('inventory-section').style.display = 'none';
+                
+                loadClassSelection();
+            } else {
+                document.getElementById('characterCreation').style.display = 'none';
+                document.getElementById('characterCard').style.display = 'block';
+                document.getElementById('mainActions').style.display = 'block';
+                document.getElementById('statsToday').style.display = 'block';
+                document.getElementById('statsTotal').style.display = 'block';
+                document.getElementById('inventory-section').style.display = 'block';
             }
         }
         
         document.addEventListener('DOMContentLoaded', () => {
+            checkCharacterExists();
             cargarPersonaje();
             
             setInterval(() => {

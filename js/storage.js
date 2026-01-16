@@ -2,8 +2,10 @@ const STORAGE_KEY = 'heroina_del_hogar_data';
 
 const DEFAULT_DATA = {
     character: {
-        name: "Heroína",
+        name: "",
         avatar: null,
+        gender: "",
+        class: "",
         level: 1,
         xp: 0,
         gold: 0,
@@ -11,6 +13,9 @@ const DEFAULT_DATA = {
         maxEnergy: 6,
         lives: 6,
         maxLives: 6
+    },
+    inventory: {
+        potions: []
     },
     activeMission: null,
     history: {
@@ -72,6 +77,10 @@ function loadData() {
             if (parsedData.character.lives === undefined) {
                 parsedData.character.lives = 6;
                 parsedData.character.maxLives = 6;
+            }
+            
+            if (!parsedData.inventory) {
+                parsedData.inventory = { potions: [] };
             }
             
             if (!validateData(parsedData)) {
@@ -266,7 +275,7 @@ function completeActiveMission() {
     const data = loadData();
     const activeMission = data.activeMission;
     
-    data.character.energy = Math.max(0, data.character.energy - 2);
+    data.character.energy = Math.max(0, data.character.energy - 1);
     
     data.activeMission = null;
     saveData(data);
@@ -278,7 +287,7 @@ function failActiveMission() {
     const activeMission = data.activeMission;
     
     data.character.lives = Math.max(0, data.character.lives - 1);
-    data.character.energy = Math.max(0, data.character.energy - 2);
+    data.character.energy = Math.max(0, data.character.energy - 1);
     
     data.activeMission = null;
     saveData(data);
@@ -290,7 +299,7 @@ function failActiveMission() {
 
 function hasEnoughEnergy() {
     const data = loadData();
-    return data.character.energy >= 2;
+    return data.character.energy >= 1;
 }
 
 function recoverLife() {
@@ -301,6 +310,64 @@ function recoverLife() {
     );
     saveData(data);
     return data.character.lives;
+}
+
+function createCharacterWithClass(name, gender, classId, avatar) {
+    const data = loadData();
+    const selectedClass = CLASSES.find(c => c.id === classId);
+    
+    if (!selectedClass) {
+        return { success: false, message: "Clase no encontrada" };
+    }
+    
+    data.character.name = name;
+    data.character.gender = gender;
+    data.character.class = classId;
+    data.character.avatar = avatar;
+    data.character.lives = selectedClass.stats.lives;
+    data.character.maxLives = selectedClass.stats.maxLives;
+    data.character.energy = selectedClass.stats.energy;
+    data.character.maxEnergy = selectedClass.stats.maxEnergy;
+    
+    saveData(data);
+    return { success: true, message: "Personaje creado" };
+}
+
+function addPotionToInventory(potionId) {
+    const data = loadData();
+    const existingPotion = data.inventory.potions.find(p => p.id === potionId);
+    
+    if (existingPotion) {
+        existingPotion.quantity++;
+    } else {
+        data.inventory.potions.push({ id: potionId, quantity: 1 });
+    }
+    
+    saveData(data);
+    return data.inventory.potions;
+}
+
+function usePotion(potionId) {
+    const data = loadData();
+    const potion = data.inventory.potions.find(p => p.id === potionId);
+    
+    if (!potion || potion.quantity <= 0) {
+        return { success: false, message: "No tienes esta poción" };
+    }
+    
+    potion.quantity--;
+    
+    if (potion.quantity === 0) {
+        data.inventory.potions = data.inventory.potions.filter(p => p.id !== potionId);
+    }
+    
+    saveData(data);
+    return { success: true, message: "Poción usada" };
+}
+
+function getPotionsInventory() {
+    const data = loadData();
+    return data.inventory.potions || [];
 }
 
 window.storage = {
@@ -320,5 +387,9 @@ window.storage = {
     completeActiveMission,
     failActiveMission,
     hasEnoughEnergy,
-    recoverLife
+    recoverLife,
+    addPotionToInventory,
+    usePotion,
+    getPotionsInventory,
+    createCharacterWithClass
 };

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heroína del Hogar - Tienda de Recompensas</title>
+    <title>Heroes del Hogar - Tienda de Recompensas</title>
     
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-adventure">
         <div class="container-fluid">
             <a class="navbar-brand fantasy-font" href="index.html">
-                <i class="bi bi-shield-fill"></i> Heroína del Hogar
+                <i class="bi bi-shield-fill"></i> Heroes del Hogar
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -86,6 +86,9 @@
                 <button type="button" class="btn btn-outline-primary active" onclick="filtrarRecompensas('todas')">
                     Todas
                 </button>
+                <button type="button" class="btn btn-outline-purple" onclick="filtrarRecompensas('potion')">
+                    🧪 Pociones
+                </button>
                 <button type="button" class="btn btn-outline-success" onclick="filtrarRecompensas('pequeña')">
                     Pequeñas
                 </button>
@@ -98,6 +101,15 @@
                 <button type="button" class="btn btn-outline-danger" onclick="filtrarRecompensas('epica')">
                     Épicas
                 </button>
+            </div>
+        </div>
+
+        <!-- Lista de Pociones -->
+        <div id="recompensasPociones" class="recompensas-seccion">
+            <h5 class="section-title">
+                <i class="bi bi-droplet-fill"></i> Pociones Mágicas
+            </h5>
+            <div id="listaPociones" class="row">
             </div>
         </div>
 
@@ -198,6 +210,40 @@
         </div>
     </div>
 
+    <!-- Modales Personalizados -->
+    <!-- Modal de Alerta -->
+    <div id="customAlert" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon" id="alertIcon">ℹ️</div>
+            <h3 id="alertTitle" style="color: #ffd700;">Aviso</h3>
+            <p id="alertMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <button class="custom-modal-btn" onclick="closeAlert()">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="customConfirm" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon">⚠️</div>
+            <h3 id="confirmTitle" style="color: #ffd700;">Confirmar</h3>
+            <p id="confirmMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <div class="custom-modal-buttons">
+                <button class="custom-modal-btn btn-confirm" id="confirmYes">Sí</button>
+                <button class="custom-modal-btn btn-cancel" id="confirmNo">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recompensa -->
+    <div id="customReward" class="custom-modal">
+        <div class="custom-modal-content reward-modal">
+            <div class="reward-animation">🎉</div>
+            <h2 id="rewardTitle" style="color: #ffd700; font-size: 2rem;">¡Misión Completada!</h2>
+            <div class="reward-details" id="rewardDetails" style="color: #e0e0e0; font-size: 1.3rem; margin: 1.5rem 0;"></div>
+            <button class="custom-modal-btn btn-success" onclick="closeReward()">¡Genial!</button>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -205,6 +251,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <!-- Scripts del juego -->
+    <script src="js/modals.js"></script>
     <script src="js/data.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/game.js"></script>
@@ -224,6 +271,7 @@
         
         function crearTarjetaRecompensa(reward, state) {
             const colorClass = {
+                'potion': 'border-purple',
                 'pequeña': 'border-success',
                 'media': 'border-info',
                 'grande': 'border-warning',
@@ -262,7 +310,7 @@
                         <div class="card-body">
                             <div class="recompensa-icono mb-2">${reward.icon}</div>
                             <h6 class="card-title fw-bold">${reward.name}</h6>
-                            <p class="card-text small text-muted">${reward.description}</p>
+                            <p class="card-text small" style="color: #a0a0a0;">${reward.description}</p>
                             
                             <div class="recompensa-precio mb-3">
                                 <span class="badge bg-warning text-dark fs-6">
@@ -281,10 +329,15 @@
         function cargarRecompensas() {
             const rewardsWithState = window.game.getAvailableRewards();
             
+            const potions = rewardsWithState.filter(r => r.category === 'potion');
             const small = rewardsWithState.filter(r => r.category === 'pequeña');
             const medium = rewardsWithState.filter(r => r.category === 'media');
             const large = rewardsWithState.filter(r => r.category === 'grande');
             const epic = rewardsWithState.filter(r => r.category === 'epica');
+            
+            document.getElementById('listaPociones').innerHTML = potions.map(r => 
+                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
+            ).join('');
             
             document.getElementById('listaPequenas').innerHTML = small.map(r => 
                 crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
@@ -314,7 +367,9 @@
                 sections.forEach(s => s.style.display = 'block');
             } else {
                 sections.forEach(s => s.style.display = 'none');
-                if (categoria === 'pequeña') {
+                if (categoria === 'potion') {
+                    document.getElementById('recompensasPociones').style.display = 'block';
+                } else if (categoria === 'pequeña') {
                     document.getElementById('recompensasPequenas').style.display = 'block';
                 } else if (categoria === 'media') {
                     document.getElementById('recompensasMedias').style.display = 'block';
@@ -342,14 +397,20 @@
         function confirmarCompra() {
             if (!recompensaSeleccionada) return;
             
-            const result = window.game.purchaseReward(recompensaSeleccionada.id);
+            let result;
+            if (recompensaSeleccionada.category === 'potion') {
+                result = window.game.purchasePotion(recompensaSeleccionada.id);
+            } else {
+                result = window.game.purchaseReward(recompensaSeleccionada.id);
+            }
             
             const modalConfirmacion = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion'));
             modalConfirmacion.hide();
             
             if (result.success) {
                 setTimeout(() => {
-                    mostrarExito(result.reward);
+                    const item = result.reward || result.potion;
+                    mostrarExito(item);
                 }, 300);
                 
                 setTimeout(() => {
@@ -357,7 +418,7 @@
                     actualizarHeader();
                 }, 1000);
             } else {
-                alert(result.message);
+                showError(result.message);
             }
             
             recompensaSeleccionada = null;

@@ -31,7 +31,7 @@ function startMission(missionId) {
     if (!window.storage.hasEnoughEnergy()) {
         return { 
             success: false, 
-            message: "No tienes suficiente energía (necesitas 2 ❤️). Espera a mañana o sube de nivel para recuperarla." 
+            message: "No tienes suficiente energía (necesitas 1 ⚡). Espera a mañana, sube de nivel o usa una poción." 
         };
     }
     
@@ -87,6 +87,76 @@ function completeActiveMission() {
         newLevel: result.newLevel,
         title: result.title
     };
+}
+
+function purchasePotion(potionId) {
+    const potion = REWARDS.find(r => r.id === potionId && r.category === 'potion');
+    
+    if (!potion) {
+        return { success: false, message: "Poción no encontrada" };
+    }
+    
+    const state = getState();
+    
+    if (state.character.level < potion.requiredLevel) {
+        return { 
+            success: false, 
+            message: `Necesitas nivel ${potion.requiredLevel} para desbloquear esto` 
+        };
+    }
+    
+    const result = window.storage.purchaseReward(potionId, potion.price);
+    
+    if (result.success) {
+        window.storage.addPotionToInventory(potionId);
+        gameState = window.storage.loadData();
+        return {
+            success: true,
+            potion,
+            message: "¡Poción comprada!"
+        };
+    }
+    
+    return result;
+}
+
+function usePotion(potionId) {
+    const potion = REWARDS.find(r => r.id === potionId && r.category === 'potion');
+    
+    if (!potion) {
+        return { success: false, message: "Poción no encontrada" };
+    }
+    
+    const usageResult = window.storage.usePotion(potionId);
+    
+    if (!usageResult.success) {
+        return usageResult;
+    }
+    
+    const state = getState();
+    let effectMessage = "";
+    
+    if (potion.effect === "restoreLife") {
+        const livesRestored = Math.min(potion.value, state.character.maxLives - state.character.lives);
+        window.storage.updateCharacter('lives', Math.min(state.character.lives + potion.value, state.character.maxLives));
+        effectMessage = `Recuperaste ${livesRestored} corazón(es) de vida ❤️`;
+    } else if (potion.effect === "restoreEnergy") {
+        const energyRestored = Math.min(potion.value, state.character.maxEnergy - state.character.energy);
+        window.storage.updateCharacter('energy', Math.min(state.character.energy + potion.value, state.character.maxEnergy));
+        effectMessage = `Recuperaste ${energyRestored} punto(s) de energía ⚡`;
+    }
+    
+    gameState = window.storage.loadData();
+    
+    return {
+        success: true,
+        message: effectMessage,
+        potion
+    };
+}
+
+function getPotionInventory() {
+    return window.storage.getPotionsInventory();
 }
 
 function failActiveMission() {
@@ -337,6 +407,9 @@ window.game = {
     completeActiveMission,
     failActiveMission,
     purchaseReward,
+    purchasePotion,
+    usePotion,
+    getPotionInventory,
     getLevelProgress,
     getMissionsByType,
     getAvailableRewards,
