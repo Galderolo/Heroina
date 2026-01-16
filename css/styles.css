@@ -12,6 +12,11 @@
     --color-legendary: #ff8c00;
 }
 
+html {
+    background-color: #0a0e27;
+    overscroll-behavior: none;
+}
+
 body {
     font-family: 'Quicksand', sans-serif;
     background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
@@ -19,6 +24,7 @@ body {
     min-height: 100vh;
     color: #e0e0e0;
     padding-top: 70px;
+    overscroll-behavior-y: contain;
 }
 
 h1, h2, h3, h4, h5, h6, p, span {
@@ -1132,12 +1138,104 @@ h1, h2, h3, h4, h5, h6, p, span {
     transform: translateY(-2px);
 }
 
+@media (max-width: 991px) {
+    .scroll-to-top {
+        bottom: 80px;
+    }
+}
+
 @media (max-width: 768px) {
     .scroll-to-top {
-        bottom: 20px;
         right: 20px;
         width: 45px;
         height: 45px;
         font-size: 1.3rem;
+    }
+}
+
+/* Bottom Navigation Bar - Solo móvil */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(15, 52, 96, 0.95) 0%, rgba(10, 14, 39, 0.98) 100%);
+    backdrop-filter: blur(10px);
+    border-top: 2px solid var(--color-gold);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 0.5rem;
+    color: #a0a0a0;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.bottom-nav-item i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.bottom-nav-item span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.bottom-nav-item:hover {
+    color: var(--color-gold);
+    text-decoration: none;
+}
+
+.bottom-nav-item.active {
+    color: var(--color-gold-bright);
+}
+
+.bottom-nav-item.active i {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}
+
+.bottom-nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 3px;
+    background: var(--color-gold-bright);
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+/* Ajustar padding del body en móvil para la bottom nav */
+@media (max-width: 991px) {
+    body {
+        padding-bottom: 70px;
+    }
+}
+
+/* Ocultar menú del navbar en móvil (usamos bottom nav) */
+@media (max-width: 991px) {
+    .navbar-toggler {
+        display: none !important;
+    }
+    
+    .navbar-collapse {
+        display: none !important;
     }
 }
