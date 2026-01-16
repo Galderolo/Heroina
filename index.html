@@ -781,6 +781,11 @@
         }
     </script>
 
+    <!-- Botón Scroll to Top -->
+    <button id="scrollToTop" class="scroll-to-top" title="Volver arriba">
+        <i class="bi bi-arrow-up-circle-fill"></i>
+    </button>
+
     <!-- PWA Install Button -->
     <script>
         let deferredPrompt;
@@ -813,6 +818,26 @@
         window.addEventListener('appinstalled', () => {
             document.getElementById('installPWA').style.display = 'none';
             deferredPrompt = null;
+        });
+    </script>
+
+    <!-- Scroll to Top functionality -->
+    <script>
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     </script>
 </body>
