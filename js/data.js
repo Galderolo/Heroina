@@ -495,7 +495,7 @@ const REWARDS = [
         price: 120,
         category: "potion",
         icon: "⚡",
-        requiredLevel: 3,
+        requiredLevel: 1,
         effect: "restoreEnergy",
         value: 2
     }
