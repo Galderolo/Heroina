@@ -1239,12 +1239,12 @@ h1, h2, h3, h4, h5, h6, p, span {
 
 .stat-item small {
     color: #c0c0c0;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
 }
 
 .stat-item strong {
     color: #e0e0e0;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
 }
 
 .stat-separator {
@@ -1261,11 +1261,11 @@ h1, h2, h3, h4, h5, h6, p, span {
     }
     
     .stat-item small {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
     
     .stat-item strong {
-        font-size: 0.85rem;
+        font-size: 0.95rem;
     }
 }
 
