@@ -1,311 +1,352 @@
-// ============================================
-// LÓGICA PRINCIPAL DEL JUEGO
-// ============================================
-
-// Estado global del juego
 let gameState = null;
 
-// Inicializar el juego
-function inicializarJuego() {
-    gameState = window.storage.cargarDatos();
+function initializeGame() {
+    gameState = window.storage.loadData();
     return gameState;
 }
 
-// Obtener estado actual
-function obtenerEstado() {
+function getState() {
     if (!gameState) {
-        inicializarJuego();
+        initializeGame();
     }
     return gameState;
 }
 
-// Configurar personaje (primera vez)
-function configurarPersonaje(nombre, avatarBase64 = null) {
-    window.storage.actualizarPersonaje('nombre', nombre);
+function configureCharacter(name, avatarBase64 = null) {
+    window.storage.updateCharacter('name', name);
     if (avatarBase64) {
-        window.storage.actualizarPersonaje('avatar', avatarBase64);
+        window.storage.updateCharacter('avatar', avatarBase64);
     }
-    gameState = window.storage.cargarDatos();
+    gameState = window.storage.loadData();
     return gameState;
 }
 
-// Iniciar misión
-function iniciarMision(misionId) {
-    const mision = MISIONES.find(m => m.id === misionId);
+function startMission(missionId) {
+    const mission = MISSIONS.find(m => m.id === missionId);
     
-    if (!mision) {
-        return { exito: false, mensaje: "Misión no encontrada" };
+    if (!mission) {
+        return { success: false, message: "Misión no encontrada" };
     }
     
-    // Verificar energía suficiente
-    if (!window.storage.tieneSuficienteEnergia()) {
+    if (!window.storage.hasEnoughEnergy()) {
         return { 
-            exito: false, 
-            mensaje: "No tienes suficiente energía (necesitas 2 ❤️). Espera a mañana o sube de nivel para recuperarla." 
+            success: false, 
+            message: "No tienes suficiente energía (necesitas 2 ❤️). Espera a mañana o sube de nivel para recuperarla." 
         };
     }
     
-    const resultado = window.storage.iniciarMision(misionId, mision.nombre, mision.icono);
+    const result = window.storage.startMission(missionId, mission.name, mission.icon);
     
-    if (!resultado.exito) {
-        return resultado;
+    if (!result.success) {
+        return result;
     }
     
-    gameState = window.storage.cargarDatos();
+    gameState = window.storage.loadData();
     
     return {
-        exito: true,
-        mision,
-        mensaje: "Misión iniciada"
+        success: true,
+        mission,
+        message: "Misión iniciada"
     };
 }
 
-// Cancelar misión activa
-function cancelarMisionActiva() {
-    const resultado = window.storage.cancelarMisionActiva();
-    gameState = window.storage.cargarDatos();
-    return resultado;
+function cancelActiveMission() {
+    const result = window.storage.cancelActiveMission();
+    gameState = window.storage.loadData();
+    return result;
 }
 
-// Obtener misión activa
-function obtenerMisionActiva() {
-    return window.storage.obtenerMisionActiva();
+function getActiveMission() {
+    return window.storage.getActiveMission();
 }
 
-// Completar misión exitosamente
-function completarMisionActiva() {
-    const misionActiva = window.storage.obtenerMisionActiva();
+function completeActiveMission() {
+    const activeMission = window.storage.getActiveMission();
     
-    if (!misionActiva) {
-        return { exito: false, mensaje: "No hay ninguna misión en progreso" };
+    if (!activeMission) {
+        return { success: false, message: "No hay ninguna misión en progreso" };
     }
     
-    const mision = MISIONES.find(m => m.id === misionActiva.misionId);
+    const mission = MISSIONS.find(m => m.id === activeMission.missionId);
     
-    if (!mision) {
-        return { exito: false, mensaje: "Misión no encontrada" };
+    if (!mission) {
+        return { success: false, message: "Misión no encontrada" };
     }
     
-    // Marcar como completada
-    window.storage.completarMisionActiva();
-    const resultado = window.storage.registrarMisionCompletada(mision.id, mision.xp, mision.oro);
-    gameState = window.storage.cargarDatos();
+    window.storage.completeActiveMission();
+    const result = window.storage.registerCompletedMission(mission.id, mission.xp, mission.gold);
+    gameState = window.storage.loadData();
     
     return {
-        exito: true,
-        tipo: 'completada',
-        mision,
-        xpGanada: mision.xp,
-        oroGanado: mision.oro,
-        subioNivel: resultado.subioNivel,
-        nivelNuevo: resultado.nivelNuevo,
-        titulo: resultado.titulo
+        success: true,
+        type: 'completed',
+        mission,
+        xpGained: mission.xp,
+        goldGained: mission.gold,
+        leveledUp: result.leveledUp,
+        newLevel: result.newLevel,
+        title: result.title
     };
 }
 
-// Fracasar en misión (pierde vida)
-function fracasarMisionActiva() {
-    const misionActiva = window.storage.obtenerMisionActiva();
+function failActiveMission() {
+    const activeMission = window.storage.getActiveMission();
     
-    if (!misionActiva) {
-        return { exito: false, mensaje: "No hay ninguna misión en progreso" };
+    if (!activeMission) {
+        return { success: false, message: "No hay ninguna misión en progreso" };
     }
     
-    const mision = MISIONES.find(m => m.id === misionActiva.misionId);
+    const mission = MISSIONS.find(m => m.id === activeMission.missionId);
     
-    if (!mision) {
-        return { exito: false, mensaje: "Misión no encontrada" };
+    if (!mission) {
+        return { success: false, message: "Misión no encontrada" };
     }
     
-    // Marcar como fracasada
-    const resultado = window.storage.fracasarMisionActiva();
-    gameState = window.storage.cargarDatos();
+    const result = window.storage.failActiveMission();
+    gameState = window.storage.loadData();
     
     return {
-        exito: true,
-        tipo: 'fracasada',
-        mision,
-        vidasRestantes: resultado.vidasRestantes,
-        sinVidas: resultado.vidasRestantes === 0
+        success: true,
+        type: 'failed',
+        mission,
+        remainingLives: result.remainingLives,
+        noLives: result.remainingLives === 0
     };
 }
 
-// Comprar recompensa de la tienda
-function comprarRecompensa(recompensaId) {
-    const recompensa = RECOMPENSAS.find(r => r.id === recompensaId);
+function purchaseReward(rewardId) {
+    const reward = REWARDS.find(r => r.id === rewardId);
     
-    if (!recompensa) {
-        return { exito: false, mensaje: "Recompensa no encontrada" };
+    if (!reward) {
+        return { success: false, message: "Recompensa no encontrada" };
     }
     
-    const estado = obtenerEstado();
+    const state = getState();
     
-    // Verificar nivel requerido
-    if (estado.personaje.nivel < recompensa.nivelRequerido) {
+    if (state.character.level < reward.requiredLevel) {
         return { 
-            exito: false, 
-            mensaje: `Necesitas nivel ${recompensa.nivelRequerido} para desbloquear esto` 
+            success: false, 
+            message: `Necesitas nivel ${reward.requiredLevel} para desbloquear esto` 
         };
     }
     
-    const resultado = window.storage.comprarRecompensa(recompensaId, recompensa.precio);
+    const result = window.storage.purchaseReward(rewardId, reward.price);
     
-    if (resultado.exito) {
-        gameState = window.storage.cargarDatos();
+    if (result.success) {
+        gameState = window.storage.loadData();
         return {
-            exito: true,
-            recompensa,
-            mensaje: "¡Recompensa comprada con éxito!"
+            success: true,
+            reward,
+            message: "¡Recompensa comprada con éxito!"
         };
     }
     
-    return resultado;
+    return result;
 }
 
-// Obtener progreso de nivel (porcentaje)
-function obtenerProgresoNivel() {
-    const estado = obtenerEstado();
-    const xpNecesaria = calcularXPParaNivel(estado.personaje.nivel);
-    const progreso = (estado.personaje.xp / xpNecesaria) * 100;
+function getLevelProgress() {
+    const state = getState();
+    const requiredXP = calculateXPForLevel(state.character.level);
+    const progress = (state.character.xp / requiredXP) * 100;
     
     return {
-        xpActual: estado.personaje.xp,
-        xpNecesaria,
-        porcentaje: Math.min(progreso, 100),
-        nivel: estado.personaje.nivel
+        currentXP: state.character.xp,
+        requiredXP,
+        percentage: Math.min(progress, 100),
+        level: state.character.level
     };
 }
 
-// Obtener misiones disponibles según tipo
-function obtenerMisionesPorTipo(tipo = null) {
-    if (tipo) {
-        return MISIONES.filter(m => m.tipo === tipo);
+function getMissionsByType(type = null) {
+    if (type) {
+        return MISSIONS.filter(m => m.type === type);
     }
-    return MISIONES;
+    return MISSIONS;
 }
 
-// Obtener recompensas disponibles según nivel
-function obtenerRecompensasDisponibles() {
-    const estado = obtenerEstado();
-    return RECOMPENSAS.map(r => ({
+function getAvailableRewards() {
+    const state = getState();
+    return REWARDS.map(r => ({
         ...r,
-        desbloqueada: estado.personaje.nivel >= r.nivelRequerido,
-        puedeComprar: estado.personaje.oro >= r.precio && estado.personaje.nivel >= r.nivelRequerido
+        unlocked: state.character.level >= r.requiredLevel,
+        canPurchase: state.character.gold >= r.price && state.character.level >= r.requiredLevel
     }));
 }
 
-// Obtener misiones completadas hoy
-function obtenerMisionesHoy() {
-    const hoy = new Date().toDateString();
-    const estado = obtenerEstado();
+function getTodayMissions() {
+    const today = new Date().toDateString();
+    const state = getState();
     
-    return estado.historial.misionesCompletadas.filter(m => {
-        return new Date(m.fecha).toDateString() === hoy;
+    return state.history.completedMissions.filter(m => {
+        return new Date(m.date).toDateString() === today;
     });
 }
 
-// Calcular racha (días consecutivos con misiones)
-function calcularRacha() {
-    const estado = obtenerEstado();
-    const misiones = estado.historial.misionesCompletadas;
+function calculateStreak() {
+    const state = getState();
+    const missions = state.history.completedMissions;
     
-    if (misiones.length === 0) return 0;
+    if (missions.length === 0) return 0;
     
-    let racha = 1;
-    let diaActual = new Date();
-    diaActual.setHours(0, 0, 0, 0);
+    let streak = 1;
+    let currentDay = new Date();
+    currentDay.setHours(0, 0, 0, 0);
     
-    for (let i = misiones.length - 1; i >= 0; i--) {
-        const fechaMision = new Date(misiones[i].fecha);
-        fechaMision.setHours(0, 0, 0, 0);
+    for (let i = missions.length - 1; i >= 0; i--) {
+        const missionDate = new Date(missions[i].date);
+        missionDate.setHours(0, 0, 0, 0);
         
-        const diferenciaDias = Math.floor((diaActual - fechaMision) / (1000 * 60 * 60 * 24));
+        const daysDiff = Math.floor((currentDay - missionDate) / (1000 * 60 * 60 * 24));
         
-        if (diferenciaDias === 1) {
-            racha++;
-            diaActual = fechaMision;
-        } else if (diferenciaDias > 1) {
+        if (daysDiff === 1) {
+            streak++;
+            currentDay = missionDate;
+        } else if (daysDiff > 1) {
             break;
         }
     }
     
-    return racha;
+    return streak;
 }
 
-// Reiniciar juego (con confirmación)
-function reiniciarJuego() {
-    const confirmacion = confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.');
+function resetGame() {
+    const confirmation = confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.');
     
-    if (confirmacion) {
-        window.storage.reiniciarDatos();
-        gameState = window.storage.cargarDatos();
-        return { exito: true, mensaje: "Juego reiniciado" };
+    if (confirmation) {
+        window.storage.resetData();
+        gameState = window.storage.loadData();
+        return { success: true, message: "Juego reiniciado" };
     }
     
-    return { exito: false, mensaje: "Reinicio cancelado" };
+    return { success: false, message: "Reinicio cancelado" };
 }
 
-// Exportar imagen del avatar
-function subirAvatar(file) {
+function resizeAndCompressImage(file, maxWidth, maxHeight, quality) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         
         reader.onload = (e) => {
-            const avatarBase64 = e.target.result;
-            window.storage.actualizarPersonaje('avatar', avatarBase64);
-            gameState = window.storage.cargarDatos();
-            resolve(avatarBase64);
+            const img = new Image();
+            
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = height * (maxWidth / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = width * (maxHeight / height);
+                        height = maxHeight;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                
+                const sizeInKB = Math.round((compressedBase64.length * 3) / 4 / 1024);
+                
+                if (sizeInKB > 500) {
+                    reject(new Error('La imagen es demasiado grande incluso después de comprimirla. Intenta con otra foto.'));
+                    return;
+                }
+                
+                resolve(compressedBase64);
+            };
+            
+            img.onerror = () => {
+                reject(new Error('Error al cargar la imagen'));
+            };
+            
+            img.src = e.target.result;
         };
         
-        reader.onerror = (error) => {
-            reject(error);
+        reader.onerror = () => {
+            reject(new Error('Error al leer el archivo'));
         };
         
         reader.readAsDataURL(file);
     });
 }
 
-// Obtener resumen del personaje
-function obtenerResumenPersonaje() {
-    const estado = obtenerEstado();
-    const progreso = obtenerProgresoNivel();
-    const titulo = obtenerTituloPorNivel(estado.personaje.nivel);
-    const estadisticasHoy = window.storage.obtenerEstadisticasHoy();
-    const racha = calcularRacha();
+function uploadAvatar(file) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!file.type.startsWith('image/')) {
+                reject(new Error('El archivo debe ser una imagen'));
+                return;
+            }
+            
+            const maxSizeInMB = 10;
+            if (file.size > maxSizeInMB * 1024 * 1024) {
+                reject(new Error('La imagen es demasiado grande. Máximo 10MB.'));
+                return;
+            }
+            
+            const compressedAvatar = await resizeAndCompressImage(file, 200, 200, 0.8);
+            
+            const saved = window.storage.updateCharacter('avatar', compressedAvatar);
+            
+            if (!saved) {
+                reject(new Error('No se pudo guardar la imagen. Intenta con una foto más pequeña.'));
+                return;
+            }
+            
+            gameState = window.storage.loadData();
+            resolve(compressedAvatar);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+function getCharacterSummary() {
+    const state = getState();
+    const progress = getLevelProgress();
+    const title = getTitleByLevel(state.character.level);
+    const todayStats = window.storage.getTodayStats();
+    const streak = calculateStreak();
     
     return {
-        ...estado.personaje,
-        titulo,
-        progreso,
-        estadisticasHoy,
-        racha,
-        totalMisiones: estado.estadisticas.totalMisiones,
-        totalGastado: estado.estadisticas.totalGastado
+        ...state.character,
+        title,
+        progress,
+        todayStats,
+        streak,
+        totalMissions: state.stats.totalMissions,
+        totalSpent: state.stats.totalSpent
     };
 }
 
-// Exportar funciones globales
 window.game = {
-    inicializarJuego,
-    obtenerEstado,
-    configurarPersonaje,
-    iniciarMision,
-    cancelarMisionActiva,
-    obtenerMisionActiva,
-    completarMisionActiva,
-    fracasarMisionActiva,
-    comprarRecompensa,
-    obtenerProgresoNivel,
-    obtenerMisionesPorTipo,
-    obtenerRecompensasDisponibles,
-    obtenerMisionesHoy,
-    calcularRacha,
-    reiniciarJuego,
-    subirAvatar,
-    obtenerResumenPersonaje
+    initializeGame,
+    getState,
+    configureCharacter,
+    startMission,
+    cancelActiveMission,
+    getActiveMission,
+    completeActiveMission,
+    failActiveMission,
+    purchaseReward,
+    getLevelProgress,
+    getMissionsByType,
+    getAvailableRewards,
+    getTodayMissions,
+    calculateStreak,
+    resetGame,
+    uploadAvatar,
+    getCharacterSummary
 };
 
-// Auto-inicializar al cargar
 document.addEventListener('DOMContentLoaded', () => {
-    inicializarJuego();
+    initializeGame();
 });

@@ -213,112 +213,107 @@
     <script>
         let recompensaSeleccionada = null;
         
-        // Actualizar header
         function actualizarHeader() {
-            const resumen = window.game.obtenerResumenPersonaje();
-            const compradas = window.storage.obtenerRecompensasCompradas();
+            const summary = window.game.getCharacterSummary();
+            const purchased = window.storage.getPurchasedRewards();
             
-            document.getElementById('headerNivel').textContent = resumen.nivel;
-            document.getElementById('headerOro').textContent = resumen.oro;
-            document.getElementById('headerCompradas').textContent = compradas.length;
+            document.getElementById('headerNivel').textContent = summary.level;
+            document.getElementById('headerOro').textContent = summary.gold;
+            document.getElementById('headerCompradas').textContent = purchased.length;
         }
         
-        // Crear tarjeta de recompensa
-        function crearTarjetaRecompensa(recompensa, estado) {
-            const colorClase = {
+        function crearTarjetaRecompensa(reward, state) {
+            const colorClass = {
                 'pequeña': 'border-success',
                 'media': 'border-info',
                 'grande': 'border-warning',
                 'epica': 'border-danger'
             };
             
-            const bloqueada = !estado.desbloqueada;
-            const sinOro = estado.desbloqueada && !estado.puedeComprar;
+            const locked = !state.unlocked;
+            const noGold = state.unlocked && !state.canPurchase;
             
-            let botonHTML = '';
-            if (bloqueada) {
-                botonHTML = `
+            let buttonHTML = '';
+            if (locked) {
+                buttonHTML = `
                     <button class="btn btn-secondary w-100" disabled>
-                        <i class="bi bi-lock-fill"></i> Nivel ${recompensa.nivelRequerido}
+                        <i class="bi bi-lock-fill"></i> Nivel ${reward.requiredLevel}
                     </button>
                 `;
-            } else if (sinOro) {
-                botonHTML = `
+            } else if (noGold) {
+                buttonHTML = `
                     <button class="btn btn-outline-warning w-100" disabled>
                         <i class="bi bi-coin"></i> No tienes oro suficiente
                     </button>
                 `;
             } else {
-                botonHTML = `
-                    <button class="btn btn-warning w-100" onclick="prepararCompra(${recompensa.id})">
+                buttonHTML = `
+                    <button class="btn btn-warning w-100" onclick="prepararCompra(${reward.id})">
                         <i class="bi bi-bag-check"></i> Comprar
                     </button>
                 `;
             }
             
-            const cardClase = bloqueada ? 'recompensa-bloqueada' : '';
+            const cardClass = locked ? 'recompensa-bloqueada' : '';
             
             return `
-                <div class="col-md-6 col-lg-4 mb-3 recompensa-item" data-categoria="${recompensa.categoria}">
-                    <div class="card h-100 recompensa-card ${colorClase[recompensa.categoria]} ${cardClase}">
+                <div class="col-md-6 col-lg-4 mb-3 recompensa-item" data-categoria="${reward.category}">
+                    <div class="card h-100 recompensa-card ${colorClass[reward.category]} ${cardClass}">
                         <div class="card-body">
-                            <div class="recompensa-icono mb-2">${recompensa.icono}</div>
-                            <h6 class="card-title fw-bold">${recompensa.nombre}</h6>
-                            <p class="card-text small text-muted">${recompensa.descripcion}</p>
+                            <div class="recompensa-icono mb-2">${reward.icon}</div>
+                            <h6 class="card-title fw-bold">${reward.name}</h6>
+                            <p class="card-text small text-muted">${reward.description}</p>
                             
                             <div class="recompensa-precio mb-3">
                                 <span class="badge bg-warning text-dark fs-6">
-                                    <i class="bi bi-coin"></i> ${recompensa.precio} Oro
+                                    <i class="bi bi-coin"></i> ${reward.price} Oro
                                 </span>
-                                ${bloqueada ? `<span class="badge bg-secondary ms-2"><i class="bi bi-lock"></i> Nivel ${recompensa.nivelRequerido}</span>` : ''}
+                                ${locked ? `<span class="badge bg-secondary ms-2"><i class="bi bi-lock"></i> Nivel ${reward.requiredLevel}</span>` : ''}
                             </div>
                             
-                            ${botonHTML}
+                            ${buttonHTML}
                         </div>
                     </div>
                 </div>
             `;
         }
         
-        // Cargar recompensas
         function cargarRecompensas() {
-            const recompensasConEstado = window.game.obtenerRecompensasDisponibles();
+            const rewardsWithState = window.game.getAvailableRewards();
             
-            const pequenas = recompensasConEstado.filter(r => r.categoria === 'pequeña');
-            const medias = recompensasConEstado.filter(r => r.categoria === 'media');
-            const grandes = recompensasConEstado.filter(r => r.categoria === 'grande');
-            const epicas = recompensasConEstado.filter(r => r.categoria === 'epica');
+            const small = rewardsWithState.filter(r => r.category === 'pequeña');
+            const medium = rewardsWithState.filter(r => r.category === 'media');
+            const large = rewardsWithState.filter(r => r.category === 'grande');
+            const epic = rewardsWithState.filter(r => r.category === 'epica');
             
-            document.getElementById('listaPequenas').innerHTML = pequenas.map(r => 
-                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            document.getElementById('listaPequenas').innerHTML = small.map(r => 
+                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
             ).join('');
             
-            document.getElementById('listaMedias').innerHTML = medias.map(r => 
-                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            document.getElementById('listaMedias').innerHTML = medium.map(r => 
+                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
             ).join('');
             
-            document.getElementById('listaGrandes').innerHTML = grandes.map(r => 
-                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            document.getElementById('listaGrandes').innerHTML = large.map(r => 
+                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
             ).join('');
             
-            document.getElementById('listaEpicas').innerHTML = epicas.map(r => 
-                crearTarjetaRecompensa(RECOMPENSAS.find(rec => rec.id === r.id), r)
+            document.getElementById('listaEpicas').innerHTML = epic.map(r => 
+                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
             ).join('');
         }
         
-        // Filtrar recompensas
         function filtrarRecompensas(categoria) {
-            const secciones = document.querySelectorAll('.recompensas-seccion');
-            const botones = document.querySelectorAll('.btn-group .btn');
+            const sections = document.querySelectorAll('.recompensas-seccion');
+            const buttons = document.querySelectorAll('.btn-group .btn');
             
-            // Actualizar botones activos
-            botones.forEach(btn => btn.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             if (categoria === 'todas') {
-                secciones.forEach(s => s.style.display = 'block');
+                sections.forEach(s => s.style.display = 'block');
             } else {
-                secciones.forEach(s => s.style.display = 'none');
+                sections.forEach(s => s.style.display = 'none');
                 if (categoria === 'pequeña') {
                     document.getElementById('recompensasPequenas').style.display = 'block';
                 } else if (categoria === 'media') {
@@ -331,60 +326,53 @@
             }
         }
         
-        // Preparar compra
-        function prepararCompra(recompensaId) {
-            const recompensa = RECOMPENSAS.find(r => r.id === recompensaId);
-            recompensaSeleccionada = recompensa;
+        function prepararCompra(rewardId) {
+            const reward = REWARDS.find(r => r.id === rewardId);
+            recompensaSeleccionada = reward;
             
-            document.getElementById('modalRecompensaIcono').textContent = recompensa.icono;
-            document.getElementById('modalRecompensaNombre').textContent = recompensa.nombre;
-            document.getElementById('modalRecompensaDescripcion').textContent = recompensa.descripcion;
-            document.getElementById('modalRecompensaPrecio').textContent = recompensa.precio;
+            document.getElementById('modalRecompensaIcono').textContent = reward.icon;
+            document.getElementById('modalRecompensaNombre').textContent = reward.name;
+            document.getElementById('modalRecompensaDescripcion').textContent = reward.description;
+            document.getElementById('modalRecompensaPrecio').textContent = reward.price;
             
             const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
             modal.show();
         }
         
-        // Confirmar compra
         function confirmarCompra() {
             if (!recompensaSeleccionada) return;
             
-            const resultado = window.game.comprarRecompensa(recompensaSeleccionada.id);
+            const result = window.game.purchaseReward(recompensaSeleccionada.id);
             
-            // Cerrar modal de confirmación
             const modalConfirmacion = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion'));
             modalConfirmacion.hide();
             
-            if (resultado.exito) {
-                // Mostrar modal de éxito
+            if (result.success) {
                 setTimeout(() => {
-                    mostrarExito(resultado.recompensa);
+                    mostrarExito(result.reward);
                 }, 300);
                 
-                // Recargar recompensas y header
                 setTimeout(() => {
                     cargarRecompensas();
                     actualizarHeader();
                 }, 1000);
             } else {
-                alert(resultado.mensaje);
+                alert(result.message);
             }
             
             recompensaSeleccionada = null;
         }
         
-        // Mostrar compra exitosa
-        function mostrarExito(recompensa) {
-            const estado = window.game.obtenerEstado();
+        function mostrarExito(reward) {
+            const state = window.game.getState();
             
-            document.getElementById('modalExitoIcono').textContent = recompensa.icono;
-            document.getElementById('modalExitoNombre').textContent = recompensa.nombre;
-            document.getElementById('modalExitoOroRestante').textContent = estado.personaje.oro + ' oro';
+            document.getElementById('modalExitoIcono').textContent = reward.icon;
+            document.getElementById('modalExitoNombre').textContent = reward.name;
+            document.getElementById('modalExitoOroRestante').textContent = state.character.gold + ' oro';
             
             const modal = new bootstrap.Modal(document.getElementById('modalExito'));
             modal.show();
             
-            // Efecto de confeti
             confetti({
                 particleCount: 150,
                 spread: 80,
@@ -393,7 +381,6 @@
             });
         }
         
-        // Cargar al iniciar
         document.addEventListener('DOMContentLoaded', () => {
             cargarRecompensas();
             actualizarHeader();

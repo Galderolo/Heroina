@@ -1,25 +1,16 @@
-/* ============================================
-   ESTILOS PERSONALIZADOS - HEROÍNA DEL HOGAR
-   Temática: Aventura
-   ============================================ */
-
 :root {
-    /* Paleta de colores aventura */
     --color-primary: #2d6a4f;
     --color-secondary: #40916c;
     --color-accent: #95d5b2;
     --color-gold: #d4a574;
     --color-dark: #1b4332;
     --color-light: #d8f3dc;
-    
-    /* Colores de rareza */
     --color-comun: #52b788;
     --color-raro: #3a86ff;
     --color-epico: #ffd60a;
     --color-legendario: #ff006e;
 }
 
-/* Tipografía */
 body {
     font-family: 'Quicksand', sans-serif;
     background: linear-gradient(135deg, #d8f3dc 0%, #95d5b2 100%);
@@ -31,7 +22,6 @@ body {
     letter-spacing: 1px;
 }
 
-/* Navbar */
 .navbar.bg-adventure {
     background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-primary) 100%) !important;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
@@ -52,7 +42,6 @@ body {
     color: var(--color-gold) !important;
 }
 
-/* Cards generales */
 .card {
     border-radius: 15px;
     border: none;
@@ -64,7 +53,6 @@ body {
     box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
 }
 
-/* Card del personaje */
 .character-card {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border: 3px solid var(--color-gold);
@@ -74,7 +62,6 @@ body {
     padding: 2rem;
 }
 
-/* Avatar */
 .avatar-container {
     position: relative;
 }
@@ -88,7 +75,6 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* Título del personaje */
 .titulo-container {
     margin: 1rem 0;
 }
@@ -105,7 +91,6 @@ body {
     color: var(--color-gold) !important;
 }
 
-/* Nivel y progreso */
 .nivel-container h3 {
     color: var(--color-dark);
     margin-bottom: 1rem;
@@ -123,7 +108,6 @@ body {
     transition: width 0.6s ease;
 }
 
-/* Recursos */
 .recurso-card {
     background: #ffffff;
     border-radius: 12px;
@@ -163,14 +147,12 @@ body {
     50% { transform: scale(1.1); }
 }
 
-/* Estadísticas */
 .stats-card .card-header {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
     border-radius: 15px 15px 0 0 !important;
     font-weight: bold;
 }
 
-/* Botones de acción */
 .action-btn {
     border-radius: 12px;
     padding: 1rem;
@@ -187,13 +169,11 @@ body {
     box-shadow: 0 6px 15px rgba(0,0,0,0.3);
 }
 
-/* Header de recursos */
 .recursos-header {
     background: #ffffff;
     border-radius: 12px;
 }
 
-/* Section titles */
 .section-title {
     color: var(--color-dark);
     font-weight: 700;
@@ -208,7 +188,6 @@ body {
     margin-bottom: 2rem;
 }
 
-/* Tarjetas de misión */
 .mision-card {
     border-width: 2px;
     border-radius: 12px;
@@ -233,7 +212,6 @@ body {
     border-color: var(--color-epico) !important;
 }
 
-/* Misión en progreso */
 .mision-en-progreso {
     background: linear-gradient(135deg, #fff3cd 0%, #fffaeb 100%) !important;
     border-color: #ffc107 !important;
@@ -251,7 +229,6 @@ body {
     }
 }
 
-/* Misión deshabilitada */
 .mision-deshabilitada {
     opacity: 0.5;
     filter: grayscale(30%);
@@ -261,7 +238,6 @@ body {
     transform: none;
 }
 
-/* Card de misión activa */
 .mision-activa-card {
     border: 3px solid #ffc107;
     animation: pulse-border 2s ease-in-out infinite;
@@ -320,7 +296,6 @@ body {
     padding: 0.4rem 0.8rem;
 }
 
-/* Tarjetas de recompensa */
 .recompensa-card {
     border-width: 2px;
     border-radius: 12px;
@@ -369,7 +344,6 @@ body {
     padding: 0.5rem 1rem;
 }
 
-/* Modales */
 .modal-content {
     border-radius: 15px;
     border: none;
@@ -391,7 +365,6 @@ body {
     padding: 1rem 2rem 2rem 2rem;
 }
 
-/* Caja de recompensa */
 .recompensa-box {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 12px;
@@ -400,7 +373,6 @@ body {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-/* Efectos de botones */
 .btn {
     border-radius: 8px;
     font-weight: 600;
@@ -453,13 +425,11 @@ body {
     background: linear-gradient(135deg, #d90056 0%, #b0003f 100%);
 }
 
-/* Badges personalizados */
 .badge {
     font-weight: 600;
     letter-spacing: 0.5px;
 }
 
-/* Animación de brillos */
 @keyframes shine {
     0% { box-shadow: 0 0 5px rgba(255,215,0,0.5); }
     50% { box-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.6); }
@@ -470,7 +440,6 @@ body {
     animation: shine 2s ease-in-out infinite;
 }
 
-/* Efectos de confeti personalizados */
 .confetti-container {
     position: fixed;
     top: 0;
@@ -481,7 +450,6 @@ body {
     z-index: 9999;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .avatar-img {
         width: 120px;
@@ -521,7 +489,6 @@ body {
     }
 }
 
-/* Animaciones de entrada */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -537,13 +504,11 @@ body {
     animation: fadeInUp 0.6s ease-out;
 }
 
-/* Loading state */
 .loading {
     opacity: 0.6;
     pointer-events: none;
 }
 
-/* Estados de alerta personalizados */
 .alert {
     border-radius: 12px;
     border: none;
@@ -564,7 +529,6 @@ body {
     color: #084298;
 }
 
-/* Scrollbar personalizada */
 ::-webkit-scrollbar {
     width: 10px;
 }

@@ -270,7 +270,6 @@
     
     <!-- Script de la página -->
     <script>
-        // Calcular tiempo transcurrido
         function calcularTiempoTranscurrido(fechaInicio) {
             const ahora = new Date();
             const inicio = new Date(fechaInicio);
@@ -285,140 +284,115 @@
             return `${horas} horas`;
         }
         
-        // Cargar datos del personaje
         function cargarPersonaje() {
-            const resumen = window.game.obtenerResumenPersonaje();
-            const estado = window.game.obtenerEstado();
+            const summary = window.game.getCharacterSummary();
+            const state = window.game.getState();
             
-            // Actualizar nombre
-            document.getElementById('nombrePersonaje').textContent = resumen.nombre;
-            
-            // Actualizar título
+            document.getElementById('nombrePersonaje').textContent = summary.name;
             document.getElementById('tituloPersonaje').innerHTML = 
-                `<i class="bi bi-award"></i> ${resumen.titulo}`;
+                `<i class="bi bi-award"></i> ${summary.title}`;
+            document.getElementById('nivelPersonaje').textContent = summary.level;
             
-            // Actualizar nivel
-            document.getElementById('nivelPersonaje').textContent = resumen.nivel;
+            const { currentXP, requiredXP, percentage } = summary.progress;
+            document.getElementById('barraXP').style.width = percentage + '%';
+            document.getElementById('textoXP').textContent = `${currentXP} / ${requiredXP} XP`;
             
-            // Actualizar barra de XP
-            const { xpActual, xpNecesaria, porcentaje } = resumen.progreso;
-            document.getElementById('barraXP').style.width = porcentaje + '%';
-            document.getElementById('textoXP').textContent = `${xpActual} / ${xpNecesaria} XP`;
+            document.getElementById('oroPersonaje').textContent = summary.gold;
             
-            // Actualizar oro
-            document.getElementById('oroPersonaje').textContent = resumen.oro;
+            const energy = state.character.energy || 0;
+            const maxEnergy = state.character.maxEnergy || 6;
+            document.getElementById('energiaPersonaje').textContent = `${energy}/${maxEnergy}`;
             
-            // Actualizar energía (número)
-            const energia = estado.personaje.energia || 0;
-            const energiaMax = estado.personaje.energiaMaxima || 6;
-            document.getElementById('energiaPersonaje').textContent = `${energia}/${energiaMax}`;
+            const lives = state.character.lives !== undefined ? state.character.lives : 3;
+            const maxLives = state.character.maxLives || 3;
+            let heartsHTML = '';
             
-            // Actualizar vidas (corazones)
-            const vidas = estado.personaje.vidas !== undefined ? estado.personaje.vidas : 3;
-            const vidasMax = estado.personaje.vidasMaximas || 3;
-            let corazonesHTML = '';
-            
-            for (let i = 0; i < vidasMax; i++) {
-                if (i < vidas) {
-                    corazonesHTML += '<span class="corazon corazon-lleno">❤️</span>';
+            for (let i = 0; i < maxLives; i++) {
+                if (i < lives) {
+                    heartsHTML += '<span class="corazon corazon-lleno">❤️</span>';
                 } else {
-                    corazonesHTML += '<span class="corazon corazon-vacio">💔</span>';
+                    heartsHTML += '<span class="corazon corazon-vacio">💔</span>';
                 }
             }
             
-            document.getElementById('vidasPersonaje').innerHTML = corazonesHTML;
+            document.getElementById('vidasPersonaje').innerHTML = heartsHTML;
             
-            // Actualizar avatar
-            if (resumen.avatar) {
-                document.getElementById('avatarImage').src = resumen.avatar;
+            if (summary.avatar) {
+                document.getElementById('avatarImage').src = summary.avatar;
             }
             
-            // Estadísticas de hoy
-            document.getElementById('misionesHoy').textContent = resumen.estadisticasHoy.misiones;
-            document.getElementById('xpHoy').textContent = resumen.estadisticasHoy.xp;
-            document.getElementById('oroHoy').textContent = resumen.estadisticasHoy.oro;
-            document.getElementById('rachaPersonaje').textContent = resumen.racha;
+            document.getElementById('misionesHoy').textContent = summary.todayStats.missions;
+            document.getElementById('xpHoy').textContent = summary.todayStats.xp;
+            document.getElementById('oroHoy').textContent = summary.todayStats.gold;
+            document.getElementById('rachaPersonaje').textContent = summary.streak;
             
-            // Estadísticas totales
-            document.getElementById('totalMisiones').textContent = estado.estadisticas.totalMisiones;
-            document.getElementById('totalXP').textContent = estado.estadisticas.totalXP;
-            document.getElementById('totalOro').textContent = estado.estadisticas.totalOro;
-            document.getElementById('totalGastado').textContent = estado.estadisticas.totalGastado;
+            document.getElementById('totalMisiones').textContent = state.stats.totalMissions;
+            document.getElementById('totalXP').textContent = state.stats.totalXP;
+            document.getElementById('totalOro').textContent = state.stats.totalGold;
+            document.getElementById('totalGastado').textContent = state.stats.totalSpent;
             
-            // Mostrar misión activa si existe
-            const misionActiva = window.game.obtenerMisionActiva();
-            if (misionActiva) {
+            const activeMission = window.game.getActiveMission();
+            if (activeMission) {
                 document.getElementById('misionActivaCard').style.display = 'block';
-                document.getElementById('misionActivaIcono').textContent = misionActiva.icono;
-                document.getElementById('misionActivaNombre').textContent = misionActiva.nombre;
+                document.getElementById('misionActivaIcono').textContent = activeMission.icon;
+                document.getElementById('misionActivaNombre').textContent = activeMission.name;
                 document.getElementById('misionActivaTiempo').textContent = 
-                    calcularTiempoTranscurrido(misionActiva.fechaInicio);
+                    calcularTiempoTranscurrido(activeMission.startDate);
             } else {
                 document.getElementById('misionActivaCard').style.display = 'none';
             }
         }
         
-        // Completar misión activa
         function completarMisionActiva() {
-            const resultado = window.game.completarMisionActiva();
+            const result = window.game.completeActiveMission();
             
-            if (!resultado.exito) {
-                alert(resultado.mensaje);
+            if (!result.success) {
+                alert(result.message);
                 return;
             }
             
-            // Mostrar recompensa
-            mostrarRecompensa(resultado);
+            mostrarRecompensa(result);
             
-            // Si subió de nivel
-            if (resultado.subioNivel) {
+            if (result.leveledUp) {
                 setTimeout(() => {
-                    mostrarSubidaNivel(resultado);
+                    mostrarSubidaNivel(result);
                 }, 2000);
             }
             
-            // Recargar
             setTimeout(() => {
                 cargarPersonaje();
             }, 500);
         }
         
-        // Fracasar en misión activa
         function fracasarMisionActiva() {
             if (!confirm('⚠️ ¿Seguro que la misión FRACASÓ?\n\nSe perderá 1 vida ❤️ y 2 de energía ⚡')) {
                 return;
             }
             
-            const resultado = window.game.fracasarMisionActiva();
+            const result = window.game.failActiveMission();
             
-            if (!resultado.exito) {
-                alert(resultado.mensaje);
+            if (!result.success) {
+                alert(result.message);
                 return;
             }
             
-            // Mostrar mensaje de fracaso
-            mostrarFracaso(resultado);
+            mostrarFracaso(result);
             
-            // Recargar
             setTimeout(() => {
                 cargarPersonaje();
             }, 500);
         }
         
-        // Cancelar misión activa
         function cancelarMisionActiva() {
             if (confirm('¿Cancelar la misión?\n\nNo pierdes nada, pero tampoco ganas.')) {
-                window.game.cancelarMisionActiva();
+                window.game.cancelActiveMission();
                 cargarPersonaje();
             }
         }
         
-        // Mostrar recompensa
-        function mostrarRecompensa(resultado) {
-            // Usar el modal si existe, o mostrar alerta
-            alert(`¡Misión completada!\n\n+${resultado.xpGanada} XP\n+${resultado.oroGanado} Oro`);
+        function mostrarRecompensa(result) {
+            alert(`¡Misión completada!\n\n+${result.xpGained} XP\n+${result.goldGained} Oro`);
             
-            // Confeti
             confetti({
                 particleCount: 100,
                 spread: 70,
@@ -426,14 +400,12 @@
             });
         }
         
-        // Mostrar subida de nivel
-        function mostrarSubidaNivel(resultado) {
+        function mostrarSubidaNivel(result) {
             const modal = new bootstrap.Modal(document.getElementById('modalSubidaNivel'));
-            document.getElementById('modalNuevoNivel').textContent = resultado.nivelNuevo;
-            document.getElementById('modalNuevoTitulo').textContent = resultado.titulo;
+            document.getElementById('modalNuevoNivel').textContent = result.newLevel;
+            document.getElementById('modalNuevoTitulo').textContent = result.title;
             modal.show();
             
-            // Confeti dorado
             confetti({
                 particleCount: 200,
                 spread: 100,
@@ -442,29 +414,26 @@
             });
         }
         
-        // Mostrar fracaso de misión
-        function mostrarFracaso(resultado) {
-            const vidasRestantes = resultado.vidasRestantes;
+        function mostrarFracaso(result) {
+            const remainingLives = result.remainingLives;
             
-            if (resultado.sinVidas) {
+            if (result.noLives) {
                 alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\n\n⚠️ ¡NO QUEDAN VIDAS! Ten más cuidado.`);
             } else {
-                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\nVidas restantes: ${vidasRestantes}`);
+                alert(`💔 ¡Misión fracasada!\n\n❤️ Has perdido una vida.\nVidas restantes: ${remainingLives}`);
             }
         }
         
-        // Cambiar nombre
         function cambiarNombre() {
-            const nombreActual = document.getElementById('nombrePersonaje').textContent;
-            const nuevoNombre = prompt('¿Cómo se llama tu heroína?', nombreActual);
+            const currentName = document.getElementById('nombrePersonaje').textContent;
+            const newName = prompt('¿Cómo se llama tu heroína?', currentName);
             
-            if (nuevoNombre && nuevoNombre.trim()) {
-                window.game.configurarPersonaje(nuevoNombre.trim());
+            if (newName && newName.trim()) {
+                window.game.configureCharacter(newName.trim());
                 cargarPersonaje();
             }
         }
         
-        // Cambiar avatar
         function cambiarAvatar() {
             document.getElementById('avatarInput').click();
         }
@@ -473,34 +442,32 @@
             const file = e.target.files[0];
             if (file) {
                 try {
-                    const avatarBase64 = await window.game.subirAvatar(file);
+                    const avatarBase64 = await window.game.uploadAvatar(file);
                     document.getElementById('avatarImage').src = avatarBase64;
+                    alert('¡Foto actualizada correctamente!');
                 } catch (error) {
-                    alert('Error al subir la imagen');
+                    alert(error.message || 'Error al subir la imagen');
                 }
             }
         });
         
-        // Confirmar reinicio
         function confirmarReinicio() {
             if (confirm('⚠️ ¿Estás seguro de que quieres borrar TODO el progreso? Esta acción NO se puede deshacer.')) {
-                window.game.reiniciarJuego();
+                window.game.resetGame();
                 location.reload();
             }
         }
         
-        // Cargar al iniciar
         document.addEventListener('DOMContentLoaded', () => {
             cargarPersonaje();
             
-            // Actualizar tiempo de misión activa cada minuto
             setInterval(() => {
-                const misionActiva = window.game.obtenerMisionActiva();
-                if (misionActiva) {
+                const activeMission = window.game.getActiveMission();
+                if (activeMission) {
                     document.getElementById('misionActivaTiempo').textContent = 
-                        calcularTiempoTranscurrido(misionActiva.fechaInicio);
+                        calcularTiempoTranscurrido(activeMission.startDate);
                 }
-            }, 60000); // Cada 60 segundos
+            }, 60000);
         });
     </script>
 </body>

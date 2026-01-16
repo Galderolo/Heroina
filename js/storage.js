@@ -1,332 +1,324 @@
-// ============================================
-// SISTEMA DE ALMACENAMIENTO - localStorage
-// ============================================
-
 const STORAGE_KEY = 'heroina_del_hogar_data';
 
-// Datos por defecto del personaje
 const DEFAULT_DATA = {
-    personaje: {
-        nombre: "Heroína",
-        avatar: null, // base64 de la imagen
-        nivel: 1,
+    character: {
+        name: "Heroína",
+        avatar: null,
+        level: 1,
         xp: 0,
-        oro: 0,
-        energia: 6,        // Energía para hacer misiones
-        energiaMaxima: 6,
-        vidas: 6,          // Corazones (vidas)
-        vidasMaximas: 6
+        gold: 0,
+        energy: 6,
+        maxEnergy: 6,
+        lives: 6,
+        maxLives: 6
     },
-    misionActiva: null, // { misionId, nombre, icono, fechaInicio }
-    historial: {
-        misionesCompletadas: [], // { misionId, fecha, xpGanada, oroGanado }
-        recompensasCompradas: [], // { recompensaId, fecha, precioGastado }
-        nivelesAlcanzados: [1] // historial de niveles
+    activeMission: null,
+    history: {
+        completedMissions: [],
+        purchasedRewards: [],
+        levelsReached: [1]
     },
-    estadisticas: {
-        totalMisiones: 0,
+    stats: {
+        totalMissions: 0,
         totalXP: 0,
-        totalOro: 0,
-        totalGastado: 0,
-        misionesHoy: 0,
-        ultimaConexion: new Date().toISOString()
+        totalGold: 0,
+        totalSpent: 0,
+        missionsToday: 0,
+        lastConnection: new Date().toISOString()
     }
 };
 
-// Guardar datos completos
-function guardarDatos(datos) {
+function saveData(data) {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+        const jsonString = JSON.stringify(data);
+        const sizeInBytes = new Blob([jsonString]).size;
+        const maxSize = 4 * 1024 * 1024;
+        
+        if (sizeInBytes > maxSize) {
+            console.error('Data exceeds localStorage limit');
+            return false;
+        }
+        
+        localStorage.setItem(STORAGE_KEY, jsonString);
         return true;
     } catch (error) {
-        console.error('Error al guardar datos:', error);
+        console.error('Error saving data:', error);
+        if (error.name === 'QuotaExceededError') {
+            alert('Error: No hay espacio suficiente. Intenta eliminar la foto del avatar.');
+        }
         return false;
     }
 }
 
-// Cargar datos
-function cargarDatos() {
+function loadData() {
     try {
-        const datos = localStorage.getItem(STORAGE_KEY);
-        if (datos) {
-            const datosParseados = JSON.parse(datos);
-            // Actualizar última conexión
-            datosParseados.estadisticas.ultimaConexion = new Date().toISOString();
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) {
+            const parsedData = JSON.parse(data);
+            parsedData.stats.lastConnection = new Date().toISOString();
             
-            // Resetear misiones de hoy y energía si es un nuevo día
-            const hoy = new Date().toDateString();
-            const ultimaConexion = new Date(datosParseados.estadisticas.ultimaConexion).toDateString();
+            const today = new Date().toDateString();
+            const lastConnection = new Date(parsedData.stats.lastConnection).toDateString();
             
-            if (ultimaConexion !== hoy) {
-                datosParseados.estadisticas.misionesHoy = 0;
-                // Restaurar energía completa al nuevo día
-                datosParseados.personaje.energia = datosParseados.personaje.energiaMaxima || 6;
+            if (lastConnection !== today) {
+                parsedData.stats.missionsToday = 0;
+                parsedData.character.energy = parsedData.character.maxEnergy || 6;
             }
             
-            // Asegurar que energiaMaxima existe (para datos antiguos)
-            if (!datosParseados.personaje.energiaMaxima) {
-                datosParseados.personaje.energiaMaxima = 6;
+            if (!parsedData.character.maxEnergy) {
+                parsedData.character.maxEnergy = 6;
             }
             
-            // Asegurar que vidas existen (para datos antiguos)
-            if (datosParseados.personaje.vidas === undefined) {
-                datosParseados.personaje.vidas = 6;
-                datosParseados.personaje.vidasMaximas = 6;
+            if (parsedData.character.lives === undefined) {
+                parsedData.character.lives = 6;
+                parsedData.character.maxLives = 6;
             }
             
-            return datosParseados;
+            if (!validateData(parsedData)) {
+                console.warn('Data validation failed, resetting to defaults');
+                return { ...DEFAULT_DATA };
+            }
+            
+            return parsedData;
         }
         return { ...DEFAULT_DATA };
     } catch (error) {
-        console.error('Error al cargar datos:', error);
+        console.error('Error loading data:', error);
         return { ...DEFAULT_DATA };
     }
 }
 
-// Reiniciar datos (borrar todo)
-function reiniciarDatos() {
+function validateData(data) {
+    if (!data || typeof data !== 'object') return false;
+    if (!data.character || typeof data.character !== 'object') return false;
+    if (!data.history || typeof data.history !== 'object') return false;
+    if (!data.stats || typeof data.stats !== 'object') return false;
+    if (typeof data.character.level !== 'number') return false;
+    if (typeof data.character.xp !== 'number') return false;
+    if (typeof data.character.gold !== 'number') return false;
+    return true;
+}
+
+function resetData() {
     try {
         localStorage.removeItem(STORAGE_KEY);
         return true;
     } catch (error) {
-        console.error('Error al reiniciar datos:', error);
+        console.error('Error resetting data:', error);
         return false;
     }
 }
 
-// Actualizar personaje
-function actualizarPersonaje(campo, valor) {
-    const datos = cargarDatos();
-    datos.personaje[campo] = valor;
-    return guardarDatos(datos);
+function updateCharacter(field, value) {
+    const data = loadData();
+    data.character[field] = value;
+    return saveData(data);
 }
 
-// Añadir XP y oro
-function añadirXPyOro(xp, oro) {
-    const datos = cargarDatos();
-    datos.personaje.xp += xp;
-    datos.personaje.oro += oro;
-    datos.estadisticas.totalXP += xp;
-    datos.estadisticas.totalOro += oro;
+function addXPAndGold(xp, gold) {
+    const data = loadData();
+    data.character.xp += xp;
+    data.character.gold += gold;
+    data.stats.totalXP += xp;
+    data.stats.totalGold += gold;
     
-    // Verificar si sube de nivel
-    const nivelAnterior = datos.personaje.nivel;
-    const { nuevoNivel, subioNivel } = verificarSubidaNivel(datos.personaje.nivel, datos.personaje.xp);
+    const previousLevel = data.character.level;
+    const { newLevel, leveledUp } = checkLevelUp(data.character.level, data.character.xp);
     
-    if (subioNivel) {
-        datos.personaje.nivel = nuevoNivel;
-        datos.personaje.xp = 0; // Resetear XP al subir de nivel
-        datos.historial.nivelesAlcanzados.push(nuevoNivel);
+    if (leveledUp) {
+        data.character.level = newLevel;
+        data.character.xp = 0;
+        data.history.levelsReached.push(newLevel);
         
-        // Bonus: +2 vidas al subir de nivel
-        datos.personaje.energia = Math.min(
-            datos.personaje.energia + 2, 
-            datos.personaje.energiaMaxima
+        data.character.energy = Math.min(
+            data.character.energy + 2, 
+            data.character.maxEnergy
         );
     }
     
-    guardarDatos(datos);
+    saveData(data);
     
     return {
-        subioNivel,
-        nivelAnterior,
-        nivelNuevo: nuevoNivel,
-        titulo: obtenerTituloPorNivel(nuevoNivel)
+        leveledUp,
+        previousLevel,
+        newLevel: newLevel,
+        title: getTitleByLevel(newLevel)
     };
 }
 
-// Verificar si debe subir de nivel
-function verificarSubidaNivel(nivelActual, xpActual) {
-    const xpNecesaria = calcularXPParaNivel(nivelActual);
+function checkLevelUp(currentLevel, currentXP) {
+    const requiredXP = calculateXPForLevel(currentLevel);
     
-    if (xpActual >= xpNecesaria) {
+    if (currentXP >= requiredXP) {
         return {
-            subioNivel: true,
-            nuevoNivel: nivelActual + 1
+            leveledUp: true,
+            newLevel: currentLevel + 1
         };
     }
     
     return {
-        subioNivel: false,
-        nuevoNivel: nivelActual
+        leveledUp: false,
+        newLevel: currentLevel
     };
 }
 
-// Registrar misión completada
-function registrarMisionCompletada(misionId, xp, oro) {
-    const datos = cargarDatos();
+function registerCompletedMission(missionId, xp, gold) {
+    const data = loadData();
     
-    const registro = {
-        misionId,
-        fecha: new Date().toISOString(),
-        xpGanada: xp,
-        oroGanado: oro
+    const record = {
+        missionId,
+        date: new Date().toISOString(),
+        xpGained: xp,
+        goldGained: gold
     };
     
-    datos.historial.misionesCompletadas.push(registro);
-    datos.estadisticas.totalMisiones++;
-    datos.estadisticas.misionesHoy++;
+    data.history.completedMissions.push(record);
+    data.stats.totalMissions++;
+    data.stats.missionsToday++;
     
-    guardarDatos(datos);
+    saveData(data);
     
-    return añadirXPyOro(xp, oro);
+    return addXPAndGold(xp, gold);
 }
 
-// Comprar recompensa
-function comprarRecompensa(recompensaId, precio) {
-    const datos = cargarDatos();
+function purchaseReward(rewardId, price) {
+    const data = loadData();
     
-    if (datos.personaje.oro < precio) {
-        return { exito: false, mensaje: "No tienes suficiente oro" };
+    if (data.character.gold < price) {
+        return { success: false, message: "No tienes suficiente oro" };
     }
     
-    datos.personaje.oro -= precio;
-    datos.estadisticas.totalGastado += precio;
+    data.character.gold -= price;
+    data.stats.totalSpent += price;
     
-    const registro = {
-        recompensaId,
-        fecha: new Date().toISOString(),
-        precioGastado: precio
+    const record = {
+        rewardId,
+        date: new Date().toISOString(),
+        priceSpent: price
     };
     
-    datos.historial.recompensasCompradas.push(registro);
+    data.history.purchasedRewards.push(record);
     
-    guardarDatos(datos);
+    saveData(data);
     
-    return { exito: true, mensaje: "¡Recompensa comprada!" };
+    return { success: true, message: "¡Recompensa comprada!" };
 }
 
-// Obtener estadísticas del día
-function obtenerEstadisticasHoy() {
-    const datos = cargarDatos();
-    const hoy = new Date().toDateString();
+function getTodayStats() {
+    const data = loadData();
+    const today = new Date().toDateString();
     
-    const misionesHoy = datos.historial.misionesCompletadas.filter(m => {
-        return new Date(m.fecha).toDateString() === hoy;
+    const todayMissions = data.history.completedMissions.filter(m => {
+        return new Date(m.date).toDateString() === today;
     });
     
-    const xpHoy = misionesHoy.reduce((sum, m) => sum + m.xpGanada, 0);
-    const oroHoy = misionesHoy.reduce((sum, m) => sum + m.oroGanado, 0);
+    const todayXP = todayMissions.reduce((sum, m) => sum + m.xpGained, 0);
+    const todayGold = todayMissions.reduce((sum, m) => sum + m.goldGained, 0);
     
     return {
-        misiones: misionesHoy.length,
-        xp: xpHoy,
-        oro: oroHoy
+        missions: todayMissions.length,
+        xp: todayXP,
+        gold: todayGold
     };
 }
 
-// Obtener historial de recompensas compradas
-function obtenerRecompensasCompradas() {
-    const datos = cargarDatos();
-    return datos.historial.recompensasCompradas;
+function getPurchasedRewards() {
+    const data = loadData();
+    return data.history.purchasedRewards;
 }
 
-// Verificar si una recompensa ya fue comprada (para items únicos)
-function recompensaYaComprada(recompensaId) {
-    const datos = cargarDatos();
-    return datos.historial.recompensasCompradas.some(r => r.recompensaId === recompensaId);
+function isRewardPurchased(rewardId) {
+    const data = loadData();
+    return data.history.purchasedRewards.some(r => r.rewardId === rewardId);
 }
 
-// Iniciar misión
-function iniciarMision(misionId, nombre, icono) {
-    const datos = cargarDatos();
+function startMission(missionId, name, icon) {
+    const data = loadData();
     
-    // Si ya hay una misión activa, no permitir
-    if (datos.misionActiva) {
-        return { exito: false, mensaje: "Ya hay una misión en progreso" };
+    if (data.activeMission) {
+        return { success: false, message: "Ya hay una misión en progreso" };
     }
     
-    datos.misionActiva = {
-        misionId,
-        nombre,
-        icono,
-        fechaInicio: new Date().toISOString()
+    data.activeMission = {
+        missionId,
+        name,
+        icon,
+        startDate: new Date().toISOString()
     };
     
-    guardarDatos(datos);
-    return { exito: true, mensaje: "Misión iniciada" };
+    saveData(data);
+    return { success: true, message: "Misión iniciada" };
 }
 
-// Cancelar misión activa
-function cancelarMisionActiva() {
-    const datos = cargarDatos();
-    datos.misionActiva = null;
-    guardarDatos(datos);
-    return { exito: true, mensaje: "Misión cancelada" };
+function cancelActiveMission() {
+    const data = loadData();
+    data.activeMission = null;
+    saveData(data);
+    return { success: true, message: "Misión cancelada" };
 }
 
-// Obtener misión activa
-function obtenerMisionActiva() {
-    const datos = cargarDatos();
-    return datos.misionActiva;
+function getActiveMission() {
+    const data = loadData();
+    return data.activeMission;
 }
 
-// Completar misión activa exitosamente (consume energía)
-function completarMisionActiva() {
-    const datos = cargarDatos();
-    const misionActiva = datos.misionActiva;
+function completeActiveMission() {
+    const data = loadData();
+    const activeMission = data.activeMission;
     
-    // Consumir 2 de energía al completar
-    datos.personaje.energia = Math.max(0, datos.personaje.energia - 2);
+    data.character.energy = Math.max(0, data.character.energy - 2);
     
-    datos.misionActiva = null;
-    guardarDatos(datos);
-    return misionActiva;
+    data.activeMission = null;
+    saveData(data);
+    return activeMission;
 }
 
-// Fracasar en misión activa (pierde vida y energía)
-function fracasarMisionActiva() {
-    const datos = cargarDatos();
-    const misionActiva = datos.misionActiva;
+function failActiveMission() {
+    const data = loadData();
+    const activeMission = data.activeMission;
     
-    // Perder 1 vida
-    datos.personaje.vidas = Math.max(0, datos.personaje.vidas - 1);
+    data.character.lives = Math.max(0, data.character.lives - 1);
+    data.character.energy = Math.max(0, data.character.energy - 2);
     
-    // También consume energía (se intentó la misión)
-    datos.personaje.energia = Math.max(0, datos.personaje.energia - 2);
-    
-    datos.misionActiva = null;
-    guardarDatos(datos);
+    data.activeMission = null;
+    saveData(data);
     return {
-        misionActiva,
-        vidasRestantes: datos.personaje.vidas
+        activeMission,
+        remainingLives: data.character.lives
     };
 }
 
-// Verificar si tiene suficiente energía
-function tieneSuficienteEnergia() {
-    const datos = cargarDatos();
-    return datos.personaje.energia >= 2;
+function hasEnoughEnergy() {
+    const data = loadData();
+    return data.character.energy >= 2;
 }
 
-// Recuperar una vida (por recompensa o nivel)
-function recuperarVida() {
-    const datos = cargarDatos();
-    datos.personaje.vidas = Math.min(
-        datos.personaje.vidas + 1,
-        datos.personaje.vidasMaximas
+function recoverLife() {
+    const data = loadData();
+    data.character.lives = Math.min(
+        data.character.lives + 1,
+        data.character.maxLives
     );
-    guardarDatos(datos);
-    return datos.personaje.vidas;
+    saveData(data);
+    return data.character.lives;
 }
 
-// Exportar funciones
 window.storage = {
-    guardarDatos,
-    cargarDatos,
-    reiniciarDatos,
-    actualizarPersonaje,
-    añadirXPyOro,
-    registrarMisionCompletada,
-    comprarRecompensa,
-    obtenerEstadisticasHoy,
-    obtenerRecompensasCompradas,
-    recompensaYaComprada,
-    iniciarMision,
-    cancelarMisionActiva,
-    obtenerMisionActiva,
-    completarMisionActiva,
-    fracasarMisionActiva,
-    tieneSuficienteEnergia,
-    recuperarVida
+    saveData,
+    loadData,
+    resetData,
+    updateCharacter,
+    addXPAndGold,
+    registerCompletedMission,
+    purchaseReward,
+    getTodayStats,
+    getPurchasedRewards,
+    isRewardPurchased,
+    startMission,
+    cancelActiveMission,
+    getActiveMission,
+    completeActiveMission,
+    failActiveMission,
+    hasEnoughEnergy,
+    recoverLife
 };
