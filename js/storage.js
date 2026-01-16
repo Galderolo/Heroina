@@ -139,10 +139,12 @@ function addXPAndGold(xp, gold) {
         data.character.xp = 0;
         data.history.levelsReached.push(newLevel);
         
-        data.character.energy = Math.min(
-            data.character.energy + 2, 
-            data.character.maxEnergy
-        );
+        if (data.character.lives < data.character.maxLives) {
+            data.character.lives = Math.min(
+                data.character.lives + 1,
+                data.character.maxLives
+            );
+        }
     }
     
     saveData(data);
@@ -248,6 +250,8 @@ function startMission(missionId, name, icon) {
         return { success: false, message: "Ya hay una misión en progreso" };
     }
     
+    data.character.energy = Math.max(0, data.character.energy - 1);
+    
     data.activeMission = {
         missionId,
         name,
@@ -275,8 +279,6 @@ function completeActiveMission() {
     const data = loadData();
     const activeMission = data.activeMission;
     
-    data.character.energy = Math.max(0, data.character.energy - 1);
-    
     data.activeMission = null;
     saveData(data);
     return activeMission;
@@ -287,7 +289,6 @@ function failActiveMission() {
     const activeMission = data.activeMission;
     
     data.character.lives = Math.max(0, data.character.lives - 1);
-    data.character.energy = Math.max(0, data.character.energy - 1);
     
     data.activeMission = null;
     saveData(data);
