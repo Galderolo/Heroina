@@ -124,6 +124,16 @@ const MISSIONS = [
         repeatable: true
     },
     {
+        id: 5a,
+        name: "El banquete mágico",
+        description: "Termina la comida que te han puesto en el almuerzo o la cena",
+        type: "diaria",
+        xp: 3,
+        gold: 15,
+        icon: "🍳",
+        repeatable: true
+    },
+    {
         id: 6,
         name: "Despertar con Energía de Heroína",
         description: "Vestirse sola por la mañana",
