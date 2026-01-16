@@ -1058,3 +1058,35 @@ h1, h2, h3, h4, h5, h6, p, span {
         padding: 0.4rem 0.5rem;
     }
 }
+
+/* Header de recursos - texto visible y bien formateado */
+.recursos-header h5 {
+    white-space: nowrap;
+    color: #e0e0e0 !important;
+}
+
+.recursos-header small {
+    color: #c0c0c0 !important;
+}
+
+.recursos-header .text-primary,
+.recursos-header .text-warning,
+.recursos-header .text-danger,
+.recursos-header .text-success {
+    opacity: 1 !important;
+}
+
+/* Responsive tablet y móvil landscape - mejor legibilidad */
+@media (min-width: 576px) and (max-width: 991px) {
+    .recursos-header h5 {
+        font-size: 1.1rem;
+    }
+    
+    .recursos-header small {
+        font-size: 0.8rem;
+    }
+    
+    .recursos-header .row {
+        row-gap: 0.5rem;
+    }
+}

@@ -75,23 +75,23 @@
                     </div>
                     <div class="col-md-8">
                         <div class="row text-center">
-                            <div class="col-3 col-md-2">
+                            <div class="col-6 col-sm-6 col-lg-2 mb-2 mb-lg-0">
                                 <small>Nivel</small>
                                 <h5 class="mb-0" id="headerNivel">1</h5>
                             </div>
-                            <div class="col-3 col-md-3">
+                            <div class="col-6 col-sm-6 col-lg-2 mb-2 mb-lg-0">
                                 <small>Energía</small>
                                 <h5 class="mb-0 text-primary" id="headerEnergia">6</h5>
                             </div>
-                            <div class="col-3 col-md-2">
+                            <div class="col-6 col-sm-6 col-lg-3 mb-2 mb-lg-0">
                                 <small>Vidas</small>
-                                <h5 class="mb-0 text-danger" id="headerVidas">❤️❤️❤️</h5>
+                                <h5 class="mb-0 text-danger" id="headerVidas">6/6 ❤️</h5>
                             </div>
-                            <div class="col-3 col-md-2">
+                            <div class="col-6 col-sm-6 col-lg-2 mb-2 mb-lg-0">
                                 <small>Oro</small>
-                                <h5 class="mb-0 text-warning" id="headerOro">0</h5>
+                                <h5 class="mb-0 text-warning" id="headerOro">0 <i class="bi bi-coin text-warning"></i></h5>
                             </div>
-                            <div class="col-12 col-md-3 mt-2 mt-md-0">
+                            <div class="col-12 col-sm-12 col-lg-3 mb-2 mb-lg-0">
                                 <small>Misiones Hoy</small>
                                 <h5 class="mb-0 text-success" id="headerMisionesHoy">0</h5>
                             </div>
@@ -289,20 +289,13 @@
             const energy = state.character.energy || 0;
             const maxEnergy = state.character.maxEnergy || 6;
             const lives = state.character.lives !== undefined ? state.character.lives : 3;
+            const maxLives = state.character.maxLives || 6;
             
             document.getElementById('headerNivel').textContent = summary.level;
             document.getElementById('headerEnergia').innerHTML = `${energy}/${maxEnergy} ⚡`;
+            document.getElementById('headerVidas').innerHTML = `${lives}/${maxLives} ❤️`;
             
-            let livesHTML = '';
-            for (let i = 0; i < lives; i++) {
-                livesHTML += '❤️';
-            }
-            if (lives === 0) {
-                livesHTML = '💔';
-            }
-            document.getElementById('headerVidas').innerHTML = livesHTML || '💔';
-            
-            document.getElementById('headerOro').textContent = summary.gold;
+            document.getElementById('headerOro').innerHTML = `${summary.gold} <i class="bi bi-coin text-warning"></i>`;
             document.getElementById('headerMisionesHoy').textContent = summary.todayStats.missions;
         }
         
