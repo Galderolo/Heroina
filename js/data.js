@@ -124,7 +124,7 @@ const MISSIONS = [
         repeatable: true
     },
     {
-        id: 5a,
+        id: 21,
         name: "El banquete mágico",
         description: "Termina la comida que te han puesto en el almuerzo o la cena",
         type: "diaria",
