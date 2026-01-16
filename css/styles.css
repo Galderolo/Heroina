@@ -702,6 +702,19 @@ h1, h2, h3, h4, h5, h6, p, span {
     box-shadow: 0 0 25px rgba(0, 212, 255, 0.6);
 }
 
+.btn-complete-mission {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: 2px solid rgba(40, 167, 69, 0.5);
+    color: white;
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-complete-mission:hover {
+    background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+    box-shadow: 0 0 25px rgba(40, 167, 69, 0.6);
+    color: white;
+}
+
 .btn-warning {
     background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
     border: 2px solid rgba(255, 215, 0, 0.5);

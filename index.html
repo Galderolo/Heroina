@@ -217,7 +217,7 @@
 
         <!-- Misiones en Progreso -->
         <div class="card mision-activa-card shadow mb-4" id="activeMissionSection" style="display: none;">
-            <div class="card-header bg-warning text-dark">
+            <div class="card-header bg-adventure text-white">
                 <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Misiones en Progreso</h5>
             </div>
             <div class="card-body" id="activeMissionsList">
@@ -580,8 +580,8 @@
                             </div>
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-success" onclick="completarMisionActiva(${mission.missionId})">
-                                <i class="bi bi-check-circle-fill"></i> Completada
+                            <button class="btn btn-complete-mission" onclick="completarMisionActiva(${mission.missionId})">
+                                <i class="bi bi-check-circle-fill"></i> Completar
                             </button>
                             <div class="btn-group">
                                 <button class="btn btn-danger btn-sm" onclick="fracasarMisionActiva(${mission.missionId})">
