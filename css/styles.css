@@ -1066,7 +1066,8 @@ h1, h2, h3, h4, h5, h6, p, span {
     }
 }
 
-/* Header de recursos - texto visible y bien formateado */
+/* Header de recursos - ESTILOS ANTIGUOS (ya no se usan, ahora usamos stats-compact) */
+/*
 .recursos-header h5 {
     white-space: nowrap;
     color: #e0e0e0 !important;
@@ -1083,7 +1084,6 @@ h1, h2, h3, h4, h5, h6, p, span {
     opacity: 1 !important;
 }
 
-/* Responsive tablet y móvil landscape - mejor legibilidad */
 @media (min-width: 576px) and (max-width: 991px) {
     .recursos-header h5 {
         font-size: 1.1rem;
@@ -1097,6 +1097,7 @@ h1, h2, h3, h4, h5, h6, p, span {
         row-gap: 0.5rem;
     }
 }
+*/
 
 /* Botón Scroll to Top */
 .scroll-to-top {
@@ -1237,5 +1238,61 @@ h1, h2, h3, h4, h5, h6, p, span {
     
     .navbar-collapse {
         display: none !important;
+    }
+}
+
+/* Header de recursos - layout compacto */
+.stats-compact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.stat-item small {
+    color: #c0c0c0;
+    font-size: 0.75rem;
+}
+
+.stat-item strong {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+}
+
+.stat-separator {
+    color: var(--color-gold);
+    opacity: 0.3;
+    font-weight: 300;
+}
+
+/* Responsive - más espacio en móvil pequeño */
+@media (max-width: 576px) {
+    .stats-compact {
+        gap: 0.4rem;
+        font-size: 0.9rem;
+    }
+    
+    .stat-item small {
+        font-size: 0.7rem;
+    }
+    
+    .stat-item strong {
+        font-size: 0.85rem;
+    }
+}
+
+/* En desktop, alinear a la derecha */
+@media (min-width: 768px) {
+    .stats-compact {
+        justify-content: flex-end;
     }
 }

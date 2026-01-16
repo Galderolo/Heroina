@@ -74,27 +74,22 @@
                         </h4>
                     </div>
                     <div class="col-md-8">
-                        <div class="row text-center">
-                            <div class="col-6 col-sm-6 col-lg-2 mb-2 mb-lg-0">
-                                <small>Nivel</small>
-                                <h5 class="mb-0" id="headerNivel">1</h5>
-                            </div>
-                            <div class="col-6 col-sm-6 col-lg-2 mb-2 mb-lg-0">
-                                <small>Energía</small>
-                                <h5 class="mb-0 text-primary" id="headerEnergia">6</h5>
-                            </div>
-                            <div class="col-6 col-sm-6 col-lg-3 mb-2 mb-lg-0">
-                                <small>Vidas</small>
-                                <h5 class="mb-0 text-danger" id="headerVidas">6/6 ❤️</h5>
-                            </div>
-                            <div class="col-6 col-sm-6 col-lg-2 mb-2 mb-lg-0">
-                                <small>Oro</small>
-                                <h5 class="mb-0 text-warning" id="headerOro">0 <i class="bi bi-coin text-warning"></i></h5>
-                            </div>
-                            <div class="col-12 col-sm-12 col-lg-3 mb-2 mb-lg-0">
-                                <small>Misiones Hoy</small>
-                                <h5 class="mb-0 text-success" id="headerMisionesHoy">0</h5>
-                            </div>
+                        <div class="stats-compact">
+                            <span class="stat-item">
+                                <small>Nivel</small> <strong id="headerNivel">1</strong>
+                            </span>
+                            <span class="stat-separator">|</span>
+                            <span class="stat-item">
+                                <small>Energía</small> <strong class="text-primary" id="headerEnergia">6</strong>
+                            </span>
+                            <span class="stat-separator">|</span>
+                            <span class="stat-item">
+                                <small>Vidas</small> <strong class="text-danger" id="headerVidas">6/6 ❤️</strong>
+                            </span>
+                            <span class="stat-separator">|</span>
+                            <span class="stat-item">
+                                <strong class="text-warning" id="headerOro">0 <i class="bi bi-coin text-warning"></i></strong>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -294,9 +289,7 @@
             document.getElementById('headerNivel').textContent = summary.level;
             document.getElementById('headerEnergia').innerHTML = `${energy}/${maxEnergy} ⚡`;
             document.getElementById('headerVidas').innerHTML = `${lives}/${maxLives} ❤️`;
-            
             document.getElementById('headerOro').innerHTML = `${summary.gold} <i class="bi bi-coin text-warning"></i>`;
-            document.getElementById('headerMisionesHoy').textContent = summary.todayStats.missions;
         }
         
         function crearTarjetaMision(mission) {
