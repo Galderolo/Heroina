@@ -344,6 +344,16 @@
             const minutes = timerInfo.minutesRemaining;
             const seconds = timerInfo.secondsRemaining;
             
+            if (minutes <= 0 && seconds <= 0) {
+                const result = window.game.checkAndRestoreEnergy();
+                if (result.restored) {
+                    actualizarHeader();
+                } else {
+                    updateEnergyTimer();
+                }
+                return;
+            }
+            
             if (minutes > 0) {
                 timerElement.textContent = `⏱️ ${minutes}m ${seconds}s`;
             } else {
