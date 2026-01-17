@@ -79,7 +79,7 @@ const MISSIONS = [
         description: "Hacer la cama y dejarla lista para la próxima aventura",
         type: "diaria",
         xp: 3,
-        gold: 15,
+        gold: 18,
         icon: "🛏️",
         repeatable: true
     },
@@ -89,7 +89,7 @@ const MISSIONS = [
         description: "Recoger todos los juguetes y devolverlos a su hogar",
         type: "diaria",
         xp: 2,
-        gold: 10,
+        gold: 15,
         icon: "🧸",
         repeatable: true
     },
@@ -99,7 +99,7 @@ const MISSIONS = [
         description: "Lavarse los dientes después de comer",
         type: "diaria",
         xp: 2,
-        gold: 10,
+        gold: 15,
         icon: "🪥",
         repeatable: true
     },
@@ -109,7 +109,7 @@ const MISSIONS = [
         description: "Lavarse las manos y la cara",
         type: "diaria",
         xp: 2,
-        gold: 10,
+        gold: 15,
         icon: "💧",
         repeatable: true
     },
@@ -119,7 +119,7 @@ const MISSIONS = [
         description: "Recoger el cuarto antes de dormir",
         type: "diaria",
         xp: 3,
-        gold: 15,
+        gold: 20,
         icon: "🏰",
         repeatable: true
     },
@@ -129,7 +129,7 @@ const MISSIONS = [
         description: "Termina la comida que te han puesto en el almuerzo o la cena",
         type: "diaria",
         xp: 3,
-        gold: 15,
+        gold: 18,
         icon: "🍳",
         repeatable: true
     },
@@ -139,7 +139,7 @@ const MISSIONS = [
         description: "Vestirse sola por la mañana",
         type: "diaria",
         xp: 3,
-        gold: 15,
+        gold: 18,
         icon: "👗",
         repeatable: true
     },
@@ -149,7 +149,7 @@ const MISSIONS = [
         description: "Recoger lo que has usado durante el día",
         type: "diaria",
         xp: 2,
-        gold: 10,
+        gold: 15,
         icon: "🚪",
         repeatable: true
     },
@@ -199,7 +199,7 @@ const MISSIONS = [
         description: "Tirar la basura cuando toca",
         type: "ayuda",
         xp: 3,
-        gold: 15,
+        gold: 20,
         icon: "🗑️",
         repeatable: true
     },
@@ -209,7 +209,7 @@ const MISSIONS = [
         description: "Colocar los zapatos en su sitio",
         type: "ayuda",
         xp: 3,
-        gold: 15,
+        gold: 20,
         icon: "👟",
         repeatable: true
     },
@@ -290,7 +290,7 @@ const REWARDS = [
         id: 1,
         name: "Elegir el Postre del Día",
         description: "Tú eliges qué postre comer hoy",
-        price: 50,
+        price: 40,
         category: "pequeña",
         icon: "🍦",
         requiredLevel: 1
@@ -299,7 +299,7 @@ const REWARDS = [
         id: 2,
         name: "Elegir Dibujos Hoy",
         description: "Tú decides qué ver en la tele",
-        price: 60,
+        price: 45,
         category: "pequeña",
         icon: "📺",
         requiredLevel: 1
@@ -308,7 +308,7 @@ const REWARDS = [
         id: 3,
         name: "Elegir la Canción del Coche",
         description: "Poner tu música favorita en el coche",
-        price: 50,
+        price: 40,
         category: "pequeña",
         icon: "🎵",
         requiredLevel: 1
@@ -317,7 +317,7 @@ const REWARDS = [
         id: 4,
         name: "Tiempo Extra de Pintar",
         description: "15 minutos extra para dibujar o pintar",
-        price: 70,
+        price: 55,
         category: "pequeña",
         icon: "🎨",
         requiredLevel: 1
@@ -326,7 +326,7 @@ const REWARDS = [
         id: 5,
         name: "Elegir el Cuento",
         description: "Tú eliges qué cuento leer antes de dormir",
-        price: 60,
+        price: 45,
         category: "pequeña",
         icon: "📖",
         requiredLevel: 1
@@ -335,7 +335,7 @@ const REWARDS = [
         id: 6,
         name: "Dormir con un Peluche Extra",
         description: "Esta noche puedes llevar un peluche más a la cama",
-        price: 80,
+        price: 60,
         category: "pequeña",
         icon: "🧸",
         requiredLevel: 1
