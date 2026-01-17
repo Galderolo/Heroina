@@ -262,7 +262,34 @@
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- Scripts del juego -->
+    <script src="js/version-check.js"></script>
+    <script>
+    (async function() {
+        try {
+            const versionCheck = await checkFilesVersion();
+            if (versionCheck.needsUpdate) {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    }
+                }
+                saveStoredFileVersions(versionCheck.newVersions);
+                window.location.reload(true);
+                return; 
+            }
+            saveStoredFileVersions(versionCheck.newVersions);
+        } catch (error) {
+            console.error('Error en verificación de versión:', error);
+        }
+    })();
+    </script>
+    
+    <!-- Scripts del juego (solo se cargan si no hay actualización) -->
     <script src="js/modals.js"></script>
     <script src="js/data.js"></script>
     <script src="js/storage.js"></script>

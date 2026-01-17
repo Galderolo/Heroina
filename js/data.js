@@ -275,12 +275,12 @@ const MISSIONS = [
     },
     {
         id: 20,
-        name: "La Jornada de la Heroína Completa",
-        description: "Completar 5 misiones en un solo día",
+        name: "La Defensora de la Paz Familiar",
+        description: "Pasar todo el día sin rabietas ni conflictos",
         type: "epica",
-        xp: 15,
-        gold: 80,
-        icon: "🏆",
+        xp: 12,
+        gold: 75,
+        icon: "🕊️",
         repeatable: true
     }
 ];
@@ -320,7 +320,7 @@ const REWARDS = [
         price: 70,
         category: "pequeña",
         icon: "🎨",
-        requiredLevel: 2
+        requiredLevel: 1
     },
     {
         id: 5,
@@ -329,7 +329,7 @@ const REWARDS = [
         price: 60,
         category: "pequeña",
         icon: "📖",
-        requiredLevel: 2
+        requiredLevel: 1
     },
     {
         id: 6,
@@ -338,7 +338,7 @@ const REWARDS = [
         price: 80,
         category: "pequeña",
         icon: "🧸",
-        requiredLevel: 3
+        requiredLevel: 1
     },
     {
         id: 7,
@@ -347,7 +347,7 @@ const REWARDS = [
         price: 200,
         category: "media",
         icon: "🎬",
-        requiredLevel: 4
+        requiredLevel: 1
     },
     {
         id: 8,
@@ -356,7 +356,7 @@ const REWARDS = [
         price: 150,
         category: "media",
         icon: "🍿",
-        requiredLevel: 4
+        requiredLevel: 1
     },
     {
         id: 9,
@@ -365,7 +365,7 @@ const REWARDS = [
         price: 180,
         category: "media",
         icon: "🎲",
-        requiredLevel: 5
+        requiredLevel: 1
     },
     {
         id: 10,
@@ -374,7 +374,7 @@ const REWARDS = [
         price: 160,
         category: "media",
         icon: "🛁",
-        requiredLevel: 5
+        requiredLevel: 1
     },
     {
         id: 11,
@@ -383,7 +383,7 @@ const REWARDS = [
         price: 200,
         category: "media",
         icon: "🎮",
-        requiredLevel: 6
+        requiredLevel: 1
     },
     {
         id: 12,
@@ -392,7 +392,7 @@ const REWARDS = [
         price: 220,
         category: "media",
         icon: "🍪",
-        requiredLevel: 7
+        requiredLevel: 1
     },
     {
         id: 13,
@@ -401,7 +401,7 @@ const REWARDS = [
         price: 350,
         category: "grande",
         icon: "🎉",
-        requiredLevel: 8
+        requiredLevel: 1
     },
     {
         id: 14,
@@ -410,7 +410,7 @@ const REWARDS = [
         price: 300,
         category: "grande",
         icon: "🧁",
-        requiredLevel: 9
+        requiredLevel: 1
     },
     {
         id: 15,
@@ -419,7 +419,7 @@ const REWARDS = [
         price: 400,
         category: "grande",
         icon: "🎁",
-        requiredLevel: 10
+        requiredLevel: 1
     },
     {
         id: 16,
@@ -428,7 +428,7 @@ const REWARDS = [
         price: 380,
         category: "grande",
         icon: "🏰",
-        requiredLevel: 12
+        requiredLevel: 1
     },
     {
         id: 17,
@@ -437,7 +437,7 @@ const REWARDS = [
         price: 400,
         category: "grande",
         icon: "🛍️",
-        requiredLevel: 14
+        requiredLevel: 1
     },
     {
         id: 18,
@@ -446,7 +446,7 @@ const REWARDS = [
         price: 350,
         category: "grande",
         icon: "🎈",
-        requiredLevel: 15
+        requiredLevel: 1
     },
     {
         id: 19,
@@ -455,7 +455,7 @@ const REWARDS = [
         price: 500,
         category: "epica",
         icon: "👑",
-        requiredLevel: 17
+        requiredLevel: 1
     },
     {
         id: 20,
@@ -464,7 +464,7 @@ const REWARDS = [
         price: 600,
         category: "epica",
         icon: "🌟",
-        requiredLevel: 18
+        requiredLevel: 1
     },
     {
         id: 21,
@@ -484,7 +484,7 @@ const REWARDS = [
         price: 200,
         category: "potion",
         icon: "⚗️",
-        requiredLevel: 5,
+        requiredLevel: 1,
         effect: "restoreLife",
         value: 2
     },

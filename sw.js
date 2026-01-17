@@ -9,6 +9,7 @@ const urlsToCache = [
   './js/storage.js',
   './js/game.js',
   './js/modals.js',
+  './js/version-check.js',
   './img/icon-192.svg',
   './img/icon-512.svg',
   './img/icon.svg'
@@ -41,17 +42,37 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch - servir desde caché, fallback a red
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - devolver respuesta
-        if (response) {
+  const url = new URL(event.request.url);
+  const isJSFile = url.pathname.endsWith('.js');
+  
+  if (isJSFile) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          }
           return response;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          // Cache hit - devolver respuesta
+          if (response) {
+            return response;
+          }
+          return fetch(event.request);
         }
-        return fetch(event.request);
-      }
-    )
-  );
+      )
+    );
+  }
 });

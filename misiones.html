@@ -82,6 +82,7 @@
                             <span class="stat-separator">|</span>
                             <span class="stat-item">
                                 <small>Energía</small> <strong class="text-primary" id="headerEnergia">6</strong>
+                                <br><small id="headerEnergyTimer" style="color: #a0a0a0; font-size: 0.7rem; display: none;"></small>
                             </span>
                             <span class="stat-separator">|</span>
                             <span class="stat-item">
@@ -269,7 +270,41 @@
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- Scripts del juego -->
+    <!-- Script de verificación de versión -->
+    <script src="js/version-check.js"></script>
+    <script>
+    (async function() {
+        try {
+            const versionCheck = await checkFilesVersion();
+            if (versionCheck.needsUpdate) {
+                // Invalidar cache del service worker
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                    // Limpiar cache
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    }
+                }
+                // Guardar nuevas versiones
+                saveStoredFileVersions(versionCheck.newVersions);
+                // Recargar página para cargar nuevos archivos
+                window.location.reload(true);
+                return; // No continuar cargando scripts viejos
+            }
+            // Si no hay actualizaciones, guardar versiones actuales y continuar
+            saveStoredFileVersions(versionCheck.newVersions);
+        } catch (error) {
+            console.error('Error en verificación de versión:', error);
+            // En caso de error, continuar normalmente
+        }
+    })();
+    </script>
+    
+    <!-- Scripts del juego (solo se cargan si no hay actualización) -->
     <script src="js/modals.js"></script>
     <script src="js/data.js"></script>
     <script src="js/storage.js"></script>
@@ -291,6 +326,29 @@
             document.getElementById('headerEnergia').innerHTML = `${energy}/${maxEnergy} ⚡`;
             document.getElementById('headerVidas').innerHTML = `${lives}/${maxLives} ❤️`;
             document.getElementById('headerOro').innerHTML = `${summary.gold} <i class="bi bi-coin text-warning"></i>`;
+            updateEnergyTimer();
+        }
+        
+        function updateEnergyTimer() {
+            const timerInfo = window.game.getEnergyTimerInfo();
+            const timerElement = document.getElementById('headerEnergyTimer');
+            
+            if (!timerElement) return;
+            
+            if (timerInfo.isFull) {
+                timerElement.style.display = 'none';
+                return;
+            }
+            
+            timerElement.style.display = 'block';
+            const minutes = timerInfo.minutesRemaining;
+            const seconds = timerInfo.secondsRemaining;
+            
+            if (minutes > 0) {
+                timerElement.textContent = `⏱️ ${minutes}m ${seconds}s`;
+            } else {
+                timerElement.textContent = `⏱️ ${seconds}s`;
+            }
         }
         
         function crearTarjetaMision(mission) {
@@ -560,6 +618,21 @@
             
             cargarMisiones();
             actualizarHeader();
+            
+            // Actualizar temporizador de energía cada segundo
+            setInterval(() => {
+                updateEnergyTimer();
+            }, 1000);
+            
+            // Verificar y restaurar energía cada minuto
+            setInterval(() => {
+                const result = window.game.checkAndRestoreEnergy();
+                if (result.restored) {
+                    actualizarHeader();
+                } else {
+                    updateEnergyTimer();
+                }
+            }, 60000);
         });
     </script>
 

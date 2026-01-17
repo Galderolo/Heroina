@@ -404,13 +404,73 @@ function getCharacterSummary() {
 }
 
 function validateCharacterExists() {
-    const data = loadData();
+    const data = getState();
     
     if (!data.character.name || data.character.name.trim() === '') {
         window.location.href = 'index.html';
         return false;
     }
     return true;
+}
+
+function getEnergyTimerInfo() {
+    const state = getState();
+    const maxEnergy = state.character.maxEnergy || 6;
+    const currentEnergy = state.character.energy || 0;
+    
+    if (currentEnergy >= maxEnergy) {
+        return { isFull: true };
+    }
+    
+    const timerInfo = window.storage.getNextEnergyRestoreTime();
+    
+    if (!timerInfo) {
+        return { isFull: true };
+    }
+    
+    return {
+        isFull: false,
+        minutesRemaining: timerInfo.minutesRemaining,
+        secondsRemaining: timerInfo.secondsRemaining,
+        nextRestoreTime: timerInfo.totalSeconds
+    };
+}
+
+function checkAndRestoreEnergy() {
+    const data = window.storage.loadData();
+    const maxEnergy = data.character.maxEnergy || 6;
+    const currentEnergy = data.character.energy || 0;
+    
+    if (currentEnergy >= maxEnergy) {
+        return { restored: false, newEnergy: currentEnergy };
+    }
+    
+    if (!data.stats.lastEnergyUpdate) {
+        
+        data.stats.lastEnergyUpdate = new Date().toISOString();
+        window.storage.saveData(data);
+        return { restored: false, newEnergy: currentEnergy };
+    }
+    
+    const lastUpdate = new Date(data.stats.lastEnergyUpdate);
+    const now = new Date();
+    const hoursElapsed = (now - lastUpdate) / (1000 * 60 * 60);
+    
+    if (hoursElapsed >= 1) {
+        const newEnergy = Math.min(currentEnergy + 1, maxEnergy);
+        data.character.energy = newEnergy;
+        
+        const newUpdateTime = new Date(lastUpdate);
+        newUpdateTime.setHours(newUpdateTime.getHours() + Math.floor(hoursElapsed));
+        data.stats.lastEnergyUpdate = newUpdateTime.toISOString();
+        
+        window.storage.saveData(data);
+        gameState = window.storage.loadData();
+        
+        return { restored: true, newEnergy };
+    }
+    
+    return { restored: false, newEnergy: currentEnergy };
 }
 
 window.game = {
@@ -435,7 +495,9 @@ window.game = {
     resetGame,
     uploadAvatar,
     getCharacterSummary,
-    validateCharacterExists
+    validateCharacterExists,
+    getEnergyTimerInfo,
+    checkAndRestoreEnergy
 };
 
 document.addEventListener('DOMContentLoaded', () => {

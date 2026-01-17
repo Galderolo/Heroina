@@ -199,6 +199,7 @@
                             <h4 class="mt-2">Energía</h4>
                             <p class="fs-3 fw-bold text-primary" id="energiaPersonaje">6/6</p>
                             <small style="color: #a0a0a0;">Misiones: 1 ⚡</small>
+                            <small id="energyTimer" style="color: #a0a0a0; margin-top: 0.5rem; display: none;"></small>
                         </div>
                     </div>
                     <div class="col-12 col-sm-4 mb-3 mb-sm-0">
@@ -364,7 +365,41 @@
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- Scripts del juego -->
+    <!-- Script de verificación de versión -->
+    <script src="js/version-check.js"></script>
+    <script>
+    (async function() {
+        try {
+            const versionCheck = await checkFilesVersion();
+            if (versionCheck.needsUpdate) {
+                // Invalidar cache del service worker
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                    // Limpiar cache
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    }
+                }
+                // Guardar nuevas versiones
+                saveStoredFileVersions(versionCheck.newVersions);
+                // Recargar página para cargar nuevos archivos
+                window.location.reload(true);
+                return; // No continuar cargando scripts viejos
+            }
+            // Si no hay actualizaciones, guardar versiones actuales y continuar
+            saveStoredFileVersions(versionCheck.newVersions);
+        } catch (error) {
+            console.error('Error en verificación de versión:', error);
+            // En caso de error, continuar normalmente
+        }
+    })();
+    </script>
+    
+    <!-- Scripts del juego (solo se cargan si no hay actualización) -->
     <script src="js/modals.js"></script>
     <script src="js/data.js"></script>
     <script src="js/storage.js"></script>
@@ -435,6 +470,29 @@
             
             cargarMisionesActivas();
             loadPotions();
+            updateEnergyTimer();
+        }
+        
+        function updateEnergyTimer() {
+            const timerInfo = window.game.getEnergyTimerInfo();
+            const timerElement = document.getElementById('energyTimer');
+            
+            if (!timerElement) return;
+            
+            if (timerInfo.isFull) {
+                timerElement.style.display = 'none';
+                return;
+            }
+            
+            timerElement.style.display = 'block';
+            const minutes = timerInfo.minutesRemaining;
+            const seconds = timerInfo.secondsRemaining;
+            
+            if (minutes > 0) {
+                timerElement.textContent = `⏱️ Próxima energía en: ${minutes}m ${seconds}s`;
+            } else {
+                timerElement.textContent = `⏱️ Próxima energía en: ${seconds}s`;
+            }
         }
         
         function loadPotions() {
@@ -794,6 +852,19 @@
             }
             
             cargarPersonaje();
+            
+            // Actualizar temporizador de energía cada segundo
+            setInterval(() => {
+                updateEnergyTimer();
+            }, 1000);
+            
+            // Verificar y restaurar energía cada minuto
+            setInterval(() => {
+                const result = window.game.checkAndRestoreEnergy();
+                if (result.restored) {
+                    cargarPersonaje();
+                }
+            }, 60000);
             
             setInterval(() => {
                 cargarMisionesActivas();

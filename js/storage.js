@@ -67,11 +67,44 @@ function loadData() {
                 '';
             
             let dataChanged = false;
+            const now = new Date();
+            
             if (lastConnection !== today) {
                 parsedData.stats.missionsToday = 0;
                 parsedData.character.energy = parsedData.character.maxEnergy || 6;
                 parsedData.stats.lastConnection = new Date().toISOString();
+                
+                if (!parsedData.stats.lastEnergyUpdate) {
+                    parsedData.stats.lastEnergyUpdate = new Date().toISOString();
+                }
                 dataChanged = true;
+            }
+            
+            
+            if (!parsedData.stats.lastEnergyUpdate) {
+                parsedData.stats.lastEnergyUpdate = new Date().toISOString();
+                dataChanged = true;
+            }
+            
+            const lastEnergyUpdate = new Date(parsedData.stats.lastEnergyUpdate);
+            const hoursElapsed = (now - lastEnergyUpdate) / (1000 * 60 * 60);
+            
+            if (hoursElapsed >= 1 && parsedData.character.energy < (parsedData.character.maxEnergy || 6)) {
+                const hoursToRestore = Math.floor(hoursElapsed);
+                const maxEnergy = parsedData.character.maxEnergy || 6;
+                const energyToAdd = Math.min(hoursToRestore, maxEnergy - parsedData.character.energy);
+                
+                if (energyToAdd > 0) {
+                    parsedData.character.energy = Math.min(
+                        parsedData.character.energy + energyToAdd,
+                        maxEnergy
+                    );
+                    
+                    const newUpdateTime = new Date(lastEnergyUpdate);
+                    newUpdateTime.setHours(newUpdateTime.getHours() + hoursToRestore);
+                    parsedData.stats.lastEnergyUpdate = newUpdateTime.toISOString();
+                    dataChanged = true;
+                }
             }
             
             if (!parsedData.character.maxEnergy) {
@@ -459,6 +492,77 @@ function checkAndFailExpiredMissions() {
     return expiredMissions;
 }
 
+function getNextEnergyRestoreTime() {
+    const data = loadData();
+    const maxEnergy = data.character.maxEnergy || 6;
+    const currentEnergy = data.character.energy || 0;
+    
+    
+    if (currentEnergy >= maxEnergy) {
+        return null;
+    }
+    
+    if (!data.stats.lastEnergyUpdate) {
+        
+        const nextUpdate = new Date();
+        nextUpdate.setHours(nextUpdate.getHours() + 1);
+        const totalSeconds = Math.floor((nextUpdate - new Date()) / 1000);
+        const minutesRemaining = Math.floor(totalSeconds / 60);
+        const secondsRemaining = totalSeconds % 60;
+        
+        return {
+            minutesRemaining,
+            secondsRemaining,
+            totalSeconds
+        };
+    }
+    
+    const lastUpdate = new Date(data.stats.lastEnergyUpdate);
+    const nextUpdate = new Date(lastUpdate);
+    nextUpdate.setHours(nextUpdate.getHours() + 1);
+    
+    const now = new Date();
+    const totalSeconds = Math.max(0, Math.floor((nextUpdate - now) / 1000));
+    const minutesRemaining = Math.floor(totalSeconds / 60);
+    const secondsRemaining = totalSeconds % 60;
+    
+    return {
+        minutesRemaining,
+        secondsRemaining,
+        totalSeconds
+    };
+}
+
+function saveFileVersions(versions) {
+    try {
+        localStorage.setItem('app_file_versions', JSON.stringify(versions));
+        return true;
+    } catch (error) {
+        console.error('Error saving file versions:', error);
+        return false;
+    }
+}
+
+function getFileVersions() {
+    try {
+        const versions = localStorage.getItem('app_file_versions');
+        return versions ? JSON.parse(versions) : {};
+    } catch (error) {
+        console.error('Error getting file versions:', error);
+        return {};
+    }
+}
+
+function clearFileVersions() {
+    try {
+        localStorage.removeItem('app_file_versions');
+        return true;
+    } catch (error) {
+        console.error('Error clearing file versions:', error);
+        return false;
+    }
+}
+
 window.storage = {
     saveData,
     loadData,
@@ -481,5 +585,9 @@ window.storage = {
     usePotion,
     getPotionsInventory,
     checkAndFailExpiredMissions,
-    createCharacterWithClass
+    createCharacterWithClass,
+    getNextEnergyRestoreTime,
+    saveFileVersions,
+    getFileVersions,
+    clearFileVersions
 };
