@@ -251,11 +251,60 @@ function registerCompletedMission(missionId, xp, gold) {
     return addXPAndGold(xp, gold);
 }
 
+function getRewardCooldownInfo(rewardId) {
+    const data = loadData();
+    const reward = REWARDS.find(r => r.id === rewardId);
+    
+    if (!reward || !reward.cooldownHours) {
+        return { onCooldown: false };
+    }
+    
+    const purchases = data.history.purchasedRewards.filter(r => r.rewardId === rewardId);
+    
+    if (purchases.length === 0) {
+        return { onCooldown: false };
+    }
+    
+    const lastPurchase = purchases[purchases.length - 1];
+    const lastPurchaseDate = new Date(lastPurchase.date);
+    const now = new Date();
+    const hoursElapsed = (now - lastPurchaseDate) / (1000 * 60 * 60);
+    
+    if (hoursElapsed >= reward.cooldownHours) {
+        return { onCooldown: false };
+    }
+    
+    const hoursRemaining = reward.cooldownHours - hoursElapsed;
+    const totalSeconds = Math.floor(hoursRemaining * 3600);
+    const hours = Math.floor(hoursRemaining);
+    const minutes = Math.floor((hoursRemaining - hours) * 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    
+    return {
+        onCooldown: true,
+        hoursRemaining: hours,
+        minutesRemaining: minutes,
+        secondsRemaining: seconds,
+        totalSeconds
+    };
+}
+
 function purchaseReward(rewardId, price) {
     const data = loadData();
     
     if (data.character.gold < price) {
         return { success: false, message: "No tienes suficiente oro" };
+    }
+    
+    const cooldownInfo = getRewardCooldownInfo(rewardId);
+    if (cooldownInfo.onCooldown) {
+        const hours = cooldownInfo.hoursRemaining;
+        const minutes = cooldownInfo.minutesRemaining;
+        if (hours > 0) {
+            return { success: false, message: `Esta recompensa estará disponible en ${hours}h ${minutes}m` };
+        } else {
+            return { success: false, message: `Esta recompensa estará disponible en ${minutes}m` };
+        }
     }
     
     data.character.gold -= price;
@@ -589,5 +638,6 @@ window.storage = {
     getNextEnergyRestoreTime,
     saveFileVersions,
     getFileVersions,
-    clearFileVersions
+    clearFileVersions,
+    getRewardCooldownInfo
 };

@@ -319,13 +319,45 @@
             
             const locked = !state.unlocked;
             const noGold = state.unlocked && !state.canPurchase;
+            const hasCooldown = reward.cooldownHours && reward.cooldownHours > 0;
+            let cooldownInfo = null;
+            
+            if (hasCooldown && !locked) {
+                cooldownInfo = window.game.getRewardCooldownInfo(reward.id);
+            }
+            
+            const onCooldown = cooldownInfo && cooldownInfo.onCooldown;
             
             let buttonHTML = '';
+            let cooldownTimerHTML = '';
+            
             if (locked) {
                 buttonHTML = `
                     <button class="btn btn-secondary w-100" disabled>
                         <i class="bi bi-lock-fill"></i> Nivel ${reward.requiredLevel}
                     </button>
+                `;
+            } else if (onCooldown) {
+                const hours = cooldownInfo.hoursRemaining;
+                const minutes = cooldownInfo.minutesRemaining;
+                const seconds = cooldownInfo.secondsRemaining;
+                let timerText = '';
+                if (hours > 0) {
+                    timerText = `⏱️ Disponible en: ${hours}h ${minutes}m`;
+                } else if (minutes > 0) {
+                    timerText = `⏱️ Disponible en: ${minutes}m ${seconds}s`;
+                } else {
+                    timerText = `⏱️ Disponible en: ${seconds}s`;
+                }
+                buttonHTML = `
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="bi bi-clock"></i> En Cooldown
+                    </button>
+                `;
+                cooldownTimerHTML = `
+                    <small id="cooldown-timer-${reward.id}" class="d-block mt-2" style="color: #a0a0a0; text-align: center;">
+                        ${timerText}
+                    </small>
                 `;
             } else if (noGold) {
                 buttonHTML = `
@@ -344,7 +376,7 @@
             const cardClass = locked ? 'recompensa-bloqueada' : '';
             
             return `
-                <div class="col-md-6 col-lg-4 mb-3 recompensa-item" data-categoria="${reward.category}">
+                <div class="col-md-6 col-lg-4 mb-3 recompensa-item" data-categoria="${reward.category}" data-reward-id="${reward.id}">
                     <div class="card h-100 recompensa-card ${colorClass[reward.category]} ${cardClass}">
                         <div class="card-body">
                             <div class="recompensa-icono mb-2">${reward.icon}</div>
@@ -359,6 +391,7 @@
                             </div>
                             
                             ${buttonHTML}
+                            ${cooldownTimerHTML}
                         </div>
                     </div>
                 </div>
@@ -452,10 +485,8 @@
                     mostrarExito(item);
                 }, 300);
                 
-                setTimeout(() => {
-                    cargarRecompensas();
-                    actualizarHeader();
-                }, 1000);
+                cargarRecompensas();
+                actualizarHeader();
             } else {
                 showError(result.message);
             }
@@ -481,12 +512,55 @@
             });
         }
         
+        function updateRewardCooldowns() {
+            const rewardsWithCooldown = REWARDS.filter(r => r.cooldownHours && r.cooldownHours > 0);
+            let needsReload = false;
+            
+            rewardsWithCooldown.forEach(reward => {
+                const timerElement = document.getElementById(`cooldown-timer-${reward.id}`);
+                if (!timerElement) return;
+                
+                const cooldownInfo = window.game.getRewardCooldownInfo(reward.id);
+                
+                if (!cooldownInfo.onCooldown) {
+                    if (timerElement.style.display !== 'none') {
+                        needsReload = true;
+                    }
+                    return;
+                }
+                
+                timerElement.style.display = 'block';
+                const hours = cooldownInfo.hoursRemaining;
+                const minutes = cooldownInfo.minutesRemaining;
+                const seconds = cooldownInfo.secondsRemaining;
+                
+                let timerText = '';
+                if (hours > 0) {
+                    timerText = `⏱️ Disponible en: ${hours}h ${minutes}m`;
+                } else if (minutes > 0) {
+                    timerText = `⏱️ Disponible en: ${minutes}m ${seconds}s`;
+                } else {
+                    timerText = `⏱️ Disponible en: ${seconds}s`;
+                }
+                
+                timerElement.textContent = timerText;
+            });
+            
+            if (needsReload) {
+                cargarRecompensas();
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             if (!window.game.validateCharacterExists()) {
                 return;
             }
             cargarRecompensas();
             actualizarHeader();
+            
+            setInterval(() => {
+                updateRewardCooldowns();
+            }, 1000);
         });
     </script>
 

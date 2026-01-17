@@ -473,6 +473,10 @@ function checkAndRestoreEnergy() {
     return { restored: false, newEnergy: currentEnergy };
 }
 
+function getRewardCooldownInfo(rewardId) {
+    return window.storage.getRewardCooldownInfo(rewardId);
+}
+
 window.game = {
     initializeGame,
     getState,
@@ -497,7 +501,8 @@ window.game = {
     getCharacterSummary,
     validateCharacterExists,
     getEnergyTimerInfo,
-    checkAndRestoreEnergy
+    checkAndRestoreEnergy,
+    getRewardCooldownInfo
 };
 
 document.addEventListener('DOMContentLoaded', () => {

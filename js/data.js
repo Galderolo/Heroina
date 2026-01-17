@@ -154,6 +154,16 @@ const MISSIONS = [
         repeatable: true
     },
     {
+        id: 22,
+        name: "El Fruto de la Vitalidad",
+        description: "Comer una pieza de fruta",
+        type: "diaria",
+        xp: 3,
+        gold: 18,
+        icon: "🍎",
+        repeatable: true
+    },
+    {
         id: 8,
         name: "Ayudar al Gran Chef del Reino",
         description: "Ayudar a cocinar o preparar la comida",
@@ -498,6 +508,16 @@ const REWARDS = [
         requiredLevel: 1,
         effect: "restoreEnergy",
         value: 2
+    },
+    {
+        id: 24,
+        name: "Chuchería o Chocolatina",
+        description: "Una golosina especial para disfrutar",
+        price: 35,
+        category: "pequeña",
+        icon: "🍬",
+        requiredLevel: 1,
+        cooldownHours: 48
     }
 ];
 
