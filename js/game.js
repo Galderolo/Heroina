@@ -477,6 +477,18 @@ function getRewardCooldownInfo(rewardId) {
     return window.storage.getRewardCooldownInfo(rewardId);
 }
 
+function getCharacterClass() {
+    const state = getState();
+    const classId = state.character.class;
+    
+    if (!classId) {
+        return null;
+    }
+    
+    const classInfo = CLASSES.find(c => c.id === classId);
+    return classInfo || null;
+}
+
 window.game = {
     initializeGame,
     getState,
@@ -502,7 +514,8 @@ window.game = {
     validateCharacterExists,
     getEnergyTimerInfo,
     checkAndRestoreEnergy,
-    getRewardCooldownInfo
+    getRewardCooldownInfo,
+    getCharacterClass
 };
 
 document.addEventListener('DOMContentLoaded', () => {

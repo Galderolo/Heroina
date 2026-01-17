@@ -426,8 +426,15 @@
             const state = window.game.getState();
             
             document.getElementById('nombrePersonaje').textContent = summary.name;
+            
+            const classInfo = window.game.getCharacterClass();
+            let titleText = summary.title;
+            if (classInfo) {
+                titleText = `${classInfo.name} ${summary.title}`;
+            }
             document.getElementById('tituloPersonaje').innerHTML = 
-                `<i class="bi bi-award"></i> ${summary.title}`;
+                `<i class="bi bi-award"></i> ${titleText}`;
+            
             document.getElementById('nivelPersonaje').textContent = summary.level;
             
             const { currentXP, requiredXP, percentage } = summary.progress;
