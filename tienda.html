@@ -400,6 +400,7 @@
         
         function cargarRecompensas() {
             const rewardsWithState = window.game.getAvailableRewards();
+            const allRewards = window.data.getAllRewards();
             
             const potions = rewardsWithState.filter(r => r.category === 'potion');
             const small = rewardsWithState.filter(r => r.category === 'pequeña');
@@ -408,23 +409,23 @@
             const epic = rewardsWithState.filter(r => r.category === 'epica');
             
             document.getElementById('listaPociones').innerHTML = potions.map(r => 
-                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
+                crearTarjetaRecompensa(allRewards.find(rec => rec.id === r.id), r)
             ).join('');
             
             document.getElementById('listaPequenas').innerHTML = small.map(r => 
-                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
+                crearTarjetaRecompensa(allRewards.find(rec => rec.id === r.id), r)
             ).join('');
             
             document.getElementById('listaMedias').innerHTML = medium.map(r => 
-                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
+                crearTarjetaRecompensa(allRewards.find(rec => rec.id === r.id), r)
             ).join('');
             
             document.getElementById('listaGrandes').innerHTML = large.map(r => 
-                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
+                crearTarjetaRecompensa(allRewards.find(rec => rec.id === r.id), r)
             ).join('');
             
             document.getElementById('listaEpicas').innerHTML = epic.map(r => 
-                crearTarjetaRecompensa(REWARDS.find(rec => rec.id === r.id), r)
+                crearTarjetaRecompensa(allRewards.find(rec => rec.id === r.id), r)
             ).join('');
         }
         
@@ -454,7 +455,8 @@
         }
         
         function prepararCompra(rewardId) {
-            const reward = REWARDS.find(r => r.id === rewardId);
+            const allRewards = window.data.getAllRewards();
+            const reward = allRewards.find(r => r.id === rewardId);
             recompensaSeleccionada = reward;
             
             document.getElementById('modalRecompensaIcono').textContent = reward.icon;
@@ -513,7 +515,8 @@
         }
         
         function updateRewardCooldowns() {
-            const rewardsWithCooldown = REWARDS.filter(r => r.cooldownHours && r.cooldownHours > 0);
+            const allRewards = window.data.getAllRewards();
+            const rewardsWithCooldown = allRewards.filter(r => r.cooldownHours && r.cooldownHours > 0);
             let needsReload = false;
             
             rewardsWithCooldown.forEach(reward => {
@@ -632,6 +635,10 @@
         <a href="tienda.html" class="bottom-nav-item active">
             <i class="bi bi-shop"></i>
             <span>Tienda</span>
+        </a>
+        <a href="custom.html" class="bottom-nav-item">
+            <i class="bi bi-gear"></i>
+            <span>Personalizar</span>
         </a>
     </nav>
 

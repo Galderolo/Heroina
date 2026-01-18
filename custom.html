@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heroes del Hogar - Personalizar</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0f3460">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Heroes del Hogar">
+    <link rel="apple-touch-icon" href="./img/icon-192.svg">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-adventure fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fantasy-font" href="index.html">
+                <i class="bi bi-shield-fill"></i> Heroes del Hogar
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" id="installPWA" style="display: none;">
+                        <a class="nav-link" href="#" id="installButton">
+                            <i class="bi bi-download"></i> Instalar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="bi bi-person-circle"></i> Mi Personaje
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="misiones.html">
+                            <i class="bi bi-list-check"></i> Misiones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="tienda.html">
+                            <i class="bi bi-shop"></i> Tienda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="custom.html">
+                            <i class="bi bi-gear"></i> Personalizar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container my-4">
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-adventure text-white">
+                <h4 class="mb-0"><i class="bi bi-magic"></i> Crear Misiones y Recompensas Personalizadas</h4>
+            </div>
+            <div class="card-body">
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-4" id="customTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="missions-tab" data-bs-toggle="tab" data-bs-target="#missions" type="button" role="tab">
+                            <i class="bi bi-list-check"></i> Misiones
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="rewards-tab" data-bs-toggle="tab" data-bs-target="#rewards" type="button" role="tab">
+                            <i class="bi bi-gift"></i> Recompensas
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="customTabContent">
+                    <!-- Misiones Tab -->
+                    <div class="tab-pane fade show active" id="missions" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Misión</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="missionForm">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="missionName" required maxlength="50">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Descripción</label>
+                                                <textarea class="form-control" id="missionDescription" rows="3" required maxlength="200"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Tipo</label>
+                                                <select class="form-select" id="missionType" required>
+                                                    <option value="diaria">Diaria (XP: 3, Oro: 20)</option>
+                                                    <option value="ayuda">Ayuda (XP: 5, Oro: 30)</option>
+                                                    <option value="epica">Épica (XP: 12, Oro: 75)</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Icono (Emoji)</label>
+                                                <input type="text" class="form-control" id="missionIcon" placeholder="🛏️" maxlength="2" required>
+                                                <small class="text-muted">Escribe un emoji</small>
+                                            </div>
+                                            <input type="hidden" id="missionEditId">
+                                            <button type="submit" class="btn btn-success w-100" id="missionSubmitBtn">
+                                                <i class="bi bi-check-circle"></i> Crear Misión
+                                            </button>
+                                            <button type="button" class="btn btn-secondary w-100 mt-2" id="missionCancelBtn" style="display: none;" onclick="cancelMissionEdit()">
+                                                <i class="bi bi-x-circle"></i> Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h5 class="mb-3">Misiones Personalizadas</h5>
+                                <div id="customMissionsList" class="row">
+                                    <!-- Se llenará dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recompensas Tab -->
+                    <div class="tab-pane fade" id="rewards" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Recompensa</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="rewardForm">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="rewardName" required maxlength="50">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Descripción</label>
+                                                <textarea class="form-control" id="rewardDescription" rows="3" required maxlength="200"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Categoría</label>
+                                                <select class="form-select" id="rewardCategory" required>
+                                                    <option value="pequeña">Pequeña (Precio: 60)</option>
+                                                    <option value="media">Media (Precio: 220)</option>
+                                                    <option value="grande">Grande (Precio: 400)</option>
+                                                    <option value="epica">Épica (Precio: 600)</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Icono (Emoji)</label>
+                                                <input type="text" class="form-control" id="rewardIcon" placeholder="🍦" maxlength="2" required>
+                                                <small class="text-muted">Escribe un emoji</small>
+                                            </div>
+                                            <input type="hidden" id="rewardEditId">
+                                            <button type="submit" class="btn btn-warning w-100" id="rewardSubmitBtn">
+                                                <i class="bi bi-check-circle"></i> Crear Recompensa
+                                            </button>
+                                            <button type="button" class="btn btn-secondary w-100 mt-2" id="rewardCancelBtn" style="display: none;" onclick="cancelRewardEdit()">
+                                                <i class="bi bi-x-circle"></i> Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h5 class="mb-3">Recompensas Personalizadas</h5>
+                                <div id="customRewardsList" class="row">
+                                    <!-- Se llenará dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales Personalizados -->
+    <div id="customAlert" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon" id="alertIcon">ℹ️</div>
+            <h3 id="alertTitle" style="color: #ffd700;">Aviso</h3>
+            <p id="alertMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <button class="custom-modal-btn" onclick="closeAlert()">Aceptar</button>
+        </div>
+    </div>
+
+    <div id="customConfirm" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-icon">⚠️</div>
+            <h3 id="confirmTitle" style="color: #ffd700;">Confirmar</h3>
+            <p id="confirmMessage" style="color: #e0e0e0; font-size: 1.1rem;"></p>
+            <div class="custom-modal-buttons">
+                <button class="custom-modal-btn btn-confirm" id="confirmYes">Sí</button>
+                <button class="custom-modal-btn btn-cancel" id="confirmNo">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts del juego -->
+    <script src="js/modals.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/game.js"></script>
+    
+    <!-- Script de la página -->
+    <script>
+        function loadCustomMissions() {
+            const missions = window.storage.getCustomMissions();
+            const container = document.getElementById('customMissionsList');
+            
+            if (!missions || missions.length === 0) {
+                container.innerHTML = '<div class="col-12"><p class="text-muted text-center">No hay misiones personalizadas. Crea una nueva usando el formulario.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = missions.map(mission => {
+                const typeLabels = {
+                    'diaria': 'Diaria',
+                    'ayuda': 'Ayuda',
+                    'epica': 'Épica'
+                };
+                const typeColors = {
+                    'diaria': 'success',
+                    'ayuda': 'info',
+                    'epica': 'warning'
+                };
+                
+                return `
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-${typeColors[mission.type]}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-${typeColors[mission.type]}">${typeLabels[mission.type]}</span>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editMission(${mission.id})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteMission(${mission.id})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-center mb-2" style="font-size: 2rem;">${mission.icon}</div>
+                                <h6 class="fw-bold">${mission.name}</h6>
+                                <p class="small text-muted mb-2">${mission.description}</p>
+                                <div class="small">
+                                    <span class="badge bg-info">${mission.xp} XP</span>
+                                    <span class="badge bg-warning">${mission.gold} Oro</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function loadCustomRewards() {
+            const rewards = window.storage.getCustomRewards();
+            const container = document.getElementById('customRewardsList');
+            
+            if (!rewards || rewards.length === 0) {
+                container.innerHTML = '<div class="col-12"><p class="text-muted text-center">No hay recompensas personalizadas. Crea una nueva usando el formulario.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = rewards.map(reward => {
+                const categoryLabels = {
+                    'pequeña': 'Pequeña',
+                    'media': 'Media',
+                    'grande': 'Grande',
+                    'epica': 'Épica'
+                };
+                const categoryColors = {
+                    'pequeña': 'success',
+                    'media': 'info',
+                    'grande': 'warning',
+                    'epica': 'danger'
+                };
+                
+                return `
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-${categoryColors[reward.category]}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-${categoryColors[reward.category]}">${categoryLabels[reward.category]}</span>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editReward(${reward.id})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteReward(${reward.id})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-center mb-2" style="font-size: 2rem;">${reward.icon}</div>
+                                <h6 class="fw-bold">${reward.name}</h6>
+                                <p class="small text-muted mb-2">${reward.description}</p>
+                                <div class="small">
+                                    <span class="badge bg-warning">${reward.price} Oro</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function editMission(id) {
+            const missions = window.storage.getCustomMissions();
+            const mission = missions.find(m => m.id === id);
+            
+            if (!mission) return;
+            
+            document.getElementById('missionName').value = mission.name;
+            document.getElementById('missionDescription').value = mission.description;
+            document.getElementById('missionType').value = mission.type;
+            document.getElementById('missionIcon').value = mission.icon;
+            document.getElementById('missionEditId').value = id;
+            document.getElementById('missionSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Guardar Cambios';
+            document.getElementById('missionCancelBtn').style.display = 'block';
+        }
+        
+        function cancelMissionEdit() {
+            document.getElementById('missionForm').reset();
+            document.getElementById('missionEditId').value = '';
+            document.getElementById('missionSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Crear Misión';
+            document.getElementById('missionCancelBtn').style.display = 'none';
+        }
+        
+        function deleteMission(id) {
+            showConfirm(
+                'Esta acción no se puede deshacer.',
+                '¿Eliminar esta misión personalizada?',
+                () => {
+                    window.storage.deleteCustomMission(id);
+                    loadCustomMissions();
+                    showSuccess('Misión eliminada correctamente');
+                }
+            );
+        }
+        
+        function editReward(id) {
+            const rewards = window.storage.getCustomRewards();
+            const reward = rewards.find(r => r.id === id);
+            
+            if (!reward) return;
+            
+            document.getElementById('rewardName').value = reward.name;
+            document.getElementById('rewardDescription').value = reward.description;
+            document.getElementById('rewardCategory').value = reward.category;
+            document.getElementById('rewardIcon').value = reward.icon;
+            document.getElementById('rewardEditId').value = id;
+            document.getElementById('rewardSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Guardar Cambios';
+            document.getElementById('rewardCancelBtn').style.display = 'block';
+        }
+        
+        function cancelRewardEdit() {
+            document.getElementById('rewardForm').reset();
+            document.getElementById('rewardEditId').value = '';
+            document.getElementById('rewardSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Crear Recompensa';
+            document.getElementById('rewardCancelBtn').style.display = 'none';
+        }
+        
+        function deleteReward(id) {
+            showConfirm(
+                'Esta acción no se puede deshacer.',
+                '¿Eliminar esta recompensa personalizada?',
+                () => {
+                    window.storage.deleteCustomReward(id);
+                    loadCustomRewards();
+                    showSuccess('Recompensa eliminada correctamente');
+                }
+            );
+        }
+        
+        document.getElementById('missionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('missionName').value.trim();
+            const description = document.getElementById('missionDescription').value.trim();
+            const type = document.getElementById('missionType').value;
+            const icon = document.getElementById('missionIcon').value.trim();
+            const editId = document.getElementById('missionEditId').value;
+            
+            if (!name || !description || !icon) {
+                showError('Por favor completa todos los campos');
+                return;
+            }
+            
+            const values = window.data.getStandardMissionValues(type);
+            
+            const mission = {
+                name,
+                description,
+                type,
+                icon,
+                xp: values.xp,
+                gold: values.gold,
+                repeatable: true,
+                custom: true
+            };
+            
+            if (editId) {
+                window.storage.updateCustomMission(Number(editId), mission);
+                showSuccess('Misión actualizada correctamente');
+            } else {
+                window.storage.addCustomMission(mission);
+                showSuccess('Misión creada correctamente');
+            }
+            
+            cancelMissionEdit();
+            loadCustomMissions();
+        });
+        
+        document.getElementById('rewardForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('rewardName').value.trim();
+            const description = document.getElementById('rewardDescription').value.trim();
+            const category = document.getElementById('rewardCategory').value;
+            const icon = document.getElementById('rewardIcon').value.trim();
+            const editId = document.getElementById('rewardEditId').value;
+            
+            if (!name || !description || !icon) {
+                showError('Por favor completa todos los campos');
+                return;
+            }
+            
+            const price = window.data.getStandardRewardPrice(category);
+            
+            const reward = {
+                name,
+                description,
+                category,
+                icon,
+                price,
+                requiredLevel: 1,
+                custom: true
+            };
+            
+            if (editId) {
+                window.storage.updateCustomReward(Number(editId), reward);
+                showSuccess('Recompensa actualizada correctamente');
+            } else {
+                window.storage.addCustomReward(reward);
+                showSuccess('Recompensa creada correctamente');
+            }
+            
+            cancelRewardEdit();
+            loadCustomRewards();
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCustomMissions();
+            loadCustomRewards();
+        });
+    </script>
+
+    <!-- Bottom Navigation Bar - Solo móvil -->
+    <nav class="bottom-nav d-lg-none">
+        <a href="index.html" class="bottom-nav-item">
+            <i class="bi bi-person-circle"></i>
+            <span>Mi Personaje</span>
+        </a>
+        <a href="misiones.html" class="bottom-nav-item">
+            <i class="bi bi-list-check"></i>
+            <span>Misiones</span>
+        </a>
+        <a href="tienda.html" class="bottom-nav-item">
+            <i class="bi bi-shop"></i>
+            <span>Tienda</span>
+        </a>
+        <a href="custom.html" class="bottom-nav-item active">
+            <i class="bi bi-gear"></i>
+            <span>Personalizar</span>
+        </a>
+    </nav>
+</body>
+</html>

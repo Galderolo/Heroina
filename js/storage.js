@@ -612,6 +612,108 @@ function clearFileVersions() {
     }
 }
 
+function getCustomMissions() {
+    try {
+        const missions = localStorage.getItem('custom_missions');
+        return missions ? JSON.parse(missions) : [];
+    } catch (error) {
+        console.error('Error getting custom missions:', error);
+        return [];
+    }
+}
+
+function saveCustomMissions(missions) {
+    try {
+        localStorage.setItem('custom_missions', JSON.stringify(missions));
+        return true;
+    } catch (error) {
+        console.error('Error saving custom missions:', error);
+        return false;
+    }
+}
+
+function addCustomMission(mission) {
+    const missions = getCustomMissions();
+    let newId = Date.now();
+    while (missions.some(m => m.id === newId)) {
+        newId++;
+    }
+    mission.id = newId;
+    missions.push(mission);
+    saveCustomMissions(missions);
+    return mission;
+}
+
+function updateCustomMission(missionId, mission) {
+    const missions = getCustomMissions();
+    const index = missions.findIndex(m => m.id === missionId);
+    if (index === -1) {
+        return false;
+    }
+    mission.id = missionId;
+    missions[index] = mission;
+    saveCustomMissions(missions);
+    return true;
+}
+
+function deleteCustomMission(missionId) {
+    const missions = getCustomMissions();
+    const filtered = missions.filter(m => m.id !== missionId);
+    saveCustomMissions(filtered);
+    return true;
+}
+
+function getCustomRewards() {
+    try {
+        const rewards = localStorage.getItem('custom_rewards');
+        return rewards ? JSON.parse(rewards) : [];
+    } catch (error) {
+        console.error('Error getting custom rewards:', error);
+        return [];
+    }
+}
+
+function saveCustomRewards(rewards) {
+    try {
+        localStorage.setItem('custom_rewards', JSON.stringify(rewards));
+        return true;
+    } catch (error) {
+        console.error('Error saving custom rewards:', error);
+        return false;
+    }
+}
+
+function addCustomReward(reward) {
+    const rewards = getCustomRewards();
+    let newId = Date.now();
+    while (rewards.some(r => r.id === newId)) {
+        newId++;
+    }
+    reward.id = newId;
+    rewards.push(reward);
+    saveCustomRewards(rewards);
+    return reward;
+}
+
+function updateCustomReward(rewardId, reward) {
+    const rewards = getCustomRewards();
+    const index = rewards.findIndex(r => r.id === rewardId);
+    if (index === -1) {
+        return false;
+    }
+    reward.id = rewardId;
+    rewards[index] = reward;
+    saveCustomRewards(rewards);
+    return true;
+}
+
+function deleteCustomReward(rewardId) {
+    const rewards = getCustomRewards();
+    const filtered = rewards.filter(r => r.id !== rewardId);
+    saveCustomRewards(filtered);
+    return true;
+}
+
 window.storage = {
     saveData,
     loadData,
@@ -639,5 +741,15 @@ window.storage = {
     saveFileVersions,
     getFileVersions,
     clearFileVersions,
-    getRewardCooldownInfo
+    getRewardCooldownInfo,
+    getCustomMissions,
+    saveCustomMissions,
+    addCustomMission,
+    updateCustomMission,
+    deleteCustomMission,
+    getCustomRewards,
+    saveCustomRewards,
+    addCustomReward,
+    updateCustomReward,
+    deleteCustomReward
 };

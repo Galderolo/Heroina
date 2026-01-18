@@ -533,3 +533,39 @@ function getTitleByLevel(level) {
 function getUnlockedRewards(level) {
     return REWARDS.filter(r => r.requiredLevel <= level);
 }
+
+function getStandardMissionValues(type) {
+    const values = {
+        'diaria': { xp: 3, gold: 20 },
+        'ayuda': { xp: 5, gold: 30 },
+        'epica': { xp: 12, gold: 75 }
+    };
+    return values[type] || values['diaria'];
+}
+
+function getStandardRewardPrice(category) {
+    const prices = {
+        'pequeña': 60,
+        'media': 220,
+        'grande': 400,
+        'epica': 600
+    };
+    return prices[category] || prices['pequeña'];
+}
+
+function getAllMissions() {
+    const customMissions = window.storage ? window.storage.getCustomMissions() : [];
+    return [...MISSIONS, ...customMissions];
+}
+
+function getAllRewards() {
+    const customRewards = window.storage ? window.storage.getCustomRewards() : [];
+    return [...REWARDS, ...customRewards];
+}
+
+window.data = {
+    getStandardMissionValues,
+    getStandardRewardPrice,
+    getAllMissions,
+    getAllRewards
+};

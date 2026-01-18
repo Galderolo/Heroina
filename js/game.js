@@ -22,7 +22,8 @@ function configureCharacter(name, avatarBase64 = null) {
 }
 
 function startMission(missionId) {
-    const mission = MISSIONS.find(m => m.id === missionId);
+    const allMissions = window.data.getAllMissions();
+    const mission = allMissions.find(m => m.id === missionId);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
@@ -69,7 +70,8 @@ function completeActiveMission(missionId) {
         return { success: false, message: "Misión no encontrada" };
     }
     
-    const mission = MISSIONS.find(m => m.id === missionIdNum);
+    const allMissions = window.data.getAllMissions();
+    const mission = allMissions.find(m => m.id === missionIdNum);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
@@ -96,7 +98,8 @@ function checkExpiredMissions() {
 }
 
 function purchasePotion(potionId) {
-    const potion = REWARDS.find(r => r.id === potionId && r.category === 'potion');
+    const allRewards = window.data.getAllRewards();
+    const potion = allRewards.find(r => r.id === potionId && r.category === 'potion');
     
     if (!potion) {
         return { success: false, message: "Poción no encontrada" };
@@ -127,7 +130,8 @@ function purchasePotion(potionId) {
 }
 
 function usePotion(potionId) {
-    const potion = REWARDS.find(r => r.id === potionId && r.category === 'potion');
+    const allRewards = window.data.getAllRewards();
+    const potion = allRewards.find(r => r.id === potionId && r.category === 'potion');
     
     if (!potion) {
         return { success: false, message: "Poción no encontrada" };
@@ -174,7 +178,8 @@ function failActiveMission(missionId) {
         return { success: false, message: "Misión no encontrada" };
     }
     
-    const mission = MISSIONS.find(m => m.id === missionIdNum);
+    const allMissions = window.data.getAllMissions();
+    const mission = allMissions.find(m => m.id === missionIdNum);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
@@ -193,7 +198,8 @@ function failActiveMission(missionId) {
 }
 
 function purchaseReward(rewardId) {
-    const reward = REWARDS.find(r => r.id === rewardId);
+    const allRewards = window.data.getAllRewards();
+    const reward = allRewards.find(r => r.id === rewardId);
     
     if (!reward) {
         return { success: false, message: "Recompensa no encontrada" };
@@ -236,15 +242,17 @@ function getLevelProgress() {
 }
 
 function getMissionsByType(type = null) {
+    const allMissions = window.data.getAllMissions();
     if (type) {
-        return MISSIONS.filter(m => m.type === type);
+        return allMissions.filter(m => m.type === type);
     }
-    return MISSIONS;
+    return allMissions;
 }
 
 function getAvailableRewards() {
     const state = getState();
-    return REWARDS.map(r => ({
+    const allRewards = window.data.getAllRewards();
+    return allRewards.map(r => ({
         ...r,
         unlocked: state.character.level >= r.requiredLevel,
         canPurchase: state.character.gold >= r.price && state.character.level >= r.requiredLevel

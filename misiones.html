@@ -58,6 +58,11 @@
                             <i class="bi bi-shop"></i> Tienda
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="custom.html">
+                            <i class="bi bi-gear"></i> Personalizar
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -466,9 +471,10 @@
         }
         
         function cargarMisiones() {
-            const daily = MISSIONS.filter(m => m.type === 'diaria');
-            const help = MISSIONS.filter(m => m.type === 'ayuda');
-            const epic = MISSIONS.filter(m => m.type === 'epica');
+            const allMissions = window.data.getAllMissions();
+            const daily = allMissions.filter(m => m.type === 'diaria');
+            const help = allMissions.filter(m => m.type === 'ayuda');
+            const epic = allMissions.filter(m => m.type === 'epica');
             
             document.getElementById('listaDiarias').innerHTML = daily.map(crearTarjetaMision).join('');
             document.getElementById('listaAyuda').innerHTML = help.map(crearTarjetaMision).join('');
@@ -551,7 +557,8 @@
         }
         
         function completarMisionDirecta(missionId) {
-            const mission = MISSIONS.find(m => m.id === missionId);
+            const allMissions = window.data.getAllMissions();
+            const mission = allMissions.find(m => m.id === missionId);
             misionSeleccionada = mission;
             
             document.getElementById('modalMisionNombre').textContent = mission.name;
@@ -718,6 +725,10 @@
         <a href="tienda.html" class="bottom-nav-item">
             <i class="bi bi-shop"></i>
             <span>Tienda</span>
+        </a>
+        <a href="custom.html" class="bottom-nav-item">
+            <i class="bi bi-gear"></i>
+            <span>Personalizar</span>
         </a>
     </nav>
 
