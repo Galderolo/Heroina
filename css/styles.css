@@ -833,6 +833,67 @@ h1, h2, h3, h4, h5, h6, p, span {
     }
 }
 
+/* Recursos (index) - HUD compacto en móvil vertical */
+@media (max-width: 576px) and (orientation: portrait) {
+    .recursos-row {
+        margin-top: 0.75rem !important;
+    }
+
+    .recurso-card {
+        padding: 0.75rem;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.12);
+
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        grid-template-rows: auto auto;
+        column-gap: 0.75rem;
+        row-gap: 0.15rem;
+        align-items: center;
+        text-align: left;
+    }
+
+    .recurso-card > i {
+        grid-row: 1 / span 2;
+        justify-self: center;
+        align-self: center;
+        font-size: 1.6rem !important; /* override Bootstrap fs-1 */
+        line-height: 1;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.25));
+    }
+
+    .recurso-card h4 {
+        margin: 0 !important; /* override Bootstrap mt-2 */
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        opacity: 0.9;
+    }
+
+    .recurso-card p {
+        margin: 0 !important;
+        font-size: 1.35rem;
+        line-height: 1;
+    }
+
+    .recurso-card small {
+        display: none !important;
+    }
+}
+
+/* Touch: evitar hover “saltón” y dar feeling de botón */
+@media (hover: none) and (pointer: coarse) {
+    .recurso-card:hover {
+        transform: none !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.2) !important;
+        border-color: rgba(212, 175, 55, 0.2) !important;
+    }
+
+    .recurso-card:active {
+        transform: scale(0.98);
+    }
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;

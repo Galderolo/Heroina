@@ -197,7 +197,7 @@
                 </div>
 
                 <!-- Recursos -->
-                <div class="row mt-4">
+                <div class="row mt-4 recursos-row">
                     <div class="col-12 col-sm-4 mb-3 mb-sm-0">
                         <div class="recurso-card">
                             <i class="bi bi-coin fs-1 text-warning"></i>
@@ -219,7 +219,7 @@
                         <div class="recurso-card">
                             <i class="bi bi-heart-fill fs-1 text-danger"></i>
                             <h4 class="mt-2">Vidas</h4>
-                            <p class="fs-3" id="vidasPersonaje">
+                            <p class="fs-3 fw-bold text-danger" id="vidasPersonaje">
                                 <!-- Se actualizará dinámicamente -->
                             </p>
                             <small style="color: #a0a0a0;">Se pierden al fracasar</small>
@@ -460,19 +460,9 @@
             const maxEnergy = state.character.maxEnergy || 6;
             document.getElementById('energiaPersonaje').textContent = `${energy}/${maxEnergy}`;
             
-            const lives = state.character.lives !== undefined ? state.character.lives : 3;
-            const maxLives = state.character.maxLives || 3;
-            let heartsHTML = '';
-            
-            for (let i = 0; i < maxLives; i++) {
-                if (i < lives) {
-                    heartsHTML += '<span class="corazon corazon-lleno">❤️</span>';
-                } else {
-                    heartsHTML += '<span class="corazon corazon-vacio">💔</span>';
-                }
-            }
-            
-            document.getElementById('vidasPersonaje').innerHTML = heartsHTML;
+            const lives = state.character.lives ?? 6;
+            const maxLives = state.character.maxLives ?? 6;
+            document.getElementById('vidasPersonaje').textContent = `${lives}/${maxLives} `;
             
             if (summary.avatar) {
                 document.getElementById('avatarImage').src = summary.avatar;
