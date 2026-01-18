@@ -1,9 +1,13 @@
-// Lista de archivos JS a monitorear
+// Lista de archivos JS y HTML a monitorear
 const FILES_TO_CHECK = [
     'js/data.js',
     'js/game.js',
     'js/storage.js',
-    'js/modals.js'
+    'js/modals.js',
+    'index.html',
+    'misiones.html',
+    'tienda.html',
+    'custom.html'
 ];
 
 function calculateFileHash(content) {
