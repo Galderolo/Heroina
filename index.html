@@ -126,35 +126,7 @@
             </div>
         </div>
 
-        <!-- Acciones Principales -->
-        <div class="main-actions-section" id="mainActions">
-            <div class="row justify-content-center">
-                <div class="col-4 col-md-4 col-lg-3 mb-3">
-                    <a href="misiones.html" class="card h-100 action-card-slim border-warning">
-                        <div class="card-body text-center py-3">
-                            <i class="bi bi-list-check action-icon-slim"></i>
-                            <span class="action-text-slim">Misiones</span>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-4 col-md-4 col-lg-3 mb-3">
-                    <a href="tienda.html" class="card h-100 action-card-slim border-warning">
-                        <div class="card-body text-center py-3">
-                            <i class="bi bi-shop action-icon-slim"></i>
-                            <span class="action-text-slim">Tienda</span>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-4 col-md-4 col-lg-3 mb-3">
-                    <a href="custom.html" class="card h-100 action-card-slim border-warning">
-                        <div class="card-body text-center py-3">
-                            <i class="bi bi-gear action-icon-slim"></i>
-                            <span class="action-text-slim">Personalizar</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
+        <!-- Acciones Principales (eliminadas: ahora se navega por el menú inferior) -->
 
         <!-- Card del Personaje -->
         <div class="card character-card shadow-lg mb-4" id="characterCard">
@@ -839,11 +811,12 @@
         
         function checkCharacterExists() {
             const state = window.game.getState();
+            const mainActions = document.getElementById('mainActions');
             
             if (!state.character.name || state.character.name === "") {
                 document.getElementById('characterCreation').style.display = 'block';
                 document.getElementById('characterCard').style.display = 'none';
-                document.getElementById('mainActions').style.display = 'none';
+                if (mainActions) mainActions.style.display = 'none';
                 document.getElementById('statsToday').style.display = 'none';
                 document.getElementById('statsTotal').style.display = 'none';
                 document.getElementById('inventory-section').style.display = 'none';
@@ -852,7 +825,7 @@
             } else {
                 document.getElementById('characterCreation').style.display = 'none';
                 document.getElementById('characterCard').style.display = 'block';
-                document.getElementById('mainActions').style.display = 'block';
+                if (mainActions) mainActions.style.display = 'block';
                 document.getElementById('statsToday').style.display = 'block';
                 document.getElementById('statsTotal').style.display = 'block';
                 document.getElementById('inventory-section').style.display = 'block';
@@ -949,17 +922,21 @@
 
     <!-- Bottom Navigation Bar - Solo móvil -->
     <nav class="bottom-nav d-lg-none">
-        <a href="index.html" class="bottom-nav-item active">
-            <i class="bi bi-person-circle"></i>
-            <span>Mi Personaje</span>
+        <a href="tienda.html" class="bottom-nav-item">
+            <i class="bi bi-shop"></i>
+            <span>Tienda</span>
         </a>
         <a href="misiones.html" class="bottom-nav-item">
             <i class="bi bi-list-check"></i>
             <span>Misiones</span>
         </a>
-        <a href="tienda.html" class="bottom-nav-item">
-            <i class="bi bi-shop"></i>
-            <span>Tienda</span>
+        <a href="index.html" class="bottom-nav-item center active">
+            <i class="bi bi-person-circle"></i>
+            <span>Personaje</span>
+        </a>
+        <a href="#" class="bottom-nav-item" onclick="showWip(); return false;">
+            <i class="bi bi-hourglass-split"></i>
+            <span>WIP</span>
         </a>
         <a href="custom.html" class="bottom-nav-item">
             <i class="bi bi-gear"></i>
