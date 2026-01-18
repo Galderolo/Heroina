@@ -120,33 +120,7 @@
                                             <div class="mb-3">
                                                 <label class="form-label">Icono</label>
                                                 <div class="icon-selector" id="missionIconSelector">
-                                                    <div class="icon-grid">
-                                                        <button type="button" class="icon-btn" data-icon="🛏️">🛏️</button>
-                                                        <button type="button" class="icon-btn" data-icon="🧸">🧸</button>
-                                                        <button type="button" class="icon-btn" data-icon="🪥">🪥</button>
-                                                        <button type="button" class="icon-btn" data-icon="💧">💧</button>
-                                                        <button type="button" class="icon-btn" data-icon="🏰">🏰</button>
-                                                        <button type="button" class="icon-btn" data-icon="🍳">🍳</button>
-                                                        <button type="button" class="icon-btn" data-icon="👗">👗</button>
-                                                        <button type="button" class="icon-btn" data-icon="🚪">🚪</button>
-                                                        <button type="button" class="icon-btn" data-icon="🍎">🍎</button>
-                                                        <button type="button" class="icon-btn" data-icon="👨‍🍳">👨‍🍳</button>
-                                                        <button type="button" class="icon-btn" data-icon="🍽️">🍽️</button>
-                                                        <button type="button" class="icon-btn" data-icon="🛒">🛒</button>
-                                                        <button type="button" class="icon-btn" data-icon="👕">👕</button>
-                                                        <button type="button" class="icon-btn" data-icon="🗑️">🗑️</button>
-                                                        <button type="button" class="icon-btn" data-icon="👟">👟</button>
-                                                        <button type="button" class="icon-btn" data-icon="✨">✨</button>
-                                                        <button type="button" class="icon-btn" data-icon="🛁">🛁</button>
-                                                        <button type="button" class="icon-btn" data-icon="💝">💝</button>
-                                                        <button type="button" class="icon-btn" data-icon="🌟">🌟</button>
-                                                        <button type="button" class="icon-btn" data-icon="😊">😊</button>
-                                                        <button type="button" class="icon-btn" data-icon="⏰">⏰</button>
-                                                        <button type="button" class="icon-btn" data-icon="🕊️">🕊️</button>
-                                                        <button type="button" class="icon-btn" data-icon="📚">📚</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎨">🎨</button>
-                                                        <button type="button" class="icon-btn" data-icon="⚽">⚽</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎮">🎮</button>
+                                                    <div class="icon-grid" id="missionIconGrid">
                                                     </div>
                                                 </div>
                                                 <input type="hidden" id="missionIcon" required>
@@ -203,31 +177,7 @@
                                             <div class="mb-3">
                                                 <label class="form-label">Icono</label>
                                                 <div class="icon-selector" id="rewardIconSelector">
-                                                    <div class="icon-grid">
-                                                        <button type="button" class="icon-btn" data-icon="🍦">🍦</button>
-                                                        <button type="button" class="icon-btn" data-icon="📺">📺</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎵">🎵</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎨">🎨</button>
-                                                        <button type="button" class="icon-btn" data-icon="📖">📖</button>
-                                                        <button type="button" class="icon-btn" data-icon="🧸">🧸</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎬">🎬</button>
-                                                        <button type="button" class="icon-btn" data-icon="🍿">🍿</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎲">🎲</button>
-                                                        <button type="button" class="icon-btn" data-icon="🛁">🛁</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎮">🎮</button>
-                                                        <button type="button" class="icon-btn" data-icon="🍪">🍪</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎉">🎉</button>
-                                                        <button type="button" class="icon-btn" data-icon="🧁">🧁</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎁">🎁</button>
-                                                        <button type="button" class="icon-btn" data-icon="🏰">🏰</button>
-                                                        <button type="button" class="icon-btn" data-icon="🛍️">🛍️</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎈">🎈</button>
-                                                        <button type="button" class="icon-btn" data-icon="👑">👑</button>
-                                                        <button type="button" class="icon-btn" data-icon="🌟">🌟</button>
-                                                        <button type="button" class="icon-btn" data-icon="🍬">🍬</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎯">🎯</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎪">🎪</button>
-                                                        <button type="button" class="icon-btn" data-icon="🎭">🎭</button>
+                                                    <div class="icon-grid" id="rewardIconGrid">
                                                     </div>
                                                 </div>
                                                 <input type="hidden" id="rewardIcon" required>
@@ -290,6 +240,50 @@
     
     <!-- Script de la página -->
     <script>
+        const AVAILABLE_ICONS = [
+            '🛏️', '🧸', '🪥', '💧', '🏰', '🍳', '👗', '🚪', '🍎', '👨‍🍳',
+            '🍽️', '🛒', '👕', '🗑️', '👟', '✨', '🛁', '💝', '🌟', '😊',
+            '⏰', '🕊️', '📚', '🎨', '⚽', '🎮', '🧹', '🧼', '🥗', '🥛',
+            '🧴', '📱', '💻', '📝', '✏️', '📷', '🎯', '🏆', '⭐', '💪',
+            '🤝', '❤️', '🎁', '🎊', '🎈', '🍦', '📺', '🎵', '📖', '🎬',
+            '🍿', '🎲', '🍪', '🎉', '🧁', '🛍️', '👑', '🍬', '🎪', '🎭',
+            '🍕', '🍔', '🍟', '🍰', '🧋', '☕', '🎸', '🎹', '🎤', '🎧',
+            '🖼️', '📸', '🎠', '🎡', '🎢', '🏖️', '🌳', '🚗'
+        ];
+        
+        function renderIconGrid(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = AVAILABLE_ICONS.map(icon => 
+                `<button type="button" class="icon-btn" data-icon="${icon}">${icon}</button>`
+            ).join('');
+        }
+        
+        function setupIconSelectors() {
+            document.getElementById('missionIconSelector').addEventListener('click', function(e) {
+                const iconBtn = e.target.closest('.icon-btn');
+                if (iconBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.querySelectorAll('#missionIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+                    iconBtn.classList.add('selected');
+                    document.getElementById('missionIcon').value = iconBtn.dataset.icon;
+                }
+            });
+            
+            document.getElementById('rewardIconSelector').addEventListener('click', function(e) {
+                const iconBtn = e.target.closest('.icon-btn');
+                if (iconBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.querySelectorAll('#rewardIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+                    iconBtn.classList.add('selected');
+                    document.getElementById('rewardIcon').value = iconBtn.dataset.icon;
+                }
+            });
+        }
+        
         function loadCustomMissions() {
             const missions = window.storage.getCustomMissions();
             const container = document.getElementById('customMissionsList');
@@ -477,27 +471,29 @@
             );
         }
         
-        document.getElementById('missionIconSelector').addEventListener('click', function(e) {
-            const iconBtn = e.target.closest('.icon-btn');
-            if (iconBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                document.querySelectorAll('#missionIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
-                iconBtn.classList.add('selected');
-                document.getElementById('missionIcon').value = iconBtn.dataset.icon;
-            }
-        });
-        
-        document.getElementById('rewardIconSelector').addEventListener('click', function(e) {
-            const iconBtn = e.target.closest('.icon-btn');
-            if (iconBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                document.querySelectorAll('#rewardIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
-                iconBtn.classList.add('selected');
-                document.getElementById('rewardIcon').value = iconBtn.dataset.icon;
-            }
-        });
+        function setupIconSelectors() {
+            document.getElementById('missionIconSelector').addEventListener('click', function(e) {
+                const iconBtn = e.target.closest('.icon-btn');
+                if (iconBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.querySelectorAll('#missionIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+                    iconBtn.classList.add('selected');
+                    document.getElementById('missionIcon').value = iconBtn.dataset.icon;
+                }
+            });
+            
+            document.getElementById('rewardIconSelector').addEventListener('click', function(e) {
+                const iconBtn = e.target.closest('.icon-btn');
+                if (iconBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.querySelectorAll('#rewardIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+                    iconBtn.classList.add('selected');
+                    document.getElementById('rewardIcon').value = iconBtn.dataset.icon;
+                }
+            });
+        }
         
         document.getElementById('missionForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -577,6 +573,9 @@
         });
         
         document.addEventListener('DOMContentLoaded', () => {
+            renderIconGrid('missionIconGrid');
+            renderIconGrid('rewardIconGrid');
+            setupIconSelectors();
             loadCustomMissions();
             loadCustomRewards();
         });
