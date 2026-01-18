@@ -75,7 +75,7 @@
             </div>
             <div class="card-body">
                 <!-- Tabs -->
-                <ul class="nav nav-tabs mb-4" id="customTabs" role="tablist">
+                <ul class="nav nav-tabs mb-4 custom-tabs" id="customTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="missions-tab" data-bs-toggle="tab" data-bs-target="#missions" type="button" role="tab">
                             <i class="bi bi-list-check"></i> Misiones
@@ -102,24 +102,55 @@
                                         <form id="missionForm">
                                             <div class="mb-3">
                                                 <label class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="missionName" required maxlength="50">
+                                                <input type="text" class="form-control" id="missionName" placeholder="Ej: Preparar el desayuno" required maxlength="50">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Descripción</label>
-                                                <textarea class="form-control" id="missionDescription" rows="3" required maxlength="200"></textarea>
+                                                <textarea class="form-control" id="missionDescription" rows="3" placeholder="Ej: Hacer la cama y dejarla lista para la próxima aventura" required maxlength="200"></textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tipo</label>
                                                 <select class="form-select" id="missionType" required>
+                                                    <option value="">Selecciona un tipo...</option>
                                                     <option value="diaria">Diaria (XP: 3, Oro: 20)</option>
                                                     <option value="ayuda">Ayuda (XP: 5, Oro: 30)</option>
                                                     <option value="epica">Épica (XP: 12, Oro: 75)</option>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Icono (Emoji)</label>
-                                                <input type="text" class="form-control" id="missionIcon" placeholder="🛏️" maxlength="2" required>
-                                                <small class="text-muted">Escribe un emoji</small>
+                                                <label class="form-label">Icono</label>
+                                                <div class="icon-selector" id="missionIconSelector">
+                                                    <div class="icon-grid">
+                                                        <button type="button" class="icon-btn" data-icon="🛏️">🛏️</button>
+                                                        <button type="button" class="icon-btn" data-icon="🧸">🧸</button>
+                                                        <button type="button" class="icon-btn" data-icon="🪥">🪥</button>
+                                                        <button type="button" class="icon-btn" data-icon="💧">💧</button>
+                                                        <button type="button" class="icon-btn" data-icon="🏰">🏰</button>
+                                                        <button type="button" class="icon-btn" data-icon="🍳">🍳</button>
+                                                        <button type="button" class="icon-btn" data-icon="👗">👗</button>
+                                                        <button type="button" class="icon-btn" data-icon="🚪">🚪</button>
+                                                        <button type="button" class="icon-btn" data-icon="🍎">🍎</button>
+                                                        <button type="button" class="icon-btn" data-icon="👨‍🍳">👨‍🍳</button>
+                                                        <button type="button" class="icon-btn" data-icon="🍽️">🍽️</button>
+                                                        <button type="button" class="icon-btn" data-icon="🛒">🛒</button>
+                                                        <button type="button" class="icon-btn" data-icon="👕">👕</button>
+                                                        <button type="button" class="icon-btn" data-icon="🗑️">🗑️</button>
+                                                        <button type="button" class="icon-btn" data-icon="👟">👟</button>
+                                                        <button type="button" class="icon-btn" data-icon="✨">✨</button>
+                                                        <button type="button" class="icon-btn" data-icon="🛁">🛁</button>
+                                                        <button type="button" class="icon-btn" data-icon="💝">💝</button>
+                                                        <button type="button" class="icon-btn" data-icon="🌟">🌟</button>
+                                                        <button type="button" class="icon-btn" data-icon="😊">😊</button>
+                                                        <button type="button" class="icon-btn" data-icon="⏰">⏰</button>
+                                                        <button type="button" class="icon-btn" data-icon="🕊️">🕊️</button>
+                                                        <button type="button" class="icon-btn" data-icon="📚">📚</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎨">🎨</button>
+                                                        <button type="button" class="icon-btn" data-icon="⚽">⚽</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎮">🎮</button>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" id="missionIcon" required>
+                                                <small class="text-muted">Selecciona un icono de la lista</small>
                                             </div>
                                             <input type="hidden" id="missionEditId">
                                             <button type="submit" class="btn btn-success w-100" id="missionSubmitBtn">
@@ -153,15 +184,16 @@
                                         <form id="rewardForm">
                                             <div class="mb-3">
                                                 <label class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="rewardName" required maxlength="50">
+                                                <input type="text" class="form-control" id="rewardName" placeholder="Ej: Elegir el Postre del Día" required maxlength="50">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Descripción</label>
-                                                <textarea class="form-control" id="rewardDescription" rows="3" required maxlength="200"></textarea>
+                                                <textarea class="form-control" id="rewardDescription" rows="3" placeholder="Ej: Tú eliges qué postre comer hoy" required maxlength="200"></textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Categoría</label>
                                                 <select class="form-select" id="rewardCategory" required>
+                                                    <option value="">Selecciona una categoría...</option>
                                                     <option value="pequeña">Pequeña (Precio: 60)</option>
                                                     <option value="media">Media (Precio: 220)</option>
                                                     <option value="grande">Grande (Precio: 400)</option>
@@ -169,9 +201,37 @@
                                                 </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Icono (Emoji)</label>
-                                                <input type="text" class="form-control" id="rewardIcon" placeholder="🍦" maxlength="2" required>
-                                                <small class="text-muted">Escribe un emoji</small>
+                                                <label class="form-label">Icono</label>
+                                                <div class="icon-selector" id="rewardIconSelector">
+                                                    <div class="icon-grid">
+                                                        <button type="button" class="icon-btn" data-icon="🍦">🍦</button>
+                                                        <button type="button" class="icon-btn" data-icon="📺">📺</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎵">🎵</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎨">🎨</button>
+                                                        <button type="button" class="icon-btn" data-icon="📖">📖</button>
+                                                        <button type="button" class="icon-btn" data-icon="🧸">🧸</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎬">🎬</button>
+                                                        <button type="button" class="icon-btn" data-icon="🍿">🍿</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎲">🎲</button>
+                                                        <button type="button" class="icon-btn" data-icon="🛁">🛁</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎮">🎮</button>
+                                                        <button type="button" class="icon-btn" data-icon="🍪">🍪</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎉">🎉</button>
+                                                        <button type="button" class="icon-btn" data-icon="🧁">🧁</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎁">🎁</button>
+                                                        <button type="button" class="icon-btn" data-icon="🏰">🏰</button>
+                                                        <button type="button" class="icon-btn" data-icon="🛍️">🛍️</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎈">🎈</button>
+                                                        <button type="button" class="icon-btn" data-icon="👑">👑</button>
+                                                        <button type="button" class="icon-btn" data-icon="🌟">🌟</button>
+                                                        <button type="button" class="icon-btn" data-icon="🍬">🍬</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎯">🎯</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎪">🎪</button>
+                                                        <button type="button" class="icon-btn" data-icon="🎭">🎭</button>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" id="rewardIcon" required>
+                                                <small class="text-muted">Selecciona un icono de la lista</small>
                                             </div>
                                             <input type="hidden" id="rewardEditId">
                                             <button type="submit" class="btn btn-warning w-100" id="rewardSubmitBtn">
@@ -344,6 +404,13 @@
             document.getElementById('missionEditId').value = id;
             document.getElementById('missionSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Guardar Cambios';
             document.getElementById('missionCancelBtn').style.display = 'block';
+            
+            document.querySelectorAll('#missionIconSelector .icon-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.icon === mission.icon) {
+                    btn.classList.add('selected');
+                }
+            });
         }
         
         function cancelMissionEdit() {
@@ -351,6 +418,8 @@
             document.getElementById('missionEditId').value = '';
             document.getElementById('missionSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Crear Misión';
             document.getElementById('missionCancelBtn').style.display = 'none';
+            document.querySelectorAll('#missionIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('missionIcon').value = '';
         }
         
         function deleteMission(id) {
@@ -378,6 +447,13 @@
             document.getElementById('rewardEditId').value = id;
             document.getElementById('rewardSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Guardar Cambios';
             document.getElementById('rewardCancelBtn').style.display = 'block';
+            
+            document.querySelectorAll('#rewardIconSelector .icon-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.icon === reward.icon) {
+                    btn.classList.add('selected');
+                }
+            });
         }
         
         function cancelRewardEdit() {
@@ -385,6 +461,8 @@
             document.getElementById('rewardEditId').value = '';
             document.getElementById('rewardSubmitBtn').innerHTML = '<i class="bi bi-check-circle"></i> Crear Recompensa';
             document.getElementById('rewardCancelBtn').style.display = 'none';
+            document.querySelectorAll('#rewardIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('rewardIcon').value = '';
         }
         
         function deleteReward(id) {
@@ -399,6 +477,28 @@
             );
         }
         
+        document.getElementById('missionIconSelector').addEventListener('click', function(e) {
+            const iconBtn = e.target.closest('.icon-btn');
+            if (iconBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('#missionIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+                iconBtn.classList.add('selected');
+                document.getElementById('missionIcon').value = iconBtn.dataset.icon;
+            }
+        });
+        
+        document.getElementById('rewardIconSelector').addEventListener('click', function(e) {
+            const iconBtn = e.target.closest('.icon-btn');
+            if (iconBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('#rewardIconSelector .icon-btn').forEach(btn => btn.classList.remove('selected'));
+                iconBtn.classList.add('selected');
+                document.getElementById('rewardIcon').value = iconBtn.dataset.icon;
+            }
+        });
+        
         document.getElementById('missionForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -408,7 +508,7 @@
             const icon = document.getElementById('missionIcon').value.trim();
             const editId = document.getElementById('missionEditId').value;
             
-            if (!name || !description || !icon) {
+            if (!name || !description || !type || !icon) {
                 showError('Por favor completa todos los campos');
                 return;
             }
