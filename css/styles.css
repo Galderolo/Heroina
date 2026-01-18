@@ -932,12 +932,12 @@ h1, h2, h3, h4, h5, h6, p, span {
 }
 
 .action-card-slim .card-body {
-    padding: 1rem 0.5rem !important;
+    padding: 1rem 0.4rem !important;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .action-card-slim:hover {
@@ -954,9 +954,26 @@ h1, h2, h3, h4, h5, h6, p, span {
 
 .action-text-slim {
     font-family: 'MedievalSharp', cursive;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     color: var(--color-gold-bright);
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+}
+
+@media (max-width: 576px) {
+    .action-text-slim {
+        font-size: 0.85rem;
+    }
+    .action-icon-slim {
+        font-size: 1.75rem;
+    }
+    .action-card-slim .card-body {
+        padding: 0.9rem 0.3rem !important;
+        gap: 0.4rem;
+    }
 }
 
 .custom-modal {
