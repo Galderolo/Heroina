@@ -508,24 +508,28 @@
             actualizarHeader();
         }
         
-        function cancelarMision() {
+        function cancelarMision(missionId) {
             showConfirm(
                 'No pierdes nada, pero tampoco ganas.',
                 '¿Cancelar la misión?',
                 () => {
-                    window.game.cancelActiveMission();
+                    const result = window.game.cancelActiveMission(missionId);
+                    if (!result.success) {
+                        showError(result.message);
+                        return;
+                    }
                     cargarMisiones();
                     actualizarHeader();
                 }
             );
         }
         
-        function fracasarMision() {
+        function fracasarMision(missionId) {
             showConfirm(
                 'Se perderá 1 vida ❤️ y 1 de energía ⚡',
                 '⚠️ ¿Seguro que la misión FRACASÓ?',
                 () => {
-                    const result = window.game.failActiveMission();
+                    const result = window.game.failActiveMission(missionId);
                     
                     if (!result.success) {
                         showError(result.message);

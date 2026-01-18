@@ -62,13 +62,14 @@ function getActiveMissions() {
 
 function completeActiveMission(missionId) {
     const activeMissions = window.storage.getActiveMissions();
-    const activeMission = activeMissions.find(m => m.missionId === missionId);
+    const missionIdNum = Number(missionId);
+    const activeMission = activeMissions.find(m => Number(m.missionId) === missionIdNum);
     
     if (!activeMission) {
         return { success: false, message: "Misión no encontrada" };
     }
     
-    const mission = MISSIONS.find(m => m.id === missionId);
+    const mission = MISSIONS.find(m => m.id === missionIdNum);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
@@ -166,13 +167,14 @@ function getPotionInventory() {
 
 function failActiveMission(missionId) {
     const activeMissions = window.storage.getActiveMissions();
-    const activeMission = activeMissions.find(m => m.missionId === missionId);
+    const missionIdNum = Number(missionId);
+    const activeMission = activeMissions.find(m => Number(m.missionId) === missionIdNum);
     
     if (!activeMission) {
         return { success: false, message: "Misión no encontrada" };
     }
     
-    const mission = MISSIONS.find(m => m.id === missionId);
+    const mission = MISSIONS.find(m => m.id === missionIdNum);
     
     if (!mission) {
         return { success: false, message: "Misión no encontrada" };
