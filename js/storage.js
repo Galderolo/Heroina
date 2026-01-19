@@ -61,37 +61,41 @@ function loadData() {
         if (data) {
             const parsedData = JSON.parse(data);
             
-            const today = new Date().toDateString();
+            // Reutilizar objetos Date para optimizar
+            const now = new Date();
+            const today = now.toDateString();
+            const nowISO = now.toISOString();
+            
+            // Consolidar verificaciones en una sola pasada
+            let dataChanged = false;
             const lastConnection = parsedData.stats.lastConnection ? 
                 new Date(parsedData.stats.lastConnection).toDateString() : 
                 '';
             
-            let dataChanged = false;
-            const now = new Date();
-            
+            // Verificar si cambió el día
             if (lastConnection !== today) {
                 parsedData.stats.missionsToday = 0;
                 parsedData.character.energy = parsedData.character.maxEnergy || 6;
-                parsedData.stats.lastConnection = new Date().toISOString();
-                
+                parsedData.stats.lastConnection = nowISO;
                 if (!parsedData.stats.lastEnergyUpdate) {
-                    parsedData.stats.lastEnergyUpdate = new Date().toISOString();
+                    parsedData.stats.lastEnergyUpdate = nowISO;
                 }
                 dataChanged = true;
             }
             
-            
+            // Inicializar lastEnergyUpdate si no existe
             if (!parsedData.stats.lastEnergyUpdate) {
-                parsedData.stats.lastEnergyUpdate = new Date().toISOString();
+                parsedData.stats.lastEnergyUpdate = nowISO;
                 dataChanged = true;
             }
             
+            // Restaurar energía si es necesario
             const lastEnergyUpdate = new Date(parsedData.stats.lastEnergyUpdate);
             const hoursElapsed = (now - lastEnergyUpdate) / (1000 * 60 * 60);
+            const maxEnergy = parsedData.character.maxEnergy || 6;
             
-            if (hoursElapsed >= 1 && parsedData.character.energy < (parsedData.character.maxEnergy || 6)) {
+            if (hoursElapsed >= 1 && parsedData.character.energy < maxEnergy) {
                 const hoursToRestore = Math.floor(hoursElapsed);
-                const maxEnergy = parsedData.character.maxEnergy || 6;
                 const energyToAdd = Math.min(hoursToRestore, maxEnergy - parsedData.character.energy);
                 
                 if (energyToAdd > 0) {
@@ -107,6 +111,7 @@ function loadData() {
                 }
             }
             
+            // Inicializar valores por defecto si faltan
             if (!parsedData.character.maxEnergy) {
                 parsedData.character.maxEnergy = 6;
                 dataChanged = true;
@@ -133,8 +138,9 @@ function loadData() {
                 dataChanged = true;
             }
             
+            // Guardar cambios de forma síncrona para evitar delays
             if (dataChanged) {
-                setTimeout(() => saveData(parsedData), 100);
+                saveData(parsedData);
             }
             
             if (!validateData(parsedData)) {

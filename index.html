@@ -410,45 +410,64 @@
             const summary = window.game.getCharacterSummary();
             const state = window.game.getState();
             
-            document.getElementById('nombrePersonaje').textContent = summary.name;
+            // Cachear referencias a elementos DOM para evitar múltiples búsquedas
+            const nombrePersonaje = document.getElementById('nombrePersonaje');
+            const tituloPersonaje = document.getElementById('tituloPersonaje');
+            const nivelPersonaje = document.getElementById('nivelPersonaje');
+            const barraXP = document.getElementById('barraXP');
+            const textoXP = document.getElementById('textoXP');
+            const oroPersonaje = document.getElementById('oroPersonaje');
+            const energiaPersonaje = document.getElementById('energiaPersonaje');
+            const vidasPersonaje = document.getElementById('vidasPersonaje');
+            const avatarImage = document.getElementById('avatarImage');
+            const misionesHoy = document.getElementById('misionesHoy');
+            const xpHoy = document.getElementById('xpHoy');
+            const oroHoy = document.getElementById('oroHoy');
+            const rachaPersonaje = document.getElementById('rachaPersonaje');
+            const totalMisiones = document.getElementById('totalMisiones');
+            const totalXP = document.getElementById('totalXP');
+            const totalOro = document.getElementById('totalOro');
+            const totalGastado = document.getElementById('totalGastado');
+            
+            // Actualizar todos los elementos en batch
+            nombrePersonaje.textContent = summary.name;
             
             const classInfo = window.game.getCharacterClass();
             let titleText = summary.title;
             if (classInfo) {
                 titleText = `${classInfo.name} ${summary.title}`;
             }
-            document.getElementById('tituloPersonaje').innerHTML = 
-                `<i class="bi bi-award"></i> ${titleText}`;
+            tituloPersonaje.innerHTML = `<i class="bi bi-award"></i> ${titleText}`;
             
-            document.getElementById('nivelPersonaje').textContent = summary.level;
+            nivelPersonaje.textContent = summary.level;
             
             const { currentXP, requiredXP, percentage } = summary.progress;
-            document.getElementById('barraXP').style.width = percentage + '%';
-            document.getElementById('textoXP').textContent = `${currentXP} / ${requiredXP} XP`;
+            barraXP.style.width = percentage + '%';
+            textoXP.textContent = `${currentXP} / ${requiredXP} XP`;
             
-            document.getElementById('oroPersonaje').textContent = summary.gold;
+            oroPersonaje.textContent = summary.gold;
             
             const energy = state.character.energy || 0;
             const maxEnergy = state.character.maxEnergy || 6;
-            document.getElementById('energiaPersonaje').textContent = `${energy}/${maxEnergy}`;
+            energiaPersonaje.textContent = `${energy}/${maxEnergy}`;
             
             const lives = state.character.lives ?? 6;
             const maxLives = state.character.maxLives ?? 6;
-            document.getElementById('vidasPersonaje').textContent = `${lives}/${maxLives} `;
+            vidasPersonaje.textContent = `${lives}/${maxLives} `;
             
             if (summary.avatar) {
-                document.getElementById('avatarImage').src = summary.avatar;
+                avatarImage.src = summary.avatar;
             }
             
-            document.getElementById('misionesHoy').textContent = summary.todayStats.missions;
-            document.getElementById('xpHoy').textContent = summary.todayStats.xp;
-            document.getElementById('oroHoy').textContent = summary.todayStats.gold;
-            document.getElementById('rachaPersonaje').textContent = summary.streak;
+            misionesHoy.textContent = summary.todayStats.missions;
+            xpHoy.textContent = summary.todayStats.xp;
+            oroHoy.textContent = summary.todayStats.gold;
+            rachaPersonaje.textContent = summary.streak;
             
-            document.getElementById('totalMisiones').textContent = state.stats.totalMissions;
-            document.getElementById('totalXP').textContent = state.stats.totalXP;
-            document.getElementById('totalOro').textContent = state.stats.totalGold;
-            document.getElementById('totalGastado').textContent = state.stats.totalSpent;
+            totalMisiones.textContent = state.stats.totalMissions;
+            totalXP.textContent = state.stats.totalXP;
+            totalOro.textContent = state.stats.totalGold;
+            totalGastado.textContent = state.stats.totalSpent;
             
             cargarMisionesActivas();
             loadPotions();
@@ -799,11 +818,13 @@
                     colors: ['#FFD700', '#FFA500', '#FF8C00']
                 });
                 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Guardar marca para hacer scroll hacia arriba después del reload
+                sessionStorage.setItem('scrollToTopAfterReload', 'true');
                 
+                // Delay mínimo solo para permitir que el scroll se inicie
                 setTimeout(() => {
                     location.reload();
-                }, 1000);
+                }, 100);
             } else {
                 showError(result.message);
             }
@@ -811,57 +832,102 @@
         
         function checkCharacterExists() {
             const state = window.game.getState();
-            const mainActions = document.getElementById('mainActions');
+            const characterExists = state.character.name && state.character.name !== "";
             
-            if (!state.character.name || state.character.name === "") {
-                document.getElementById('characterCreation').style.display = 'block';
-                document.getElementById('characterCard').style.display = 'none';
+            // Cachear referencias a elementos DOM
+            const characterCreation = document.getElementById('characterCreation');
+            const characterCard = document.getElementById('characterCard');
+            const mainActions = document.getElementById('mainActions');
+            const statsToday = document.getElementById('statsToday');
+            const statsTotal = document.getElementById('statsTotal');
+            const inventorySection = document.getElementById('inventory-section');
+            
+            if (!characterExists) {
+                characterCreation.style.display = 'block';
+                characterCard.style.display = 'none';
                 if (mainActions) mainActions.style.display = 'none';
-                document.getElementById('statsToday').style.display = 'none';
-                document.getElementById('statsTotal').style.display = 'none';
-                document.getElementById('inventory-section').style.display = 'none';
+                statsToday.style.display = 'none';
+                statsTotal.style.display = 'none';
+                inventorySection.style.display = 'none';
                 
+                // Solo cargar clases si no existe personaje
                 loadClassSelection();
             } else {
-                document.getElementById('characterCreation').style.display = 'none';
-                document.getElementById('characterCard').style.display = 'block';
+                characterCreation.style.display = 'none';
+                characterCard.style.display = 'block';
                 if (mainActions) mainActions.style.display = 'block';
-                document.getElementById('statsToday').style.display = 'block';
-                document.getElementById('statsTotal').style.display = 'block';
-                document.getElementById('inventory-section').style.display = 'block';
+                statsToday.style.display = 'block';
+                statsTotal.style.display = 'block';
+                inventorySection.style.display = 'block';
             }
         }
         
+        // Deshabilitar restauración automática del scroll del navegador
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
+            const shouldScrollToTop = sessionStorage.getItem('scrollToTopAfterReload') === 'true';
+            
+            // Hacer scroll inmediatamente si se marcó antes del reload
+            if (shouldScrollToTop) {
+                window.scrollTo(0, 0);
+            }
+            
             checkCharacterExists();
             
-            // Verificar misiones expiradas
-            const expired = window.game.checkExpiredMissions();
-            if (expired.length > 0) {
-                showError(
-                    `${expired.length} misión(es) han expirado después de 12 horas y han fracasado automáticamente. Se ha perdido 1 vida por cada una.`,
-                    '⚠️ Misiones Expiradas'
-                );
+            // Verificar misiones expiradas solo si hay misiones activas (optimización)
+            const activeMissions = window.game.getActiveMissions();
+            if (activeMissions && activeMissions.length > 0) {
+                const expired = window.game.checkExpiredMissions();
+                if (expired.length > 0) {
+                    showError(
+                        `${expired.length} misión(es) han expirado después de 12 horas y han fracasado automáticamente. Se ha perdido 1 vida por cada una.`,
+                        '⚠️ Misiones Expiradas'
+                    );
+                }
             }
             
             cargarPersonaje();
             
-            // Actualizar temporizador de energía cada segundo
-            setInterval(() => {
-                updateEnergyTimer();
-            }, 1000);
+            // Asegurar scroll hacia arriba después de cargar el personaje y eliminar la marca
+            if (shouldScrollToTop) {
+                // Hacer scroll múltiples veces para asegurar que funcione
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, 0);
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                        // Eliminar la marca después de asegurar el scroll
+                        sessionStorage.removeItem('scrollToTopAfterReload');
+                    }, 100);
+                });
+                
+                // También hacer scroll cuando la ventana esté completamente cargada
+                window.addEventListener('load', () => {
+                    window.scrollTo(0, 0);
+                }, { once: true });
+            }
             
-            // Verificar y restaurar energía cada minuto
-            setInterval(() => {
-                const result = window.game.checkAndRestoreEnergy();
-                if (result.restored) {
-                    cargarPersonaje();
-                }
-            }, 60000);
-            
-            setInterval(() => {
-                cargarMisionesActivas();
-            }, 60000);
+            // Retrasar los intervalos para no bloquear la carga inicial
+            setTimeout(() => {
+                // Actualizar temporizador de energía cada segundo
+                setInterval(() => {
+                    updateEnergyTimer();
+                }, 1000);
+                
+                // Verificar y restaurar energía cada minuto
+                setInterval(() => {
+                    const result = window.game.checkAndRestoreEnergy();
+                    if (result.restored) {
+                        cargarPersonaje();
+                    }
+                }, 60000);
+                
+                setInterval(() => {
+                    cargarMisionesActivas();
+                }, 60000);
+            }, 100); // Delay pequeño para no bloquear la carga inicial
         });
     </script>
 
