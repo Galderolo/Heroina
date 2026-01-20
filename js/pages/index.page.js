@@ -47,7 +47,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
       return;
     }
 
-    timerElement.style.display = 'block';
+    timerElement.style.display = 'inline-flex';
     const minutes = timerInfo.minutesRemaining;
     const seconds = timerInfo.secondsRemaining;
 
@@ -58,8 +58,13 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
       return;
     }
 
-    timerElement.textContent =
-      minutes > 0 ? `⏱️ Próxima energía en: ${minutes}m ${seconds}s` : `⏱️ Próxima energía en: ${seconds}s`;
+    const compactPortrait = window.matchMedia?.('(max-width: 576px) and (orientation: portrait)')?.matches;
+    if (compactPortrait) {
+      timerElement.textContent = minutes > 0 ? `⏱️ ${minutes}m ${seconds}s` : `⏱️ ${seconds}s`;
+    } else {
+      timerElement.textContent =
+        minutes > 0 ? `⏱️ Próxima energía en: ${minutes}m ${seconds}s` : `⏱️ Próxima energía en: ${seconds}s`;
+    }
   }
 
   function loadPotions() {

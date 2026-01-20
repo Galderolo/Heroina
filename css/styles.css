@@ -845,7 +845,8 @@ h1, h2, h3, h4, h5, h6, p, span {
         box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.12);
 
         display: grid;
-        grid-template-columns: 44px 1fr;
+        /* icono | bloque izq (título+valor) | hueco dcha (texto/timer) */
+        grid-template-columns: 44px auto 1fr;
         grid-template-rows: auto auto;
         column-gap: 0.75rem;
         row-gap: 0.15rem;
@@ -868,16 +869,45 @@ h1, h2, h3, h4, h5, h6, p, span {
         letter-spacing: 0.14em;
         text-transform: uppercase;
         opacity: 0.9;
+        grid-column: 2;
+        grid-row: 1;
     }
 
     .recurso-card p {
         margin: 0 !important;
         font-size: 1.35rem;
         line-height: 1;
+        grid-column: 2;
+        grid-row: 2;
     }
 
     .recurso-card small {
-        display: none !important;
+        display: block !important;
+        grid-column: 3;
+        grid-row: 2;
+        margin: 0 !important;
+        font-size: 0.72rem;
+        line-height: 1.15;
+        color: #a0a0a0 !important;
+        align-self: center;
+        justify-self: start; /* como en tu imagen: en el hueco derecho, no pegado al borde */
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Energía: coste arriba a la derecha, timer abajo a la derecha */
+    .recurso-card #energyCost {
+        grid-column: 3;
+        grid-row: 1;
+        align-self: center;
+    }
+
+    .recurso-card #energyTimer {
+        grid-column: 3;
+        grid-row: 2;
+        align-self: center;
     }
 }
 
