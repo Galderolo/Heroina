@@ -82,8 +82,9 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
 
     const profiles = window.storage.listProfiles?.() || [];
 
-    // Si solo existe 1 perfil, entramos directo (excepto si venimos a gestionar perfiles)
-    if (!manageMode && profiles.length === 1) {
+    // Si solo existe 1 perfil, entramos directo SOLO si ya hay personaje creado (nombre no vacío).
+    // Si está vacío, nos quedamos en la selección para que el usuario elija “Crear perfil”.
+    if (!manageMode && profiles.length === 1 && (profiles[0]?.name || '').trim() !== '') {
       window.storage.setActiveProfile?.(profiles[0].id);
       goToIndex();
       return;

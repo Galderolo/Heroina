@@ -1,6 +1,6 @@
 {
-  "name": "Heroes del Hogar",
-  "short_name": "Heroes",
+  "name": "Guardianes del Hogar",
+  "short_name": "Guardianes",
   "description": "Aplicación de gamificación para tareas del hogar",
   "start_url": "perfiles.html",
   "display": "standalone",

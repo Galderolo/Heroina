@@ -69,6 +69,27 @@ function ensureProfilesMigrated() {
     const legacy = localStorage.getItem(STORAGE_KEY);
     if (legacy) {
       const legacyParsed = safeJsonParse(legacy, null);
+
+      // Si el legacy está “vacío” (sin personaje/progreso), NO lo migramos para que
+      // `perfiles.html` empiece realmente sin perfiles y el usuario elija crearlo.
+      try {
+        const name = (legacyParsed?.character?.name || '').trim();
+        const hasActive = Array.isArray(legacyParsed?.activeMissions) && legacyParsed.activeMissions.length > 0;
+        const hasCompleted = Array.isArray(legacyParsed?.history?.completedMissions) && legacyParsed.history.completedMissions.length > 0;
+        const hasPurchases = Array.isArray(legacyParsed?.history?.purchasedRewards) && legacyParsed.history.purchasedRewards.length > 0;
+        const totalMissions = Number(legacyParsed?.stats?.totalMissions || 0);
+        const totalGold = Number(legacyParsed?.stats?.totalGold || 0);
+        const totalXP = Number(legacyParsed?.stats?.totalXP || 0);
+        const hasProgress = !!name || hasActive || hasCompleted || hasPurchases || totalMissions > 0 || totalGold > 0 || totalXP > 0;
+
+        if (!hasProgress) {
+          localStorage.removeItem(STORAGE_KEY);
+          return { profiles, activeId };
+        }
+      } catch (_) {
+        // si no podemos determinarlo, migramos por seguridad
+      }
+
       let id = 'p1';
       if (localStorage.getItem(getProfileDataKey(id))) id = `p${Date.now()}`;
 
