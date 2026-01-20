@@ -85,7 +85,8 @@ export function loadData() {
     if (!dataStr) {
       const fresh = clone(DEFAULT_DATA);
       fresh.stats.lastConnection = new Date().toISOString();
-      fresh.stats.lastEnergyUpdate = fresh.stats.lastConnection;
+      // Timer de energía inactivo al empezar con energía llena
+      fresh.stats.lastEnergyUpdate = null;
       saveData(fresh);
       return fresh;
     }
@@ -105,19 +106,41 @@ export function loadData() {
     if (!parsedData.character) parsedData.character = clone(DEFAULT_DATA.character);
     if (!parsedData.history) parsedData.history = clone(DEFAULT_DATA.history);
 
-    // Día nuevo: reset de misiones de hoy y energía.
-    if (lastConnectionDay !== today) {
-      parsedData.stats.missionsToday = 0;
-      parsedData.character.energy = parsedData.character.maxEnergy || 6;
-      parsedData.stats.lastConnection = nowISO;
-      if (!parsedData.stats.lastEnergyUpdate) parsedData.stats.lastEnergyUpdate = nowISO;
+    // Migraciones y defaults críticos (antes de usar maxEnergy)
+    if (
+      typeof parsedData.character.maxEnergy !== 'number' ||
+      !Number.isFinite(parsedData.character.maxEnergy) ||
+      parsedData.character.maxEnergy <= 0
+    ) {
+      parsedData.character.maxEnergy = 6;
       dataChanged = true;
     }
 
-    // Inicializar lastEnergyUpdate si no existe
-    if (!parsedData.stats.lastEnergyUpdate) {
-      parsedData.stats.lastEnergyUpdate = nowISO;
+    // Día nuevo: reset de misiones de hoy y energía.
+    if (lastConnectionDay !== today) {
+      parsedData.stats.missionsToday = 0;
+      parsedData.character.energy = parsedData.character.maxEnergy;
+      parsedData.stats.lastConnection = nowISO;
+      // Al estar a energía full, el contador no debe estar activo
+      parsedData.stats.lastEnergyUpdate = null;
       dataChanged = true;
+    }
+
+    // Normalización del timer de energía:
+    // - Si estamos a energía full, el contador se considera inactivo (null)
+    // - Si falta energía y no hay timer, se inicia (nowISO)
+    const maxEnergyNow = parsedData.character.maxEnergy;
+    const currentEnergyNow = parsedData.character.energy || 0;
+    if (currentEnergyNow >= maxEnergyNow) {
+      if (parsedData.stats.lastEnergyUpdate) {
+        parsedData.stats.lastEnergyUpdate = null;
+        dataChanged = true;
+      }
+    } else {
+      if (!parsedData.stats.lastEnergyUpdate) {
+        parsedData.stats.lastEnergyUpdate = nowISO;
+        dataChanged = true;
+      }
     }
 
     // Migraciones y defaults
@@ -135,32 +158,44 @@ export function loadData() {
       dataChanged = true;
     }
 
-    if (!parsedData.character.maxEnergy) {
-      parsedData.character.maxEnergy = 6;
-      dataChanged = true;
-    }
-
     if (parsedData.character.lives === undefined) {
       parsedData.character.lives = 6;
       parsedData.character.maxLives = 6;
       dataChanged = true;
     }
 
-    // Restaurar energía en base a lastEnergyUpdate
-    const lastEnergyUpdate = new Date(parsedData.stats.lastEnergyUpdate);
-    const hoursElapsed = (now - lastEnergyUpdate) / (1000 * 60 * 60);
+    // Restaurar energía en base a lastEnergyUpdate (1 energía / hora mientras falte)
     const maxEnergy = parsedData.character.maxEnergy || 6;
+    const currentEnergy = parsedData.character.energy || 0;
+    const lastEnergyUpdateISO = parsedData.stats.lastEnergyUpdate;
 
-    if (hoursElapsed >= 1 && (parsedData.character.energy || 0) < maxEnergy) {
-      const hoursToRestore = Math.floor(hoursElapsed);
-      const energyToAdd = Math.min(hoursToRestore, maxEnergy - parsedData.character.energy);
+    if (currentEnergy < maxEnergy && lastEnergyUpdateISO) {
+      const lastEnergyUpdate = new Date(lastEnergyUpdateISO);
+      const lastTs = lastEnergyUpdate.getTime();
 
-      if (energyToAdd > 0) {
-        parsedData.character.energy = Math.min(parsedData.character.energy + energyToAdd, maxEnergy);
-        const newUpdateTime = new Date(lastEnergyUpdate);
-        newUpdateTime.setHours(newUpdateTime.getHours() + hoursToRestore);
-        parsedData.stats.lastEnergyUpdate = newUpdateTime.toISOString();
+      // Si el timestamp es inválido, reiniciamos el timer desde ahora
+      if (Number.isNaN(lastTs)) {
+        parsedData.stats.lastEnergyUpdate = nowISO;
         dataChanged = true;
+      } else {
+        const hoursElapsed = (now.getTime() - lastTs) / (1000 * 60 * 60);
+        if (hoursElapsed >= 1) {
+          const hoursToRestore = Math.floor(hoursElapsed);
+          const missing = maxEnergy - currentEnergy;
+          const energyToAdd = Math.min(hoursToRestore, missing);
+
+          if (energyToAdd > 0) {
+            const newEnergy = Math.min(currentEnergy + energyToAdd, maxEnergy);
+            parsedData.character.energy = newEnergy;
+
+            // Avanzar el timer SOLO tantas horas como energía se haya recuperado
+            const newUpdateTime = new Date(lastTs + energyToAdd * 60 * 60 * 1000);
+
+            // Si llegamos a full, el contador se apaga
+            parsedData.stats.lastEnergyUpdate = newEnergy >= maxEnergy ? null : newUpdateTime.toISOString();
+            dataChanged = true;
+          }
+        }
       }
     }
 
@@ -170,7 +205,8 @@ export function loadData() {
       console.warn('Data validation failed, resetting to defaults');
       const fresh = clone(DEFAULT_DATA);
       fresh.stats.lastConnection = nowISO;
-      fresh.stats.lastEnergyUpdate = nowISO;
+      // Reset: empezamos con energía full => contador inactivo
+      fresh.stats.lastEnergyUpdate = null;
       saveData(fresh);
       return fresh;
     }
@@ -180,7 +216,7 @@ export function loadData() {
     console.error('Error loading data:', error);
     const fresh = clone(DEFAULT_DATA);
     fresh.stats.lastConnection = new Date().toISOString();
-    fresh.stats.lastEnergyUpdate = fresh.stats.lastConnection;
+    fresh.stats.lastEnergyUpdate = null;
     return fresh;
   }
 }
@@ -198,6 +234,15 @@ export function resetData() {
 export function updateCharacter(field, value) {
   const data = loadData();
   data.character[field] = value;
+  // Reglas del temporizador de energía:
+  // - Si la energía queda full, el timer se apaga (null)
+  // - Si falta energía y no hay timer, se inicia (now)
+  if (field === 'energy') {
+    const maxEnergy = data.character.maxEnergy || 6;
+    const energy = data.character.energy || 0;
+    if (energy >= maxEnergy) data.stats.lastEnergyUpdate = null;
+    else if (!data.stats.lastEnergyUpdate) data.stats.lastEnergyUpdate = new Date().toISOString();
+  }
   return saveData(data);
 }
 
@@ -319,7 +364,14 @@ export function startMission(missionId, name, icon) {
   if (data.activeMissions.length >= 3) return { success: false, message: 'Ya tienes 3 misiones activas. Completa o cancela alguna primero.' };
   if (data.activeMissions.some((m) => m.missionId === missionId)) return { success: false, message: 'Esta misión ya está en progreso' };
 
+  const maxEnergy = data.character.maxEnergy || 6;
+  const hadTimer = !!data.stats.lastEnergyUpdate;
   data.character.energy = Math.max(0, data.character.energy - 1);
+
+  // Regla: al gastar energía, si el contador no estaba activo y ahora falta energía, se inicia.
+  if (!hadTimer && (data.character.energy || 0) < maxEnergy) {
+    data.stats.lastEnergyUpdate = new Date().toISOString();
+  }
   data.activeMissions.push({ missionId, name, icon, startDate: new Date().toISOString() });
   saveData(data);
   return { success: true, message: 'Misión iniciada' };
@@ -448,6 +500,8 @@ export function createCharacterWithClass(name, gender, classId, avatar) {
   data.character.maxLives = selectedClass.stats.maxLives;
   data.character.energy = selectedClass.stats.energy;
   data.character.maxEnergy = selectedClass.stats.maxEnergy;
+  // Al crear, si empieza a full el contador queda inactivo
+  data.stats.lastEnergyUpdate = data.character.energy >= data.character.maxEnergy ? null : new Date().toISOString();
 
   saveData(data);
   return { success: true, message: 'Personaje creado' };

@@ -358,13 +358,18 @@ function getEnergyTimerInfo() {
   const lastUpdateISO = state.stats?.lastEnergyUpdate;
   let nextUpdate;
 
+  // Si por alguna razón falta el timer, asumimos un ciclo completo desde ahora
   if (!lastUpdateISO) {
     nextUpdate = new Date(now);
     nextUpdate.setHours(nextUpdate.getHours() + 1);
   } else {
     const lastUpdate = new Date(lastUpdateISO);
-    nextUpdate = new Date(lastUpdate);
-    nextUpdate.setHours(nextUpdate.getHours() + 1);
+    const lastTs = lastUpdate.getTime();
+    if (Number.isNaN(lastTs)) {
+      nextUpdate = new Date(now.getTime() + 60 * 60 * 1000);
+    } else {
+      nextUpdate = new Date(lastTs + 60 * 60 * 1000);
+    }
   }
 
   const totalSeconds = Math.max(0, Math.floor((nextUpdate - now) / 1000));
@@ -380,34 +385,16 @@ function getEnergyTimerInfo() {
 }
 
 function checkAndRestoreEnergy() {
-  const data = storageApi.loadData();
-  const maxEnergy = data.character.maxEnergy || 6;
-  const currentEnergy = data.character.energy || 0;
+  // `loadData()` ya aplica restauración por tiempo y normaliza el timer.
+  // Para que el UI se actualice bien, comparamos antes/después.
+  const before = getState();
+  const beforeEnergy = before.character.energy || 0;
 
-  if (currentEnergy >= maxEnergy) return { restored: false, newEnergy: currentEnergy };
+  const after = storageApi.loadData();
+  const afterEnergy = after.character.energy || 0;
+  gameState = after;
 
-  if (!data.stats.lastEnergyUpdate) {
-    data.stats.lastEnergyUpdate = new Date().toISOString();
-    storageApi.saveData(data);
-    return { restored: false, newEnergy: currentEnergy };
-  }
-
-  const lastUpdate = new Date(data.stats.lastEnergyUpdate);
-  const now = new Date();
-  const hoursElapsed = (now - lastUpdate) / (1000 * 60 * 60);
-
-  if (hoursElapsed >= 1) {
-    const newEnergy = Math.min(currentEnergy + 1, maxEnergy);
-    data.character.energy = newEnergy;
-    const newUpdateTime = new Date(lastUpdate);
-    newUpdateTime.setHours(newUpdateTime.getHours() + Math.floor(hoursElapsed));
-    data.stats.lastEnergyUpdate = newUpdateTime.toISOString();
-    storageApi.saveData(data);
-    gameState = storageApi.loadData();
-    return { restored: true, newEnergy };
-  }
-
-  return { restored: false, newEnergy: currentEnergy };
+  return { restored: afterEnergy > beforeEnergy, newEnergy: afterEnergy };
 }
 
 function getRewardCooldownInfo(rewardId) {
