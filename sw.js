@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heroes-hogar-v3';
+const CACHE_NAME = 'heroes-hogar-v4';
 const urlsToCache = [
   '.',
   './index.html',
@@ -61,8 +61,16 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const isJSFile = url.pathname.endsWith('.js');
+  const isCSSFile = url.pathname.endsWith('.css');
+  const isJSONFile = url.pathname.endsWith('.json');
   const accept = event.request.headers.get('accept') || '';
   const isHTML = event.request.mode === 'navigate' || accept.includes('text/html');
+  const isSameOrigin = url.origin === self.location.origin;
+
+  // Normalizar clave de caché (ignoramos querystring tipo ?v=... o ?r=...).
+  // Esto evita que el guard “cache-bust” genere entradas infinitas y, sobre todo,
+  // permite reemplazar correctamente ./css/styles.css aunque se pida con querystring.
+  const cacheKey = isSameOrigin ? new Request(url.origin + url.pathname, { method: 'GET' }) : event.request;
   
   // HTML: network-first (evita quedarse en HTML viejo cacheado)
   if (isHTML) {
@@ -72,34 +80,34 @@ self.addEventListener('fetch', event => {
           if (response && response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseToCache);
+              cache.put(cacheKey, responseToCache);
             });
           }
           return response;
         })
         .catch(async () => {
-          const cached = await caches.match(event.request);
+          const cached = await caches.match(cacheKey);
           return cached || caches.match('./index.html');
         })
     );
     return;
   }
 
-  // JS: network-first (para que los módulos se actualicen)
-  if (isJSFile) {
+  // JS/CSS/JSON: network-first (para que módulos/estilos/manifest se actualicen)
+  if (isJSFile || isCSSFile || isJSONFile) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
           if (response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseToCache);
+              cache.put(cacheKey, responseToCache);
             });
           }
           return response;
         })
         .catch(() => {
-          return caches.match(event.request);
+          return caches.match(cacheKey);
         })
     );
   } else {

@@ -64,10 +64,14 @@ async function checkFilesVersion(filesToCheck = FILES_TO_CHECK) {
   const storedVersions = getStoredFileVersions();
   const newVersions = {};
   const changedFiles = [];
+  const hasBaseline = storedVersions && Object.keys(storedVersions).length > 0;
 
   try {
         const fetchPromises = filesToCheck.map(async (filePath) => {
       try {
+        // Nota: usamos no-store para saltarnos caché HTTP.
+        // (Si hay SW, el comportamiento final depende de su estrategia de fetch.)
+        // Añadimos cache-bust para saltarnos caches del SW (si usa cache-first).
         const url = `${filePath}?v=${Date.now()}`;
         const response = await fetch(url, {
           cache: 'no-store',
@@ -76,9 +80,9 @@ async function checkFilesVersion(filesToCheck = FILES_TO_CHECK) {
 
         if (!response.ok) {
           console.warn(`No se pudo cargar ${filePath}`);
-                    // Si no podemos verificar un archivo, forzamos actualización (suele indicar caché stale o rutas rotas).
-                    changedFiles.push(filePath);
-                    return null;
+          // Solo forzamos update si ya teníamos baseline previo (evita reload en el primer arranque).
+          if (hasBaseline && storedVersions[filePath]) changedFiles.push(filePath);
+          return null;
         }
 
         const content = await response.text();
@@ -90,16 +94,12 @@ async function checkFilesVersion(filesToCheck = FILES_TO_CHECK) {
       } catch (error) {
         console.error(`Error al verificar ${filePath}:`, error);
         if (storedVersions[filePath]) newVersions[filePath] = storedVersions[filePath];
-                changedFiles.push(filePath);
+        if (hasBaseline && storedVersions[filePath]) changedFiles.push(filePath);
         return null;
       }
     });
 
     await Promise.all(fetchPromises);
-
-    for (const filePath of filesToCheck) {
-      if (newVersions[filePath] && !storedVersions[filePath]) changedFiles.push(filePath);
-    }
 
     return { needsUpdate: changedFiles.length > 0, changedFiles, newVersions };
   } catch (error) {
@@ -110,15 +110,21 @@ async function checkFilesVersion(filesToCheck = FILES_TO_CHECK) {
 
 async function runVersionGuard(filesToCheck = FILES_TO_CHECK) {
   try {
-    const guardKey = 'heroina_version_guard_reload_attempted';
     const lastCheckKey = 'heroina_version_guard_last_check';
+    const lastReloadKey = 'heroina_version_guard_last_reload';
 
-    // No bloquear UX: no re-chequear constantemente en la misma sesión
+    // Si estamos offline, no intentamos “arreglar” caches.
+    if (typeof navigator !== 'undefined' && navigator && navigator.onLine === false) {
+      return { reloaded: false, skipped: true, reason: 'offline' };
+    }
+
+    // No bloquear UX: evitamos chequear varias veces seguidas en la misma sesión,
+    // pero el cooldown debe ser corto para que en desarrollo se actualice “al tirón”.
     try {
       const last = Number(sessionStorage.getItem(lastCheckKey) || '0');
       const now = Date.now();
-      // 5 min de “cooldown”
-      if (last > 0 && now - last < 5 * 60 * 1000) {
+      // 10s de “cooldown”
+      if (last > 0 && now - last < 10 * 1000) {
         return { reloaded: false, skipped: true };
       }
       sessionStorage.setItem(lastCheckKey, String(now));
@@ -134,29 +140,39 @@ async function runVersionGuard(filesToCheck = FILES_TO_CHECK) {
 
     // Evitar bucles de recarga si hay problemas de red/offline
     try {
-      if (sessionStorage.getItem(guardKey) === '1') {
-        return { reloaded: false };
-      }
-      sessionStorage.setItem(guardKey, '1');
+      const lastReload = Number(sessionStorage.getItem(lastReloadKey) || '0');
+      const now = Date.now();
+      // No recargar más de 1 vez cada 15s en la misma pestaña (pero permite siguientes updates)
+      if (lastReload > 0 && now - lastReload < 15 * 1000) return { reloaded: false, throttled: true };
+      sessionStorage.setItem(lastReloadKey, String(now));
     } catch (_) {
       // ignore
     }
 
-    // Invalidar cache del service worker + caches
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const registration of registrations) {
-        await registration.unregister();
+    // Forzar a que el SW (si existe) se actualice, y limpiar caches.
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((r) => r.update?.()));
       }
+    } catch (_) {
+      // ignore
     }
 
-    if ('caches' in window) {
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      }
+    } catch (_) {
+      // ignore
     }
 
     saveStoredFileVersions(versionCheck.newVersions);
-    window.location.reload();
+    // “Hard reload” con cache-bust en la URL (evita quedarse en HTML/CSS antiguos)
+    const url = new URL(window.location.href);
+    url.searchParams.set('r', String(Date.now()));
+    window.location.replace(url.toString());
     return { reloaded: true };
   } catch (error) {
     console.error('Error en verificación de versión:', error);
