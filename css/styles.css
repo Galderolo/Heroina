@@ -1111,6 +1111,47 @@ h1, h2, h3, h4, h5, h6, p, span {
     z-index: 2;
 }
 
+/* Loader global */
+.app-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(1200px 420px at 50% 0%, rgba(255, 215, 0, 0.10), transparent 60%),
+                rgba(10, 14, 39, 0.92);
+    backdrop-filter: blur(2px);
+}
+
+.app-loader.is-hidden {
+    display: none;
+}
+
+.app-loader-panel {
+    width: min(420px, 88vw);
+    padding: 1.4rem 1.25rem;
+    border-radius: 18px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.88) 0%, rgba(10, 14, 39, 0.88) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.25);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.app-loader-title {
+    color: #ffd700;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 18px rgba(255, 215, 0, 0.20), 0 0 2px rgba(0,0,0,0.85);
+}
+
+.app-loader-subtitle {
+    margin-top: 0.35rem;
+    color: rgba(224,224,224,0.75);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
 .alert {
     border-radius: 15px;
     border: 2px solid;

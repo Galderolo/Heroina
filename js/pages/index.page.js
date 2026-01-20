@@ -449,6 +449,10 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   }
 
   whenReady(async () => {
+    // Mostrar loader para evitar “flash” de UI vacía
+    const appLoader = document.getElementById('appLoader');
+    appLoader?.classList.remove('is-hidden');
+
     // Guard de perfil activo: si no hay perfil seleccionado, volvemos a perfiles
     try {
       const activeId = window.storage.getActiveProfileId?.();
@@ -513,6 +517,11 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     }
 
     cargarPersonaje();
+
+    // Ocultar loader tras el primer render
+    requestAnimationFrame(() => {
+      appLoader?.classList.add('is-hidden');
+    });
 
     if (shouldScrollToTop) {
       requestAnimationFrame(() => {
