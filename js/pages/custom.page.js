@@ -8,7 +8,8 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
     else fn();
   };
 
-  const guardPromise = window.runVersionGuard();
+  // No bloqueamos el render: el guard va en background
+  window.runVersionGuard();
 
   installGlobals();
   setupPWAInstall();
@@ -278,10 +279,7 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
     });
   };
 
-  whenReady(async () => {
-    const { reloaded } = await guardPromise;
-    if (reloaded) return;
-
+  whenReady(() => {
     renderIconGrid('missionIconGrid');
     renderIconGrid('rewardIconGrid');
     setupIconSelectors();

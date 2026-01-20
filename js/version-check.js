@@ -111,6 +111,21 @@ async function checkFilesVersion(filesToCheck = FILES_TO_CHECK) {
 async function runVersionGuard(filesToCheck = FILES_TO_CHECK) {
   try {
     const guardKey = 'heroina_version_guard_reload_attempted';
+    const lastCheckKey = 'heroina_version_guard_last_check';
+
+    // No bloquear UX: no re-chequear constantemente en la misma sesión
+    try {
+      const last = Number(sessionStorage.getItem(lastCheckKey) || '0');
+      const now = Date.now();
+      // 5 min de “cooldown”
+      if (last > 0 && now - last < 5 * 60 * 1000) {
+        return { reloaded: false, skipped: true };
+      }
+      sessionStorage.setItem(lastCheckKey, String(now));
+    } catch (_) {
+      // ignore
+    }
+
     const versionCheck = await checkFilesVersion(filesToCheck);
     if (!versionCheck.needsUpdate) {
       saveStoredFileVersions(versionCheck.newVersions);

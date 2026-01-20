@@ -9,7 +9,8 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     else fn();
   };
 
-  const guardPromise = window.runVersionGuard();
+  // No bloqueamos el render: el guard va en background
+  window.runVersionGuard();
 
   installGlobals();
   setupPWAInstall();
@@ -439,9 +440,6 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   }
 
   whenReady(async () => {
-    const { reloaded } = await guardPromise;
-    if (reloaded) return;
-
     const shouldScrollToTop = sessionStorage.getItem('scrollToTopAfterReload') === 'true';
     if (shouldScrollToTop) window.scrollTo(0, 0);
 

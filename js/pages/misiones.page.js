@@ -9,13 +9,30 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     else fn();
   };
 
-  const guardPromise = window.runVersionGuard();
+  const deferVersionGuard = () => {
+    const run = () => window.runVersionGuard();
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 2000 });
+    else setTimeout(run, 500);
+  };
 
   installGlobals();
   setupPWAInstall();
   registerServiceWorker('./sw.js');
 
   let misionSeleccionada = null;
+
+  // Cache por render (evita recalcular/consultar en cada tarjeta)
+  let cachedState = null;
+  let cachedEnergy = 0;
+  let cachedActiveMissions = [];
+  let cachedHasMaxActive = false;
+
+  function refreshRenderCache() {
+    cachedState = window.game.getState();
+    cachedEnergy = cachedState.character.energy || 0;
+    cachedActiveMissions = window.game.getActiveMissions();
+    cachedHasMaxActive = cachedActiveMissions && cachedActiveMissions.length >= 3;
+  }
 
   function updateEnergyTimer() {
     const timerInfo = window.game.getEnergyTimerInfo();
@@ -59,11 +76,11 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   function crearTarjetaMision(mission) {
     const colorClass = { diaria: 'border-success', ayuda: 'border-info', epica: 'border-warning' };
 
-    const state = window.game.getState();
-    const currentEnergy = state.character.energy || 0;
-    const activeMissions = window.game.getActiveMissions();
+    const state = cachedState || window.game.getState();
+    const currentEnergy = cachedState ? cachedEnergy : (state.character.energy || 0);
+    const activeMissions = cachedState ? cachedActiveMissions : window.game.getActiveMissions();
     const isActive = activeMissions && activeMissions.some((m) => m.missionId === mission.id);
-    const hasMaxActive = activeMissions && activeMissions.length >= 3;
+    const hasMaxActive = cachedState ? cachedHasMaxActive : (activeMissions && activeMissions.length >= 3);
     const noEnergy = currentEnergy < 1 && !isActive;
 
     let buttonHTML = '';
@@ -149,7 +166,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   }
 
   function cargarMisiones() {
-    const allMissions = window.data.getAllMissions(window.storage.getCustomMissions());
+    const allMissions = window.game.getMissionsByType(null);
     const daily = allMissions.filter((m) => m.type === 'diaria');
     const help = allMissions.filter((m) => m.type === 'ayuda');
     const epic = allMissions.filter((m) => m.type === 'epica');
@@ -183,6 +200,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
       window.showError(result.message);
       return;
     }
+    refreshRenderCache();
     cargarMisiones();
     actualizarHeader();
   };
@@ -194,6 +212,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
         window.showError(result.message);
         return;
       }
+      refreshRenderCache();
       cargarMisiones();
       actualizarHeader();
     });
@@ -211,6 +230,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
       else window.showAlert(`Has perdido una vida.\nVidas restantes: ${result.remainingLives}`, '💔 ¡Misión fracasada!', '💔');
 
       setTimeout(() => {
+        refreshRenderCache();
         cargarMisiones();
         actualizarHeader();
       }, 500);
@@ -218,7 +238,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   };
 
   window.completarMisionDirecta = function completarMisionDirecta(missionId) {
-    const allMissions = window.data.getAllMissions(window.storage.getCustomMissions());
+    const allMissions = window.game.getMissionsByType(null);
     const mission = allMissions.find((m) => m.id === missionId);
     misionSeleccionada = mission;
     document.getElementById('modalMisionNombre').textContent = mission.name;
@@ -246,6 +266,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     }, 300);
 
     setTimeout(() => {
+      refreshRenderCache();
       cargarMisiones();
       actualizarHeader();
     }, 500);
@@ -269,10 +290,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     }
   }
 
-  whenReady(async () => {
-    const { reloaded } = await guardPromise;
-    if (reloaded) return;
-
+  whenReady(() => {
     // Bloquear acceso si no hay personaje (como antes)
     if (!window.game.validateCharacterExists()) return;
 
@@ -284,17 +302,22 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
       );
     }
 
+    refreshRenderCache();
     cargarMisiones();
     actualizarHeader();
 
     setInterval(() => updateEnergyTimer(), 1000);
     setInterval(() => {
       const result = window.game.checkAndRestoreEnergy();
-      if (result.restored) actualizarHeader();
+      if (result.restored) {
+        refreshRenderCache();
+        actualizarHeader();
+      }
       else updateEnergyTimer();
     }, 60000);
 
     setupScrollToTop();
+    deferVersionGuard();
   });
 })();
 

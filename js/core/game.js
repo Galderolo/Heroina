@@ -67,7 +67,8 @@ function cancelActiveMission(missionId) {
 }
 
 function getActiveMissions() {
-  return storageApi.getActiveMissions();
+  const state = getState();
+  return state.activeMissions || [];
 }
 
 function completeActiveMission(missionId) {
@@ -97,7 +98,10 @@ function completeActiveMission(missionId) {
 }
 
 function checkExpiredMissions() {
-  return storageApi.checkAndFailExpiredMissions();
+  const expired = storageApi.checkAndFailExpiredMissions();
+  // sincronizar estado (puede haber eliminado misiones y bajado vidas)
+  gameState = storageApi.loadData();
+  return expired;
 }
 
 function failActiveMission(missionId) {
@@ -317,7 +321,11 @@ function getCharacterSummary() {
   const state = getState();
   const progress = getLevelProgress();
   const title = getTitleByLevel(state.character.level);
-  const todayStats = storageApi.getTodayStats();
+  const today = new Date().toDateString();
+  const todayMissions = state.history.completedMissions.filter((m) => new Date(m.date).toDateString() === today);
+  const todayXP = todayMissions.reduce((sum, m) => sum + m.xpGained, 0);
+  const todayGold = todayMissions.reduce((sum, m) => sum + m.goldGained, 0);
+  const todayStats = { missions: todayMissions.length, xp: todayXP, gold: todayGold };
   const streak = calculateStreak();
 
   return {
@@ -346,13 +354,28 @@ function getEnergyTimerInfo() {
   const currentEnergy = state.character.energy || 0;
   if (currentEnergy >= maxEnergy) return { isFull: true };
 
-  const timerInfo = storageApi.getNextEnergyRestoreTime();
-  if (!timerInfo) return { isFull: true };
+  const now = new Date();
+  const lastUpdateISO = state.stats?.lastEnergyUpdate;
+  let nextUpdate;
+
+  if (!lastUpdateISO) {
+    nextUpdate = new Date(now);
+    nextUpdate.setHours(nextUpdate.getHours() + 1);
+  } else {
+    const lastUpdate = new Date(lastUpdateISO);
+    nextUpdate = new Date(lastUpdate);
+    nextUpdate.setHours(nextUpdate.getHours() + 1);
+  }
+
+  const totalSeconds = Math.max(0, Math.floor((nextUpdate - now) / 1000));
+  const minutesRemaining = Math.floor(totalSeconds / 60);
+  const secondsRemaining = totalSeconds % 60;
+
   return {
     isFull: false,
-    minutesRemaining: timerInfo.minutesRemaining,
-    secondsRemaining: timerInfo.secondsRemaining,
-    nextRestoreTime: timerInfo.totalSeconds,
+    minutesRemaining,
+    secondsRemaining,
+    nextRestoreTime: totalSeconds,
   };
 }
 
@@ -388,7 +411,41 @@ function checkAndRestoreEnergy() {
 }
 
 function getRewardCooldownInfo(rewardId) {
-  return storageApi.getRewardCooldownInfo(rewardId);
+  const state = getState();
+  const allRewards = getAllRewardsResolved();
+  const reward = allRewards.find((r) => r.id === rewardId);
+
+  if (!reward || !reward.cooldownHours) {
+    return { onCooldown: false };
+  }
+
+  const purchases = state.history.purchasedRewards.filter((r) => r.rewardId === rewardId);
+  if (purchases.length === 0) {
+    return { onCooldown: false };
+  }
+
+  const lastPurchase = purchases[purchases.length - 1];
+  const lastPurchaseDate = new Date(lastPurchase.date);
+  const now = new Date();
+  const hoursElapsed = (now - lastPurchaseDate) / (1000 * 60 * 60);
+
+  if (hoursElapsed >= reward.cooldownHours) {
+    return { onCooldown: false };
+  }
+
+  const hoursRemainingFloat = reward.cooldownHours - hoursElapsed;
+  const totalSeconds = Math.floor(hoursRemainingFloat * 3600);
+  const hours = Math.floor(hoursRemainingFloat);
+  const minutes = Math.floor((hoursRemainingFloat - hours) * 60);
+  const seconds = Math.floor(totalSeconds % 60);
+
+  return {
+    onCooldown: true,
+    hoursRemaining: hours,
+    minutesRemaining: minutes,
+    secondsRemaining: seconds,
+    totalSeconds,
+  };
 }
 
 function getCharacterClass() {

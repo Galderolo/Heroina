@@ -9,23 +9,29 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     else fn();
   };
 
-  const guardPromise = window.runVersionGuard();
+  const deferVersionGuard = () => {
+    const run = () => window.runVersionGuard();
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 2000 });
+    else setTimeout(run, 500);
+  };
 
   installGlobals();
   setupPWAInstall();
   registerServiceWorker('./sw.js');
 
   let recompensaSeleccionada = null;
+  let rewardsCache = [];
 
   function actualizarHeader() {
     const summary = window.game.getCharacterSummary();
-    const purchased = window.storage.getPurchasedRewards();
+    const state = window.game.getState();
+    const purchasedCount = state.history?.purchasedRewards?.length || 0;
     document.getElementById('headerNivel').textContent = summary.level;
     document.getElementById('headerOro').innerHTML = `${summary.gold} <i class="bi bi-coin text-warning"></i>`;
-    document.getElementById('headerCompradas').textContent = purchased.length;
+    document.getElementById('headerCompradas').textContent = purchasedCount;
   }
 
-  function crearTarjetaRecompensa(reward, state) {
+  function crearTarjetaRecompensa(reward) {
     const colorClass = {
       potion: 'border-purple',
       pequeña: 'border-success',
@@ -34,8 +40,8 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
       epica: 'border-danger',
     };
 
-    const locked = !state.unlocked;
-    const noGold = state.unlocked && !state.canPurchase;
+    const locked = !reward.unlocked;
+    const noGold = reward.unlocked && !reward.canPurchase;
     const hasCooldown = reward.cooldownHours && reward.cooldownHours > 0;
     let cooldownInfo = null;
 
@@ -108,20 +114,19 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   }
 
   function cargarRecompensas() {
-    const rewardsWithState = window.game.getAvailableRewards();
-    const allRewards = window.data.getAllRewards(window.storage.getCustomRewards());
+    rewardsCache = window.game.getAvailableRewards();
 
-    const potions = rewardsWithState.filter((r) => r.category === 'potion');
-    const small = rewardsWithState.filter((r) => r.category === 'pequeña');
-    const medium = rewardsWithState.filter((r) => r.category === 'media');
-    const large = rewardsWithState.filter((r) => r.category === 'grande');
-    const epic = rewardsWithState.filter((r) => r.category === 'epica');
+    const potions = rewardsCache.filter((r) => r.category === 'potion');
+    const small = rewardsCache.filter((r) => r.category === 'pequeña');
+    const medium = rewardsCache.filter((r) => r.category === 'media');
+    const large = rewardsCache.filter((r) => r.category === 'grande');
+    const epic = rewardsCache.filter((r) => r.category === 'epica');
 
-    document.getElementById('listaPociones').innerHTML = potions.map((r) => crearTarjetaRecompensa(allRewards.find((rec) => rec.id === r.id), r)).join('');
-    document.getElementById('listaPequenas').innerHTML = small.map((r) => crearTarjetaRecompensa(allRewards.find((rec) => rec.id === r.id), r)).join('');
-    document.getElementById('listaMedias').innerHTML = medium.map((r) => crearTarjetaRecompensa(allRewards.find((rec) => rec.id === r.id), r)).join('');
-    document.getElementById('listaGrandes').innerHTML = large.map((r) => crearTarjetaRecompensa(allRewards.find((rec) => rec.id === r.id), r)).join('');
-    document.getElementById('listaEpicas').innerHTML = epic.map((r) => crearTarjetaRecompensa(allRewards.find((rec) => rec.id === r.id), r)).join('');
+    document.getElementById('listaPociones').innerHTML = potions.map(crearTarjetaRecompensa).join('');
+    document.getElementById('listaPequenas').innerHTML = small.map(crearTarjetaRecompensa).join('');
+    document.getElementById('listaMedias').innerHTML = medium.map(crearTarjetaRecompensa).join('');
+    document.getElementById('listaGrandes').innerHTML = large.map(crearTarjetaRecompensa).join('');
+    document.getElementById('listaEpicas').innerHTML = epic.map(crearTarjetaRecompensa).join('');
   }
 
   // Firma nueva para no depender de `event` global
@@ -145,8 +150,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   };
 
   window.prepararCompra = function prepararCompra(rewardId) {
-    const allRewards = window.data.getAllRewards(window.storage.getCustomRewards());
-    const reward = allRewards.find((r) => r.id === rewardId);
+    const reward = (rewardsCache && rewardsCache.length ? rewardsCache : window.game.getAvailableRewards()).find((r) => r.id === rewardId);
     recompensaSeleccionada = reward;
 
     document.getElementById('modalRecompensaIcono').textContent = reward.icon;
@@ -203,8 +207,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   }
 
   function updateRewardCooldowns() {
-    const allRewards = window.data.getAllRewards(window.storage.getCustomRewards());
-    const rewardsWithCooldown = allRewards.filter((r) => r.cooldownHours && r.cooldownHours > 0);
+    const rewardsWithCooldown = (rewardsCache || []).filter((r) => r.cooldownHours && r.cooldownHours > 0);
     let needsReload = false;
 
     rewardsWithCooldown.forEach((reward) => {
@@ -230,16 +233,14 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     if (needsReload) cargarRecompensas();
   }
 
-  whenReady(async () => {
-    const { reloaded } = await guardPromise;
-    if (reloaded) return;
-
+  whenReady(() => {
     // Bloquear acceso si no hay personaje (como antes)
     if (!window.game.validateCharacterExists()) return;
     cargarRecompensas();
     actualizarHeader();
     setInterval(() => updateRewardCooldowns(), 1000);
     setupScrollToTop();
+    deferVersionGuard();
   });
 })();
 
