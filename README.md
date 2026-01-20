@@ -81,9 +81,14 @@ python3 server.py
 ├── css/
 │   └── styles.css      # Estilos personalizados
 ├── js/
-│   ├── data.js         # Datos: misiones, títulos, recompensas
-│   ├── game.js         # Lógica del juego
-│   └── storage.js      # Persistencia con localStorage
+│   ├── pages/          # Entrypoints por página (ES Modules)
+│   ├── ui/             # UI compartida (modales, PWA, scroll-to-top)
+│   ├── core/           # Lógica del juego y datos base
+│   ├── infra/          # Persistencia (localStorage) y providers
+│   ├── version-check.js# Guard de versión (anti-cache stale)
+│   ├── data.js         # Compat: re-export de js/core/data.js
+│   ├── game.js         # Compat: re-export de js/core/game.js
+│   └── storage.js      # Compat: re-export de js/infra/storage.js
 └── img/
     └── avatar.jpg      # Foto del avatar (configurable)
 ```
@@ -200,11 +205,11 @@ Los datos se guardan automáticamente en el **localStorage** del navegador:
 ## ⚙️ Personalización
 
 Puedes personalizar fácilmente:
-- **Misiones**: Edita `js/data.js` - array `MISIONES`
-- **Títulos**: Edita `js/data.js` - array `TITULOS`
-- **Recompensas**: Edita `js/data.js` - array `RECOMPENSAS`
+- **Misiones base**: Edita `js/core/data.js` - array `MISSIONS`
+- **Títulos**: Edita `js/core/data.js` - array `TITLES`
+- **Recompensas base**: Edita `js/core/data.js` - array `REWARDS`
 - **Colores**: Edita `css/styles.css` - variables CSS en `:root`
-- **XP por nivel**: Edita la función `calcularXPParaNivel()` en `js/data.js`
+- **XP por nivel**: Edita `calculateXPForLevel()` en `js/core/data.js`
 
 ## 🔄 Reiniciar Progreso
 

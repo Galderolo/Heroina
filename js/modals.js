@@ -1,3 +1,8 @@
+// Compat ES Modules: re-export de `js/ui/modals.js`
+// Nota: el código fuente real ahora vive en `js/ui/modals.js`.
+
+export * from './ui/modals.js';
+
 let confirmCallback = null;
 let cancelCallback = null;
 

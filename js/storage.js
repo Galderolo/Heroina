@@ -1,3 +1,9 @@
+// Compat ES Modules: re-export de `js/infra/storage.js`
+// Nota: el código fuente real ahora vive en `js/infra/storage.js`.
+
+export * from './infra/storage.js';
+export { storage } from './infra/storage.js';
+
 const STORAGE_KEY = 'heroina_del_hogar_data';
 
 const DEFAULT_DATA = {

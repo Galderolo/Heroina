@@ -1,3 +1,9 @@
+// Compat ES Modules: re-export de `js/core/data.js`
+// Nota: el código fuente real ahora vive en `js/core/data.js`.
+
+export * from './core/data.js';
+export { data } from './core/data.js';
+
 const CLASSES = [
     {
         id: 'paladin',

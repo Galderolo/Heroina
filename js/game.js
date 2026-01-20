@@ -1,3 +1,9 @@
+// Compat ES Modules: re-export de `js/core/game.js`
+// Nota: el código fuente real ahora vive en `js/core/game.js`.
+
+export * from './core/game.js';
+export { game } from './core/game.js';
+
 let gameState = null;
 
 function initializeGame() {
