@@ -944,6 +944,139 @@ h1, h2, h3, h4, h5, h6, p, span {
     pointer-events: none;
 }
 
+/* Perfiles */
+.profiles-screen {
+    max-width: 980px;
+}
+
+.profiles-hero {
+    text-align: center;
+}
+
+.profiles-hero-frame {
+    position: relative;
+    padding: 1.25rem 1.25rem;
+    border-radius: 18px;
+    background: radial-gradient(1200px 240px at 50% 0%, rgba(255, 215, 0, 0.12), transparent 60%),
+                linear-gradient(135deg, rgba(22, 33, 62, 0.85) 0%, rgba(10, 14, 39, 0.85) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.22);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.04);
+    overflow: hidden;
+}
+
+.profiles-hero-topline,
+.profiles-hero-bottomline {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.85), transparent);
+    opacity: 0.9;
+}
+
+.profiles-hero-content {
+    padding: 0.85rem 0.25rem;
+}
+
+.profiles-title {
+    font-size: 2.05rem;
+    letter-spacing: 0.06em;
+    color: #ffd700;
+    text-shadow: 0 0 18px rgba(255, 215, 0, 0.25), 0 0 2px rgba(0,0,0,0.8);
+}
+
+.profiles-subtitle {
+    margin-top: 0.35rem;
+    color: rgba(224,224,224,0.85);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.profiles-actions .btn-game-primary {
+    padding: 0.95rem 1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    border-radius: 14px;
+}
+
+.btn-game-primary {
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.95) 0%, rgba(255, 168, 0, 0.95) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.65);
+    color: #1a1a1a;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.35);
+}
+
+.btn-game-primary:hover {
+    filter: brightness(1.05);
+    border-color: rgba(255, 235, 130, 0.9);
+}
+
+.btn-game-danger {
+    background: linear-gradient(180deg, rgba(255, 80, 80, 0.25) 0%, rgba(180, 25, 25, 0.22) 100%);
+    border: 1px solid rgba(255, 80, 80, 0.45);
+    color: rgba(255, 210, 210, 0.95);
+}
+
+.btn-game-danger:hover {
+    border-color: rgba(255, 120, 120, 0.75);
+    background: linear-gradient(180deg, rgba(255, 80, 80, 0.3) 0%, rgba(180, 25, 25, 0.26) 100%);
+}
+
+.profile-card {
+    cursor: pointer;
+    background: radial-gradient(600px 180px at 20% 0%, rgba(0, 212, 255, 0.10), transparent 60%),
+                linear-gradient(135deg, rgba(22, 33, 62, 0.88) 0%, rgba(10, 14, 39, 0.9) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.04);
+    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 215, 0, 0.32);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.55), 0 0 18px rgba(255, 215, 0, 0.12), inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.profile-card.is-active {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 16px 38px rgba(0,0,0,0.55), 0 0 24px rgba(255, 215, 0, 0.18), inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.profile-card-body {
+    padding: 1rem 1rem;
+}
+
+.profile-name {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: rgba(240,240,240,0.95);
+    text-shadow: 0 0 2px rgba(0,0,0,0.8);
+}
+
+.profile-hint {
+    color: rgba(224,224,224,0.7) !important;
+}
+
+.profile-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 2px solid rgba(255, 215, 0, 0.35);
+    background: rgba(15, 52, 96, 0.85);
+    box-shadow: 0 0 18px rgba(0,0,0,0.45);
+}
+
+/* Botón Cambiar perfil (index) */
+#characterCard .card-body {
+    position: relative;
+}
+
+.change-profile-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+}
+
 .alert {
     border-radius: 15px;
     border: 2px solid;

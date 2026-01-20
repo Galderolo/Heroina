@@ -1,6 +1,7 @@
 const CACHE_NAME = 'heroes-hogar-v4';
 const urlsToCache = [
   '.',
+  './perfiles.html',
   './index.html',
   './misiones.html',
   './tienda.html',
@@ -9,6 +10,7 @@ const urlsToCache = [
   './manifest.json',
 
   // Entrypoints ES Modules (páginas)
+  './js/pages/perfiles.page.js',
   './js/pages/index.page.js',
   './js/pages/misiones.page.js',
   './js/pages/tienda.page.js',

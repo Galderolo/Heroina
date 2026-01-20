@@ -4,6 +4,7 @@
 
 const FILES_TO_CHECK = [
   // HTML
+  'perfiles.html',
   'index.html',
   'misiones.html',
   'tienda.html',
@@ -13,6 +14,7 @@ const FILES_TO_CHECK = [
   'manifest.json',
   'sw.js',
   // Entrypoints de páginas
+  'js/pages/perfiles.page.js',
   'js/pages/index.page.js',
   'js/pages/misiones.page.js',
   'js/pages/tienda.page.js',

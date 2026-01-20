@@ -4,6 +4,111 @@ import { REWARDS, calculateXPForLevel, getTitleByLevel, CLASSES } from '../core/
 
 export const STORAGE_KEY = 'heroina_del_hogar_data';
 
+// --- Perfiles (globales) ---
+const PROFILES_INDEX_KEY = 'heroina_profiles_index';
+const ACTIVE_PROFILE_ID_KEY = 'heroina_active_profile_id';
+const PROFILE_KEY_PREFIX = 'heroina_profile_';
+
+function safeJsonParse(raw, fallback) {
+  try {
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getProfileDataKey(profileId) {
+  return `${PROFILE_KEY_PREFIX}${profileId}`;
+}
+
+function loadProfilesIndex() {
+  const list = safeJsonParse(localStorage.getItem(PROFILES_INDEX_KEY), []);
+  return Array.isArray(list) ? list : [];
+}
+
+function saveProfilesIndex(list) {
+  try {
+    localStorage.setItem(PROFILES_INDEX_KEY, JSON.stringify(list));
+    return true;
+  } catch (error) {
+    console.error('Error saving profiles index:', error);
+    return false;
+  }
+}
+
+function getActiveProfileIdInternal() {
+  try {
+    const raw = localStorage.getItem(ACTIVE_PROFILE_ID_KEY);
+    return raw && raw.trim() ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+function setActiveProfileIdInternal(profileId) {
+  try {
+    if (!profileId) {
+      localStorage.removeItem(ACTIVE_PROFILE_ID_KEY);
+      return true;
+    }
+    localStorage.setItem(ACTIVE_PROFILE_ID_KEY, String(profileId));
+    return true;
+  } catch (error) {
+    console.error('Error setting active profile:', error);
+    return false;
+  }
+}
+
+function ensureProfilesMigrated() {
+  const nowISO = new Date().toISOString();
+  let profiles = loadProfilesIndex();
+  let activeId = getActiveProfileIdInternal();
+
+  // Migración desde el storage legacy (1 único perfil)
+  if (profiles.length === 0) {
+    const legacy = localStorage.getItem(STORAGE_KEY);
+    if (legacy) {
+      const legacyParsed = safeJsonParse(legacy, null);
+      let id = 'p1';
+      if (localStorage.getItem(getProfileDataKey(id))) id = `p${Date.now()}`;
+
+      try {
+        localStorage.setItem(getProfileDataKey(id), legacy);
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {
+        console.error('Error migrating legacy profile:', e);
+      }
+
+      profiles = [
+        {
+          id,
+          name: legacyParsed?.character?.name || '',
+          avatar: legacyParsed?.character?.avatar || null,
+          createdAt: nowISO,
+          lastUsedAt: nowISO,
+        },
+      ];
+      saveProfilesIndex(profiles);
+      setActiveProfileIdInternal(id);
+      activeId = id;
+    }
+  }
+
+  // Normalizar activeId
+  if (activeId && !profiles.some((p) => p?.id === activeId)) {
+    activeId = null;
+    setActiveProfileIdInternal(null);
+  }
+
+  // Autoselección si solo hay 1 perfil
+  if (!activeId && profiles.length === 1) {
+    activeId = profiles[0].id;
+    setActiveProfileIdInternal(activeId);
+  }
+
+  return { profiles, activeId };
+}
+
 function clone(obj) {
   if (typeof structuredClone === 'function') return structuredClone(obj);
   return JSON.parse(JSON.stringify(obj));
@@ -52,7 +157,39 @@ export function saveData(data) {
       return false;
     }
 
-    localStorage.setItem(STORAGE_KEY, jsonString);
+    const { profiles, activeId } = ensureProfilesMigrated();
+    let profileId = activeId;
+
+    // Caso extremo: nadie creó perfil todavía -> crear uno implícito para no romper flujo
+    if (!profileId) {
+      profileId = `p${Date.now()}`;
+      const nowISO = new Date().toISOString();
+      const newProfiles = [
+        ...profiles,
+        { id: profileId, name: data?.character?.name || '', avatar: data?.character?.avatar || null, createdAt: nowISO, lastUsedAt: nowISO },
+      ];
+      saveProfilesIndex(newProfiles);
+      setActiveProfileIdInternal(profileId);
+    }
+
+    localStorage.setItem(getProfileDataKey(profileId), jsonString);
+
+    // Sincronizar metadata en el índice (nombre/avatar del personaje)
+    try {
+      const list = loadProfilesIndex();
+      const idx = list.findIndex((p) => p?.id === profileId);
+      const nowISO = new Date().toISOString();
+      const name = data?.character?.name || '';
+      const avatar = data?.character?.avatar || null;
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], name, avatar, lastUsedAt: nowISO };
+      } else {
+        list.push({ id: profileId, name, avatar, createdAt: nowISO, lastUsedAt: nowISO });
+      }
+      saveProfilesIndex(list);
+    } catch (_) {
+      // ignore
+    }
     return true;
   } catch (error) {
     console.error('Error saving data:', error);
@@ -81,7 +218,16 @@ export function validateData(data) {
 
 export function loadData() {
   try {
-    const dataStr = localStorage.getItem(STORAGE_KEY);
+    const { activeId } = ensureProfilesMigrated();
+    if (!activeId) {
+      // No hay perfiles aún: devolvemos estado “vacío” sin persistir
+      const fresh = clone(DEFAULT_DATA);
+      fresh.stats.lastConnection = new Date().toISOString();
+      fresh.stats.lastEnergyUpdate = null;
+      return fresh;
+    }
+
+    const dataStr = localStorage.getItem(getProfileDataKey(activeId));
     if (!dataStr) {
       const fresh = clone(DEFAULT_DATA);
       fresh.stats.lastConnection = new Date().toISOString();
@@ -223,12 +369,81 @@ export function loadData() {
 
 export function resetData() {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    // Reset del perfil activo (no borra el perfil)
+    const { activeId } = ensureProfilesMigrated();
+    if (!activeId) return false;
+
+    const fresh = clone(DEFAULT_DATA);
+    fresh.stats.lastConnection = new Date().toISOString();
+    fresh.stats.lastEnergyUpdate = null;
+    saveData(fresh);
     return true;
   } catch (error) {
     console.error('Error resetting data:', error);
     return false;
   }
+}
+
+// --- API Perfiles (exportable) ---
+export function listProfiles() {
+  ensureProfilesMigrated();
+  return loadProfilesIndex();
+}
+
+export function getActiveProfileId() {
+  ensureProfilesMigrated();
+  return getActiveProfileIdInternal();
+}
+
+export function setActiveProfile(profileId) {
+  const { profiles } = ensureProfilesMigrated();
+  if (!profileId || !profiles.some((p) => p?.id === profileId)) return false;
+  return setActiveProfileIdInternal(profileId);
+}
+
+export function createProfile() {
+  ensureProfilesMigrated();
+  const id = `p${Date.now()}`;
+  const nowISO = new Date().toISOString();
+
+  const list = loadProfilesIndex();
+  list.push({ id, name: '', avatar: null, createdAt: nowISO, lastUsedAt: nowISO });
+  saveProfilesIndex(list);
+  setActiveProfileIdInternal(id);
+
+  const fresh = clone(DEFAULT_DATA);
+  fresh.stats.lastConnection = nowISO;
+  fresh.stats.lastEnergyUpdate = null;
+  // Persistir el estado inicial del perfil
+  try {
+    localStorage.setItem(getProfileDataKey(id), JSON.stringify(fresh));
+  } catch (e) {
+    console.error('Error creating profile data:', e);
+  }
+
+  return { id };
+}
+
+export function deleteProfile(profileId) {
+  ensureProfilesMigrated();
+  if (!profileId) return false;
+
+  const list = loadProfilesIndex().filter((p) => p?.id !== profileId);
+  saveProfilesIndex(list);
+
+  try {
+    localStorage.removeItem(getProfileDataKey(profileId));
+  } catch (e) {
+    console.error('Error deleting profile data:', e);
+  }
+
+  const activeId = getActiveProfileIdInternal();
+  if (activeId === profileId) {
+    const next = list.length === 1 ? list[0].id : null;
+    setActiveProfileIdInternal(next);
+  }
+
+  return true;
 }
 
 export function updateCharacter(field, value) {
@@ -635,6 +850,12 @@ export const storage = {
   saveData,
   loadData,
   resetData,
+  // Perfiles
+  listProfiles,
+  getActiveProfileId,
+  setActiveProfile,
+  createProfile,
+  deleteProfile,
   updateCharacter,
   addXPAndGold,
   registerCompletedMission,

@@ -321,6 +321,10 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
     document.getElementById('avatarInput')?.click();
   };
 
+  window.cambiarPerfil = function cambiarPerfil() {
+    window.location.href = 'perfiles.html?manage=1';
+  };
+
   window.confirmarReinicio = function confirmarReinicio() {
     window.showConfirm('Esta acción NO se puede deshacer. Se borrará TODO el progreso.', '⚠️ Reiniciar Progreso', () => {
       window.game.resetGame();
@@ -445,6 +449,25 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   }
 
   whenReady(async () => {
+    // Guard de perfil activo: si no hay perfil seleccionado, volvemos a perfiles
+    try {
+      const activeId = window.storage.getActiveProfileId?.();
+      if (!activeId) {
+        const profiles = window.storage.listProfiles?.() || [];
+        if (profiles.length === 1) {
+          window.storage.setActiveProfile?.(profiles[0].id);
+          window.game.initializeGame();
+        } else {
+          window.location.replace('perfiles.html');
+          return;
+        }
+      }
+    } catch (_) {
+      // Si algo falla, mandamos a perfiles para evitar estados rotos
+      window.location.replace('perfiles.html');
+      return;
+    }
+
     const shouldScrollToTop = sessionStorage.getItem('scrollToTopAfterReload') === 'true';
     if (shouldScrollToTop) window.scrollTo(0, 0);
 
