@@ -12,6 +12,7 @@ const FILES_TO_CHECK = [
   'custom.html',
   // CSS/PWA
   'css/styles.css',
+  'img/instalar-banner.png',
   'manifest.json',
   'sw.js',
   // Entrypoints de páginas

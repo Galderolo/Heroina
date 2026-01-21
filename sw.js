@@ -34,6 +34,7 @@ const urlsToCache = [
   './img/icon-192.svg',
   './img/icon-512.svg',
   './img/icon.svg',
+  './img/instalar-banner.png',
 ];
 
 // Instalación - cachear recursos
