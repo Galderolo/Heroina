@@ -17,11 +17,13 @@ export function detectMobileOrTablet() {
   const ua = navigator.userAgent || '';
   const uaMobile = /(Android|iPhone|iPad|iPod)/i.test(ua);
 
-  // Heurística para tablets/táctiles sin bloquear portátiles: requiere multi-touch y pantalla “pequeña”
+  // iPadOS moderno puede reportar UA tipo “Macintosh”; detectamos por plataforma + multitouch.
+  // Esto cubre iPad Pro y tablets grandes sin depender de screen <= 1024.
+  const platform = navigator.platform || '';
   const touch = Number(navigator.maxTouchPoints || 0) > 1;
-  const smallScreen = Math.max(screen.width || 0, screen.height || 0) <= 1024;
+  const isIpadOsDesktopUa = platform === 'MacIntel' && touch;
 
-  return uaMobile || (touch && smallScreen);
+  return uaMobile || isIpadOsDesktopUa;
 }
 
 export function requirePwaOrRedirect({ installPath = 'instalar.html' } = {}) {

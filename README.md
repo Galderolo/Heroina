@@ -1,6 +1,13 @@
-# 🏰 Heroína del Hogar - Sistema de Gamificación
+# 🏰 Guardianes del Hogar - Sistema de Gamificación
 
 Un sistema de gamificación diseñado para motivar a niños pequeños a través de misiones, niveles y recompensas.
+
+## ✅ Qué página abrir (Landing vs App)
+
+- **Landing (para compartir / SEO / escritorio)**: abre `instalar.html`
+  - Desde ahí puedes pulsar **“Entrar en la web”** y te lleva a `perfiles.html`.
+- **PWA instalada (móvil/tablet)**: abre la app desde el icono y entrará a `perfiles.html` automáticamente.
+- **Juego (pantalla interna)**: `index.html` (se llega desde perfiles, no es la landing).
 
 ## 📋 Características
 
@@ -15,21 +22,13 @@ Un sistema de gamificación diseñado para motivar a niños pequeños a través 
 
 ## 🚀 Inicio Rápido
 
-### 1. Iniciar el Servidor
+### 1. Servir la app (necesitas HTTP para ES Modules + PWA)
 
-```bash
-cd /home/david/Escritorio/Rol
-python3 server.py
-```
+Abre la carpeta con un servidor HTTP (por ejemplo, Live Server en VS Code/Cursor).
 
-### 2. Acceder a la Aplicación
+### 2. Acceder a la aplicación
 
-**Desde el mismo ordenador:**
-- Abre tu navegador y ve a: `http://localhost:8000`
-
-**Desde móvil/tablet (en la misma red WiFi):**
-- El servidor mostrará una IP, por ejemplo: `http://192.168.1.100:8000`
-- Escribe esa dirección en el navegador de tu móvil
+Empieza por `instalar.html` (landing) y desde ahí entra a `perfiles.html` o instala la PWA.
 
 ## 📱 Uso
 
@@ -76,7 +75,7 @@ python3 server.py
 ├── index.html          # Página principal - Hoja de personaje
 ├── misiones.html       # Lista de misiones
 ├── tienda.html         # Tienda de recompensas
-├── server.py           # Servidor HTTP para red local
+├── sw.js               # Service Worker (PWA)
 ├── README.md           # Este archivo
 ├── css/
 │   └── styles.css      # Estilos personalizados
@@ -90,7 +89,10 @@ python3 server.py
 │   ├── game.js         # Compat: re-export de js/core/game.js
 │   └── storage.js      # Compat: re-export de js/infra/storage.js
 └── img/
-    └── avatar.jpg      # Foto del avatar (configurable)
+    ├── icon-192.svg
+    ├── icon-512.svg
+    ├── icon.svg
+    └── instalar-banner.png   # Banner de instalar / futuro splash (opcional)
 ```
 
 ## 🎨 Diseño
@@ -117,9 +119,8 @@ Los datos se guardan automáticamente en el **localStorage** del navegador:
 
 ## 🔧 Requisitos
 
-- Python 3.x (para el servidor)
 - Navegador web moderno (Chrome, Firefox, Safari, Edge)
-- Red WiFi local (para acceso desde móviles)
+- Servir por HTTP (no `file://`) para ES Modules y Service Worker
 
 ## 🎯 Misiones Disponibles
 

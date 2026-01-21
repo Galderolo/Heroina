@@ -1,6 +1,7 @@
 import '../version-check.js';
 import { installGlobals } from '../compat/globals.js';
 import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
+import { detectMobileOrTablet } from '../ui/requirePwa.js';
 
 (async () => {
   const whenReady = (fn) => {
@@ -32,7 +33,6 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
     deferredPrompt = e;
     const btn = document.getElementById('a2hsButton');
     const hint = document.getElementById('a2hsHint');
-    if (btn) btn.disabled = false;
     if (hint) hint.textContent = 'Pulsa “Instalar” para añadir la app a tu pantalla de inicio.';
   });
 
@@ -43,11 +43,16 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
   whenReady(() => {
     const btn = document.getElementById('a2hsButton');
     const hint = document.getElementById('a2hsHint');
+    const enterWebCta = document.getElementById('enterWebCta');
 
     if (hint) {
       // iOS no dispara beforeinstallprompt; mostramos un mensaje útil por defecto.
-      hint.textContent = 'Si el botón está desactivado, usa las instrucciones de abajo.';
+      hint.textContent = 'Si el navegador no muestra el instalador, usa las instrucciones de abajo.';
     }
+
+    // Desktop: esta página actúa como landing (SEO) y permite entrar a la web.
+    const isMobile = detectMobileOrTablet();
+    if (enterWebCta) enterWebCta.style.display = isMobile ? 'none' : 'block';
 
     btn?.addEventListener('click', async () => {
       if (!deferredPrompt) {
