@@ -467,6 +467,36 @@ export function deleteProfile(profileId) {
   return true;
 }
 
+export function getProfileSummary(profileId) {
+  ensureProfilesMigrated();
+  if (!profileId) return null;
+
+  try {
+    const raw = localStorage.getItem(getProfileDataKey(profileId));
+    if (!raw) return null;
+    const data = safeJsonParse(raw, null);
+    if (!data || !data.character) return null;
+
+    const level = Number(data.character.level || 1);
+    const classId = data.character.class || '';
+    const classInfo = CLASSES.find((c) => c.id === classId);
+    const className = classInfo ? classInfo.name : null;
+    const title = getTitleByLevel(level);
+    const displayTitle = className ? `${className} ${title}` : title;
+
+    return {
+      level,
+      classId,
+      title,
+      className,
+      displayTitle,
+    };
+  } catch (error) {
+    console.error('Error getting profile summary:', error);
+    return null;
+  }
+}
+
 export function updateCharacter(field, value) {
   const data = loadData();
   data.character[field] = value;
@@ -877,6 +907,7 @@ export const storage = {
   setActiveProfile,
   createProfile,
   deleteProfile,
+  getProfileSummary,
   updateCharacter,
   addXPAndGold,
   registerCompletedMission,

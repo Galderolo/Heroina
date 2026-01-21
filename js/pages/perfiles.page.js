@@ -51,6 +51,10 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
         const name = p?.name && String(p.name).trim() ? String(p.name).trim() : 'Perfil sin nombre';
         const avatar = p?.avatar || getDefaultAvatarSvg('🙂');
         const isActive = activeId && p?.id === activeId;
+        const hasHero = (p?.name || '').trim() !== '';
+        const summary = hasHero ? window.storage.getProfileSummary?.(p.id) : null;
+        const level = summary?.level || 1;
+        const titleLine = summary?.displayTitle || '';
 
         return `
           <div class="col-12 col-md-6 col-lg-4 mb-3">
@@ -58,7 +62,11 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
               <div class="card-body d-flex align-items-center gap-3 profile-card-body">
                 <img src="${escapeHtml(avatar)}" alt="Avatar" class="profile-avatar" onerror="this.src='${getDefaultAvatarSvg('🙂')}'">
                 <div class="flex-grow-1">
-                  <div class="profile-name">${escapeHtml(name)}</div>
+                  <div class="profile-name-line">
+                    <div class="profile-name">${escapeHtml(name)}</div>
+                    ${hasHero ? `<span class="profile-level-badge">Nivel ${escapeHtml(level)}</span>` : ``}
+                  </div>
+                  ${hasHero ? `<div class="profile-title-line">${escapeHtml(titleLine)}</div>` : ``}
                   <small class="profile-hint">${isActive ? 'Seleccionado' : 'Toca para jugar'}</small>
                 </div>
                 <button class="btn btn-sm btn-game-danger" data-action="delete" title="Borrar perfil">
