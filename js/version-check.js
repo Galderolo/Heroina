@@ -4,6 +4,7 @@
 
 const FILES_TO_CHECK = [
   // HTML
+  'instalar.html',
   'perfiles.html',
   'index.html',
   'misiones.html',
@@ -14,6 +15,7 @@ const FILES_TO_CHECK = [
   'manifest.json',
   'sw.js',
   // Entrypoints de páginas
+  'js/pages/instalar.page.js',
   'js/pages/perfiles.page.js',
   'js/pages/index.page.js',
   'js/pages/misiones.page.js',
@@ -25,6 +27,8 @@ const FILES_TO_CHECK = [
   'js/infra/storage.js',
   'js/ui/modals.js',
   'js/ui/pwa.js',
+  'js/ui/requirePwa.js',
+  'js/ui/orientationLock.js',
   'js/ui/scrollToTop.js',
   'js/ui/wip.js',
   // Este mismo archivo

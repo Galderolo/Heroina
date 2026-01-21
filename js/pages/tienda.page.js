@@ -2,12 +2,18 @@ import '../version-check.js';
 import { installGlobals } from '../compat/globals.js';
 import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
 import { setupScrollToTop } from '../ui/scrollToTop.js';
+import { requirePwaOrRedirect } from '../ui/requirePwa.js';
+import { installOrientationLock } from '../ui/orientationLock.js';
 
 (async () => {
   const whenReady = (fn) => {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
     else fn();
   };
+
+  // Forzar PWA en móvil/tablet (no en localhost)
+  const pwaGuard = requirePwaOrRedirect({ installPath: 'instalar.html' });
+  if (pwaGuard.redirected) return;
 
   const deferVersionGuard = () => {
     const run = () => window.runVersionGuard();
@@ -18,6 +24,7 @@ import { setupScrollToTop } from '../ui/scrollToTop.js';
   installGlobals();
   setupPWAInstall();
   registerServiceWorker('./sw.js');
+  installOrientationLock();
 
   let recompensaSeleccionada = null;
   let rewardsCache = [];

@@ -1,6 +1,8 @@
 import '../version-check.js';
 import { installGlobals } from '../compat/globals.js';
 import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
+import { requirePwaOrRedirect } from '../ui/requirePwa.js';
+import { installOrientationLock } from '../ui/orientationLock.js';
 
 (async () => {
   const whenReady = (fn) => {
@@ -8,12 +10,17 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
     else fn();
   };
 
+  // Forzar PWA en móvil/tablet (no en localhost)
+  const pwaGuard = requirePwaOrRedirect({ installPath: 'instalar.html' });
+  if (pwaGuard.redirected) return;
+
   // No bloqueamos el render: el guard va en background
   window.runVersionGuard();
 
   installGlobals();
   setupPWAInstall();
   registerServiceWorker('./sw.js');
+  installOrientationLock();
 
   const AVAILABLE_ICONS = [
     '🛏️',
