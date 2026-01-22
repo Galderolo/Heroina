@@ -138,7 +138,7 @@ import { installOrientationLock } from '../ui/orientationLock.js';
 
     if (!missions || missions.length === 0) {
       container.innerHTML =
-        '<div class="col-12"><p class="text-muted text-center">No hay misiones personalizadas. Crea una nueva usando el formulario.</p></div>';
+        '<div class="col-12"><p class="text-center" style="color: #a0a0a0;">No hay misiones personalizadas. Crea una nueva usando el formulario.</p></div>';
       return;
     }
 
@@ -180,7 +180,7 @@ import { installOrientationLock } from '../ui/orientationLock.js';
 
     if (!rewards || rewards.length === 0) {
       container.innerHTML =
-        '<div class="col-12"><p class="text-muted text-center">No hay recompensas personalizadas. Crea una nueva usando el formulario.</p></div>';
+        '<div class="col-12"><p class="text-center" style="color: #a0a0a0;">No hay recompensas personalizadas. Crea una nueva usando el formulario.</p></div>';
       return;
     }
 
