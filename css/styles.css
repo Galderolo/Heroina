@@ -239,6 +239,20 @@ h1, h2, h3, h4, h5, h6, p, span {
 
 .hero-action-btn {
     white-space: nowrap;
+    max-width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+/* Ajustar botón en móvil para que no se salga del contenedor */
+@media (max-width: 576px) {
+    .hero-action-btn {
+        font-size: 1rem !important;
+        padding: 12px 20px !important;
+        width: 100%;
+        max-width: calc(100% - 2rem);
+        margin: 0 auto;
+    }
 }
 
 /* Centrar botón de reiniciar progreso */

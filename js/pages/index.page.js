@@ -469,6 +469,10 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     const resetProgressBtn = document.getElementById('resetProgressBtn');
     const bottomNav = document.querySelector('.bottom-nav');
     const scrollToTopBtn = document.getElementById('scrollToTop');
+    const navItemPersonaje = document.getElementById('navItemPersonaje');
+    const navItemMisiones = document.getElementById('navItemMisiones');
+    const navItemTienda = document.getElementById('navItemTienda');
+    const navItemPersonalizar = document.getElementById('navItemPersonalizar');
 
     if (!characterCreation || !characterCard || !statsToday || !statsTotal || !inventorySection) return;
 
@@ -483,6 +487,11 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       if (bottomNav) bottomNav.style.display = 'none';
       // Ocultar botón scroll-to-top en modo creación para evitar solapamiento con botón "Comenzar Aventura"
       if (scrollToTopBtn) scrollToTopBtn.style.display = 'none';
+      // Ocultar elementos del navbar en modo creación (desktop y móvil)
+      if (navItemPersonaje) navItemPersonaje.style.display = 'none';
+      if (navItemMisiones) navItemMisiones.style.display = 'none';
+      if (navItemTienda) navItemTienda.style.display = 'none';
+      if (navItemPersonalizar) navItemPersonalizar.style.display = 'none';
       loadClassSelection();
     } else {
       characterCreation.style.display = 'none';
@@ -495,6 +504,11 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       if (bottomNav) bottomNav.style.display = '';
       // Mostrar botón scroll-to-top cuando no estamos en modo creación
       if (scrollToTopBtn) scrollToTopBtn.style.display = '';
+      // Mostrar elementos del navbar cuando no estamos en modo creación
+      if (navItemPersonaje) navItemPersonaje.style.display = '';
+      if (navItemMisiones) navItemMisiones.style.display = '';
+      if (navItemTienda) navItemTienda.style.display = '';
+      if (navItemPersonalizar) navItemPersonalizar.style.display = '';
     }
   }
 
