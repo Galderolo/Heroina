@@ -208,6 +208,35 @@ h1, h2, h3, h4, h5, h6, p, span {
     font-weight: bold;
 }
 
+/* Comprimir tarjetas de clase en móvil vertical */
+@media (max-width: 576px) and (orientation: portrait) {
+    .class-card {
+        padding: 0.6rem;
+        border-radius: 8px;
+    }
+
+    .class-icon {
+        font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .class-name {
+        font-size: 1rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .class-description {
+        font-size: 0.75rem;
+        margin-bottom: 0.3rem;
+        line-height: 1.2;
+    }
+
+    .class-stats {
+        gap: 1rem;
+        font-size: 0.85rem;
+    }
+}
+
 .hero-action-btn {
     white-space: nowrap;
 }
