@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Theme color debe estar ANTES de los estilos para evitar flash blanco en barra de estado -->
-    <meta name="theme-color" content="#0f3460">
+    <meta name="theme-color" content="#0a0e27">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Guardianes del Hogar">
@@ -15,6 +15,27 @@
         html, body {
             background-color: #0a0e27 !important;
             background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%) !important;
+            background-attachment: fixed !important;
+            min-height: 100% !important;
+            touch-action: pan-y !important;
+        }
+        html {
+            height: 100% !important;
+        }
+        /* Estilos críticos para app-loader - debe tener fondo oscuro desde el inicio */
+        #appLoader {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 3000 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: radial-gradient(1200px 420px at 50% 0%, rgba(255, 215, 0, 0.10), transparent 60%),
+                        rgba(10, 14, 39, 0.92) !important;
+        }
+        /* Ocultar loader cuando tiene la clase is-hidden */
+        #appLoader.is-hidden {
+            display: none !important;
         }
     </style>
     
