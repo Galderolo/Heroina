@@ -241,6 +241,21 @@ h1, h2, h3, h4, h5, h6, p, span {
     white-space: nowrap;
 }
 
+/* Centrar botón de reiniciar progreso */
+#resetProgressContainer {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+#resetProgressBtn {
+    display: inline-block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
 .fantasy-font {
     font-family: 'MedievalSharp', cursive;
     letter-spacing: 2px;
@@ -1812,6 +1827,12 @@ h1, h2, h3, h4, h5, h6, p, span {
 @media (max-width: 991px) {
     body {
         padding-bottom: 70px;
+    }
+    
+    /* Agregar margen inferior adicional al contenedor para evitar que el botón quede oculto */
+    .container.my-4 {
+        margin-bottom: 4rem !important;
+        padding-bottom: 1rem;
     }
 }
 
