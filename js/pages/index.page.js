@@ -451,6 +451,7 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     const inventorySection = document.getElementById('inventory-section');
     const resetProgressBtn = document.getElementById('resetProgressBtn');
     const bottomNav = document.querySelector('.bottom-nav');
+    const scrollToTopBtn = document.getElementById('scrollToTop');
 
     if (!characterCreation || !characterCard || !statsToday || !statsTotal || !inventorySection) return;
 
@@ -463,6 +464,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       inventorySection.style.display = 'none';
       if (resetProgressBtn) resetProgressBtn.style.display = 'none';
       if (bottomNav) bottomNav.style.display = 'none';
+      // Ocultar botón scroll-to-top en modo creación para evitar solapamiento con botón "Comenzar Aventura"
+      if (scrollToTopBtn) scrollToTopBtn.style.display = 'none';
       loadClassSelection();
     } else {
       characterCreation.style.display = 'none';
@@ -473,6 +476,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       inventorySection.style.display = 'block';
       if (resetProgressBtn) resetProgressBtn.style.display = 'block';
       if (bottomNav) bottomNav.style.display = '';
+      // Mostrar botón scroll-to-top cuando no estamos en modo creación
+      if (scrollToTopBtn) scrollToTopBtn.style.display = '';
     }
   }
 

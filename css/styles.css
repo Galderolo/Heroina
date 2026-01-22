@@ -37,10 +37,16 @@ h1, h2, h3, h4, h5, h6, p, span {
 
 .character-creation-container {
     animation: fadeIn 0.5s ease-in;
+    margin-bottom: 0 !important;
 }
 
-.character-creation-container .character-card .card-body {
-    position: relative;
+.character-creation-container {
+    margin-bottom: -4rem !important;
+}
+
+/* Reducir espacio debajo del contenedor cuando está en modo creación */
+.container:has(.character-creation-container) {
+    margin-bottom: 0.5rem !important;
 }
 
 .creation-back-btn {
