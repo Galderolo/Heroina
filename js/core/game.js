@@ -248,11 +248,10 @@ function calculateStreak() {
 }
 
 function resetGame() {
-  const confirmation = confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.');
-  if (!confirmation) return { success: false, message: 'Reinicio cancelado' };
+  // La confirmación ya se hace en confirmarReinicio(), no duplicar aquí
   storageApi.resetData();
   gameState = storageApi.loadData();
-  return { success: true, message: 'Juego reiniciado' };
+  return { success: true, message: 'Progreso reiniciado. El personaje mantiene su nombre, avatar y clase.' };
 }
 
 function resizeAndCompressImage(file, maxWidth, maxHeight, quality) {

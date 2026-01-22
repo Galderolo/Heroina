@@ -335,10 +335,27 @@ import { installOrientationLock } from '../ui/orientationLock.js';
   };
 
   window.confirmarReinicio = function confirmarReinicio() {
-    window.showConfirm('Esta acción NO se puede deshacer. Se borrará TODO el progreso.', '⚠️ Reiniciar Progreso', () => {
-      window.game.resetGame();
-      location.reload();
-    });
+    window.showConfirm(
+      '¿Estás seguro de que quieres reiniciar el progreso?\n\n' +
+      'Se resetearán:\n' +
+      '• Nivel, XP y Oro\n' +
+      '• Misiones completadas\n' +
+      '• Recompensas compradas\n' +
+      '• Estadísticas\n\n' +
+      'Se mantendrán:\n' +
+      '• Nombre del personaje\n' +
+      '• Avatar\n' +
+      '• Clase\n\n' +
+      '⚠️ Esta acción NO se puede deshacer.',
+      '⚠️ Reiniciar Progreso',
+      () => {
+        window.game.resetGame();
+        window.showSuccess('Progreso reiniciado correctamente. El personaje mantiene su nombre, avatar y clase.');
+        setTimeout(() => {
+          location.reload();
+        }, 1500);
+      }
+    );
   };
 
   // --- Creación de personaje ---

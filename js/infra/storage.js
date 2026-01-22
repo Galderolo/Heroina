@@ -391,12 +391,34 @@ export function loadData() {
 export function resetData() {
   try {
     // Reset del perfil activo (no borra el perfil)
+    // Preserva: nombre, avatar, clase, género
     const { activeId } = ensureProfilesMigrated();
     if (!activeId) return false;
 
+    const currentData = loadData();
     const fresh = clone(DEFAULT_DATA);
+    
+    // Preservar datos del personaje (avatar, nombre, clase, género)
+    fresh.character.name = currentData.character.name || '';
+    fresh.character.avatar = currentData.character.avatar || null;
+    fresh.character.class = currentData.character.class || '';
+    fresh.character.gender = currentData.character.gender || '';
+    
+    // Restaurar stats de la clase si existe
+    if (currentData.character.class) {
+      const classInfo = CLASSES.find((c) => c.id === currentData.character.class);
+      if (classInfo) {
+        fresh.character.lives = classInfo.stats.lives;
+        fresh.character.maxLives = classInfo.stats.maxLives;
+        fresh.character.energy = classInfo.stats.energy;
+        fresh.character.maxEnergy = classInfo.stats.maxEnergy;
+      }
+    }
+    
     fresh.stats.lastConnection = new Date().toISOString();
-    fresh.stats.lastEnergyUpdate = null;
+    // Si la energía está al máximo, el timer queda inactivo
+    fresh.stats.lastEnergyUpdate = fresh.character.energy >= fresh.character.maxEnergy ? null : new Date().toISOString();
+    
     saveData(fresh);
     return true;
   } catch (error) {
