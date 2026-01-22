@@ -31,6 +31,13 @@ body {
     overscroll-behavior-y: contain;
 }
 
+/* Añadir scroll al final sin mover elementos */
+body::after {
+    content: '';
+    display: block;
+    height: 30px;
+}
+
 h1, h2, h3, h4, h5, h6, p, span {
     color: #e0e0e0;
 }
