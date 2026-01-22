@@ -340,18 +340,11 @@ import { installOrientationLock } from '../ui/orientationLock.js';
   };
 
   // --- Creación de personaje ---
-  let selectedGenderValue = '';
   let selectedClassValue = '';
   let creationAvatarBase64 = null;
 
   window.selectCreationAvatar = function selectCreationAvatar() {
     document.getElementById('creationAvatarInput')?.click();
-  };
-
-  window.selectGender = function selectGender(gender) {
-    selectedGenderValue = gender;
-    document.querySelectorAll('.gender-btn').forEach((btn) => btn.classList.remove('selected'));
-    document.querySelector(`[data-gender="${gender}"]`)?.classList.add('selected');
   };
 
   window.selectClass = function selectClass(classId) {
@@ -368,7 +361,7 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     container.innerHTML = classes
       .map(
         (cls) => `
-          <div class="col-md-6 mb-3">
+          <div class="col-md-6 mb-2">
             <div class="class-card" data-class="${cls.id}" onclick="selectClass('${cls.id}')">
               <div class="class-icon">${cls.icon}</div>
               <h5 class="class-name">${cls.name}</h5>
@@ -391,18 +384,24 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       window.showError('Por favor, introduce tu nombre', 'Nombre Requerido');
       return;
     }
-    if (!selectedGenderValue) {
-      window.showError('Por favor, selecciona tu género', 'Género Requerido');
-      return;
-    }
     if (!selectedClassValue) {
       window.showError('Por favor, selecciona tu clase', 'Clase Requerida');
       return;
     }
 
-    const result = window.storage.createCharacterWithClass(name, selectedGenderValue, selectedClassValue, creationAvatarBase64);
+    // Crear perfil temporalmente si no existe (necesario para createCharacterWithClass)
+    const activeId = window.storage.getActiveProfileId?.();
+    let tempProfileId = null;
+    if (!activeId) {
+      const profileResult = window.storage.createProfile?.();
+      tempProfileId = profileResult?.id || window.storage.getActiveProfileId?.();
+    }
+
+    // Intentar crear el personaje
+    const result = window.storage.createCharacterWithClass(name, '', selectedClassValue, creationAvatarBase64);
 
     if (result.success) {
+      // Si la creación fue exitosa, mantener el perfil
       if (typeof window.confetti === 'function') {
         window.confetti({
           particleCount: 200,
@@ -415,6 +414,10 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       sessionStorage.setItem('scrollToTopAfterReload', 'true');
       setTimeout(() => location.reload(), 100);
     } else {
+      // Si falla, eliminar el perfil temporal que creamos
+      if (tempProfileId) {
+        window.storage.deleteProfile?.(tempProfileId);
+      }
       window.showError(result.message);
     }
   };
@@ -429,6 +432,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     const statsToday = document.getElementById('statsToday');
     const statsTotal = document.getElementById('statsTotal');
     const inventorySection = document.getElementById('inventory-section');
+    const resetProgressBtn = document.getElementById('resetProgressBtn');
+    const bottomNav = document.querySelector('.bottom-nav');
 
     if (!characterCreation || !characterCard || !statsToday || !statsTotal || !inventorySection) return;
 
@@ -439,6 +444,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       statsToday.style.display = 'none';
       statsTotal.style.display = 'none';
       inventorySection.style.display = 'none';
+      if (resetProgressBtn) resetProgressBtn.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
       loadClassSelection();
     } else {
       characterCreation.style.display = 'none';
@@ -447,6 +454,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       statsToday.style.display = 'block';
       statsTotal.style.display = 'block';
       inventorySection.style.display = 'block';
+      if (resetProgressBtn) resetProgressBtn.style.display = 'block';
+      if (bottomNav) bottomNav.style.display = '';
     }
   }
 
@@ -460,23 +469,37 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     const appLoader = document.getElementById('appLoader');
     appLoader?.classList.remove('is-hidden');
 
+    // Detectar modo creación (venimos de "Crear perfil")
+    const params = new URLSearchParams(window.location.search);
+    const createMode = params.get('create') === '1';
+
     // Guard de perfil activo: si no hay perfil seleccionado, volvemos a perfiles
+    // EXCEPTO si estamos en modo creación (venimos de "Crear perfil")
     try {
       const activeId = window.storage.getActiveProfileId?.();
       if (!activeId) {
-        const profiles = window.storage.listProfiles?.() || [];
-        if (profiles.length === 1) {
-          window.storage.setActiveProfile?.(profiles[0].id);
+        if (createMode) {
+          // Modo creación: no crear perfil todavía, solo mostrar pantalla de creación
+          // El perfil se creará cuando se complete finalizeCharacterCreation()
           window.game.initializeGame();
         } else {
-          window.location.replace('perfiles.html');
-          return;
+          const profiles = window.storage.listProfiles?.() || [];
+          if (profiles.length === 1) {
+            window.storage.setActiveProfile?.(profiles[0].id);
+            window.game.initializeGame();
+          } else {
+            window.location.replace('perfiles.html');
+            return;
+          }
         }
       }
     } catch (_) {
       // Si algo falla, mandamos a perfiles para evitar estados rotos
-      window.location.replace('perfiles.html');
-      return;
+      if (!createMode) {
+        window.location.replace('perfiles.html');
+        return;
+      }
+      window.game.initializeGame();
     }
 
     const shouldScrollToTop = sessionStorage.getItem('scrollToTopAfterReload') === 'true';

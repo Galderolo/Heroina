@@ -753,13 +753,13 @@ export function getPotionsInventory() {
   return loadData().inventory.potions || [];
 }
 
-export function createCharacterWithClass(name, gender, classId, avatar) {
+export function createCharacterWithClass(name, gender = '', classId, avatar) {
   const data = loadData();
   const selectedClass = CLASSES.find((c) => c.id === classId);
   if (!selectedClass) return { success: false, message: 'Clase no encontrada' };
 
   data.character.name = name;
-  data.character.gender = gender;
+  data.character.gender = gender || '';
   data.character.class = classId;
   data.character.avatar = avatar;
   data.character.lives = selectedClass.stats.lives;

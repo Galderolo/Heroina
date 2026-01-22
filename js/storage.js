@@ -467,7 +467,7 @@ function recoverLife() {
     return data.character.lives;
 }
 
-function createCharacterWithClass(name, gender, classId, avatar) {
+function createCharacterWithClass(name, gender = '', classId, avatar) {
     const data = loadData();
     const selectedClass = CLASSES.find(c => c.id === classId);
     
@@ -476,7 +476,7 @@ function createCharacterWithClass(name, gender, classId, avatar) {
     }
     
     data.character.name = name;
-    data.character.gender = gender;
+    data.character.gender = gender || '';
     data.character.class = classId;
     data.character.avatar = avatar;
     data.character.lives = selectedClass.stats.lives;

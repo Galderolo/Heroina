@@ -109,8 +109,9 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
 
     const createBtn = document.getElementById('createProfileBtn');
     createBtn?.addEventListener('click', () => {
-      window.storage.createProfile?.();
-      goToIndex();
+      // No crear perfil todavía: solo redirigir a creación
+      // El perfil se creará cuando se complete la creación del personaje
+      window.location.replace('index.html?create=1');
     });
 
     document.addEventListener('click', (e) => {

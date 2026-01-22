@@ -82,9 +82,11 @@
         <div id="characterCreation" class="character-creation-container" style="display: none;">
             <div class="card character-card shadow-lg mb-4">
                 <div class="card-body text-center">
-                    <h2 class="fantasy-font mb-4" style="color: #ffd700; font-size: 2.5rem;">
-                        ✨ ¡Crea Tu Héroe! ✨
-                    </h2>
+                    <button class="btn creation-back-btn" onclick="cambiarPerfil()" title="Volver" aria-label="Volver a perfiles">
+                        <i class="bi bi-arrow-left"></i>
+                        <span class="visually-hidden">Cancelar</span>
+                    </button>
+                    <h2 class="fantasy-font mb-4 character-creation-title">¡Crea Tu Héroe!</h2>
                     
                     <!-- Paso 1: Avatar -->
                     <div class="creation-step mb-4">
@@ -106,20 +108,7 @@
                                style="background: rgba(255,255,255,0.1); border: 2px solid #ffd700; color: #e0e0e0;">
                     </div>
                     
-                    <!-- Paso 3: Género -->
-                    <div class="creation-step mb-4">
-                        <h4 style="color: #e0e0e0;">👤 Género</h4>
-                        <div class="gender-selection">
-                            <button class="btn gender-btn" data-gender="boy" onclick="selectGender('boy')">
-                                👦 Niño
-                            </button>
-                            <button class="btn gender-btn" data-gender="girl" onclick="selectGender('girl')">
-                                👧 Niña
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Paso 4: Clase -->
+                    <!-- Paso 3: Clase -->
                     <div class="creation-step mb-4">
                         <h4 style="color: #e0e0e0;">⚔️ Elige tu Clase</h4>
                         <div class="class-selection row" id="classSelection">
@@ -128,7 +117,7 @@
                     </div>
                     
                     <button class="btn btn-lg btn-success hero-action-btn" onclick="finalizeCharacterCreation()" 
-                            style="font-size: 1.5rem; padding: 15px 40px;">
+                            style="font-size: 1.2rem; padding: 15px 30px;">
                         ⚡ ¡Comenzar Aventura! ⚡
                     </button>
                 </div>
@@ -299,7 +288,7 @@
 
         <!-- Botón de Reiniciar (oculto, solo para administración) -->
         <div class="text-center mt-4">
-            <button class="btn btn-sm btn-outline-danger" onclick="confirmarReinicio()">
+            <button id="resetProgressBtn" class="btn btn-sm btn-outline-danger" onclick="confirmarReinicio()">
                 <i class="bi bi-arrow-clockwise"></i> Reiniciar Progreso
             </button>
         </div>
