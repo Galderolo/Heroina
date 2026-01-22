@@ -523,12 +523,64 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       const file = e.target.files?.[0];
       if (!file) return;
       try {
-        const avatarBase64 = await window.game.uploadAvatar(file);
-        const preview = document.getElementById('previewAvatar');
-        if (preview) preview.src = avatarBase64;
-        creationAvatarBase64 = avatarBase64;
+        // Validar tipo y tamaño antes de procesar
+        if (!file.type.startsWith('image/')) {
+          window.showError('El archivo debe ser una imagen');
+          return;
+        }
+        const maxSizeInMB = 10;
+        if (file.size > maxSizeInMB * 1024 * 1024) {
+          window.showError('La imagen es demasiado grande. Máximo 10MB.');
+          return;
+        }
+
+        // Procesar imagen solo en memoria (sin guardar en storage)
+        // Usar la misma lógica de compresión que uploadAvatar pero sin guardar
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let { width, height } = img;
+
+              if (width > height) {
+                if (width > 200) {
+                  height = height * (200 / width);
+                  width = 200;
+                }
+              } else if (height > 200) {
+                width = width * (200 / height);
+                height = 200;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+              const sizeInKB = Math.round((compressedBase64.length * 3) / 4 / 1024);
+              if (sizeInKB > 500) {
+                window.showError('La imagen es demasiado grande incluso después de comprimirla. Intenta con otra foto.');
+                return;
+              }
+
+              // Guardar solo en memoria, no en storage
+              const preview = document.getElementById('previewAvatar');
+              if (preview) preview.src = compressedBase64;
+              creationAvatarBase64 = compressedBase64;
+            };
+            img.onerror = () => window.showError('Error al cargar la imagen');
+            img.src = event.target.result;
+          } catch (error) {
+            window.showError(error?.message || 'Error al procesar la imagen');
+          }
+        };
+        reader.onerror = () => window.showError('Error al leer el archivo');
+        reader.readAsDataURL(file);
       } catch (error) {
-        window.showError(error?.message || 'Error al subir la imagen');
+        window.showError(error?.message || 'Error al procesar la imagen');
       }
     });
 
