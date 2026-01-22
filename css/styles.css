@@ -14,6 +14,10 @@
 
 html {
     background-color: #0a0e27;
+    background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+    background-attachment: fixed;
+    min-height: 100%;
+    height: 100%;
     overscroll-behavior: none;
 }
 
@@ -21,7 +25,7 @@ body {
     font-family: 'Quicksand', sans-serif;
     background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
     background-attachment: fixed;
-    min-height: 100vh;
+    min-height: 100%;
     color: #e0e0e0;
     padding-top: 70px;
     overscroll-behavior-y: contain;
@@ -37,11 +41,7 @@ h1, h2, h3, h4, h5, h6, p, span {
 
 .character-creation-container {
     animation: fadeIn 0.5s ease-in;
-    margin-bottom: 0 !important;
-}
-
-.character-creation-container {
-    margin-bottom: -4rem !important;
+    margin-bottom: -6rem !important;
 }
 
 /* Reducir espacio debajo del contenedor cuando está en modo creación */
@@ -358,6 +358,28 @@ h1, h2, h3, h4, h5, h6, p, span {
 .nav-link.active {
     color: var(--color-gold-bright) !important;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+/* Navbar en desktop: ocultar textos y agrandar iconos */
+@media (min-width: 992px) {
+    .navbar-nav .nav-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        position: relative;
+        font-size: 0;
+        line-height: 0;
+    }
+    
+    .navbar-nav .nav-link i {
+        font-size: 1.8rem !important;
+        margin-bottom: 0;
+        display: inline-block !important;
+        line-height: 1;
+        vertical-align: middle;
+    }
 }
 
 .card {
@@ -1843,10 +1865,27 @@ h1, h2, h3, h4, h5, h6, p, span {
         padding-bottom: 70px;
     }
     
-    /* Agregar margen inferior adicional al contenedor para evitar que el botón quede oculto */
+    /* Agregar margen inferior adicional al contenedor solo lo necesario para evitar que el botón quede oculto */
     .container.my-4 {
-        margin-bottom: 4rem !important;
-        padding-bottom: 1rem;
+        margin-bottom: 1.5rem !important;
+    }
+}
+
+/* En desktop/horizontal: asegurar que no haya espacio extra ni bottom-nav visible */
+@media (min-width: 992px) {
+    /* Ocultar completamente el bottom-nav en desktop */
+    .bottom-nav {
+        display: none !important;
+    }
+    
+    /* Eliminar padding-bottom del body en desktop */
+    body {
+        padding-bottom: 0 !important;
+    }
+    
+    /* Margen normal del contenedor en desktop */
+    .container.my-4 {
+        margin-bottom: 1.5rem !important;
     }
 }
 
