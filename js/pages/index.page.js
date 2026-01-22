@@ -329,6 +329,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
   };
 
   window.cambiarPerfil = function cambiarPerfil() {
+    // Limpiar createMode si se cancela la creación
+    sessionStorage.removeItem('heroina_create_mode');
     window.location.href = 'perfiles.html?manage=1';
   };
 
@@ -389,10 +391,17 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       return;
     }
 
-    // Crear perfil temporalmente si no existe (necesario para createCharacterWithClass)
+    // Verificar si estamos en modo creación desde sessionStorage
+    const isCreateMode = sessionStorage.getItem('heroina_create_mode') === '1';
     const activeId = window.storage.getActiveProfileId?.();
     let tempProfileId = null;
-    if (!activeId) {
+
+    // Si estamos en modo creación, SIEMPRE crear un nuevo perfil (incluso si hay activeId)
+    if (isCreateMode) {
+      const profileResult = window.storage.createProfile?.();
+      tempProfileId = profileResult?.id || window.storage.getActiveProfileId?.();
+    } else if (!activeId) {
+      // Si no estamos en modo creación pero no hay perfil activo, crear uno
       const profileResult = window.storage.createProfile?.();
       tempProfileId = profileResult?.id || window.storage.getActiveProfileId?.();
     }
@@ -401,7 +410,11 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     const result = window.storage.createCharacterWithClass(name, '', selectedClassValue, creationAvatarBase64);
 
     if (result.success) {
-      // Si la creación fue exitosa, mantener el perfil
+      // Si la creación fue exitosa, limpiar createMode y mantener el perfil
+      if (isCreateMode) {
+        sessionStorage.removeItem('heroina_create_mode');
+      }
+
       if (typeof window.confetti === 'function') {
         window.confetti({
           particleCount: 200,
@@ -412,7 +425,10 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       }
 
       sessionStorage.setItem('scrollToTopAfterReload', 'true');
-      setTimeout(() => location.reload(), 100);
+      // Redirigir a index.html sin parámetros para mostrar el personaje creado
+      setTimeout(() => {
+        window.location.replace('index.html');
+      }, 100);
     } else {
       // Si falla, eliminar el perfil temporal que creamos
       if (tempProfileId) {
@@ -422,9 +438,10 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     }
   };
 
-  function checkCharacterExists() {
+  function checkCharacterExists(forceCreationMode = false) {
     const state = window.game.getState();
-    const characterExists = state.character.name && state.character.name !== '';
+    // Si forceCreationMode es true, forzar que no existe personaje para mostrar creación
+    const characterExists = forceCreationMode ? false : (state.character.name && state.character.name !== '');
 
     const characterCreation = document.getElementById('characterCreation');
     const characterCard = document.getElementById('characterCard');
@@ -473,6 +490,16 @@ import { installOrientationLock } from '../ui/orientationLock.js';
     const params = new URLSearchParams(window.location.search);
     const createMode = params.get('create') === '1';
 
+    // Guardar createMode en sessionStorage para que persista durante la creación
+    if (createMode) {
+      sessionStorage.setItem('heroina_create_mode', '1');
+      try {
+        localStorage.removeItem('heroina_active_profile_id');
+      } catch (_) {
+        // Ignorar errores
+      }
+    }
+
     // Guard de perfil activo: si no hay perfil seleccionado, volvemos a perfiles
     // EXCEPTO si estamos en modo creación (venimos de "Crear perfil")
     try {
@@ -492,6 +519,10 @@ import { installOrientationLock } from '../ui/orientationLock.js';
             return;
           }
         }
+      } else if (createMode) {
+        // Si hay perfil activo pero estamos en modo creación, ya lo limpiamos arriba
+        // Reinicializar el juego para que detecte que no hay perfil activo
+        window.game.initializeGame();
       }
     } catch (_) {
       // Si algo falla, mandamos a perfiles para evitar estados rotos
@@ -584,7 +615,8 @@ import { installOrientationLock } from '../ui/orientationLock.js';
       }
     });
 
-    checkCharacterExists();
+    // Pasar createMode a checkCharacterExists para forzar modo creación
+    checkCharacterExists(createMode);
 
     // Verificar misiones expiradas solo si hay misiones activas
     const activeMissions = window.game.getActiveMissions();
