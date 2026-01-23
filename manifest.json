@@ -2,7 +2,7 @@
   "name": "Guardianes del Hogar",
   "short_name": "Guardianes",
   "description": "Aplicación de gamificación para tareas del hogar",
-  "start_url": "index.html",
+  "start_url": "perfiles.html",
   "display": "standalone",
   "background_color": "#0a0e27",
   "theme_color": "#0f3460",

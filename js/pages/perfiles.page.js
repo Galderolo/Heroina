@@ -3,6 +3,7 @@ import { installGlobals } from '../compat/globals.js';
 import { requirePwaOrRedirect } from '../ui/requirePwa.js';
 import { installOrientationLock } from '../ui/orientationLock.js';
 import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
+import { setupSplashScreen } from '../ui/splashScreen.js';
 
 (async () => {
   const whenReady = (fn) => {
@@ -21,6 +22,9 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
   setupPWAInstall();
   registerServiceWorker('./sw.js');
   installOrientationLock();
+
+   // Splash estilo juego: solo PWA + cold start
+   setupSplashScreen({ splashId: 'pwaSplash', durationMs: 2000 });
 
   function escapeHtml(str) {
     return String(str)
@@ -88,7 +92,7 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
   }
 
   function goToIndex() {
-    window.location.replace('personaje.html');
+    window.location.replace('index.html');
   }
 
   whenReady(() => {
@@ -111,7 +115,7 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
     createBtn?.addEventListener('click', () => {
       // No crear perfil todavía: solo redirigir a creación
       // El perfil se creará cuando se complete la creación del personaje
-      window.location.replace('personaje.html?create=1');
+      window.location.replace('index.html?create=1');
     });
 
     document.addEventListener('click', (e) => {

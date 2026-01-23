@@ -1,10 +1,9 @@
-const CACHE_NAME = 'heroes-hogar-v6';
+const CACHE_NAME = 'heroes-hogar-v5';
 const urlsToCache = [
   '.',
   './instalar.html',
   './perfiles.html',
   './index.html',
-  './personaje.html',
   './misiones.html',
   './tienda.html',
   './custom.html',
@@ -15,7 +14,6 @@ const urlsToCache = [
   './js/pages/instalar.page.js',
   './js/pages/perfiles.page.js',
   './js/pages/index.page.js',
-  './js/pages/personaje.page.js',
   './js/pages/misiones.page.js',
   './js/pages/tienda.page.js',
   './js/pages/custom.page.js',
