@@ -241,6 +241,16 @@ h1, h2, h3, h4, h5, h6, p, span {
     white-space: nowrap;
 }
 
+@media (max-width: 576px) {
+    .hero-action-btn {
+        white-space: normal;
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        font-size: 1rem;
+    }
+}
+
 .fantasy-font {
     font-family: 'MedievalSharp', cursive;
     letter-spacing: 2px;
