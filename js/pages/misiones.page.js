@@ -4,7 +4,6 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
 import { setupScrollToTop } from '../ui/scrollToTop.js';
 import { requirePwaOrRedirect } from '../ui/requirePwa.js';
 import { installOrientationLock } from '../ui/orientationLock.js';
-import { setupSplashScreen } from '../ui/splashScreen.js';
 
 (async () => {
   const whenReady = (fn) => {
@@ -26,9 +25,6 @@ import { setupSplashScreen } from '../ui/splashScreen.js';
   setupPWAInstall();
   registerServiceWorker('./sw.js');
   installOrientationLock();
-
-  // Splash estilo juego: solo PWA + cold start
-  setupSplashScreen({ splashId: 'pwaSplash', durationMs: 2000 });
 
   let misionSeleccionada = null;
 
