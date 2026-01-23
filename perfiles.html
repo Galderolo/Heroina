@@ -24,40 +24,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Guardianes del Hogar">
     <link rel="apple-touch-icon" href="./img/icon-192.svg">
-    
-    <!-- Script inline para mostrar splash inmediatamente en PWA (evita flash) -->
-    <script>
-      (function() {
-        // Detectar modo PWA standalone
-        var isStandalone = (window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches)) || window.navigator.standalone === true;
-        
-        // Verificar si es cold start (no se ha mostrado el splash en esta sesión)
-        var SESSION_KEY = 'pwa_splash_shown';
-        var alreadyShown = sessionStorage.getItem(SESSION_KEY) === '1';
-        
-        // Ejecutar cuando el DOM esté disponible
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', initSplash);
-        } else {
-          initSplash();
-        }
-        
-        function initSplash() {
-          var splashEl = document.getElementById('pwaSplash');
-          if (!splashEl) return;
-          
-          if (isStandalone && !alreadyShown) {
-            // PWA + cold start: mostrar splash y ocultar body
-            splashEl.classList.remove('pwa-splash-hidden');
-            document.body.classList.add('body-hidden-during-splash');
-          } else {
-            // No es PWA o ya se mostró: ocultar splash y mostrar body
-            splashEl.classList.add('pwa-splash-hidden');
-            document.body.classList.remove('body-hidden-during-splash');
-          }
-        }
-      })();
-    </script>
 </head>
 <body>
     <!-- Splash PWA estilo videojuego -->
