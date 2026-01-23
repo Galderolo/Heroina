@@ -3,6 +3,7 @@ import { installGlobals } from '../compat/globals.js';
 import { requirePwaOrRedirect } from '../ui/requirePwa.js';
 import { installOrientationLock } from '../ui/orientationLock.js';
 import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
+import { setupSplashScreen } from '../ui/splashScreen.js';
 
 (async () => {
   const whenReady = (fn) => {
@@ -21,6 +22,9 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
   setupPWAInstall();
   registerServiceWorker('./sw.js');
   installOrientationLock();
+
+   // Splash estilo juego: solo PWA + cold start
+   setupSplashScreen({ splashId: 'pwaSplash', durationMs: 2000 });
 
   function escapeHtml(str) {
     return String(str)

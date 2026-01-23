@@ -1321,6 +1321,93 @@ h1, h2, h3, h4, h5, h6, p, span {
     letter-spacing: 0.03em;
 }
 
+/* Splash PWA estilo videojuego */
+.pwa-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* se activará solo al mostrar */
+}
+
+.pwa-splash-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.pwa-splash:not(.pwa-splash-hidden) {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.pwa-splash-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(255, 215, 0, 0.3), transparent 60%),
+                linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+}
+
+.pwa-splash-panel {
+    position: relative;
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.95) 0%, rgba(22, 33, 62, 0.98) 100%);
+    border: 3px solid var(--color-gold);
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.7), 0 18px 40px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+}
+
+.pwa-splash-logo {
+    font-size: 1.8rem;
+    color: var(--color-gold-bright);
+    margin-bottom: 0.5rem;
+}
+
+.pwa-splash-subtitle {
+    font-size: 0.95rem;
+    color: #c0c0c0;
+    margin-bottom: 1.5rem;
+}
+
+.pwa-splash-progress {
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(10, 14, 39, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    overflow: hidden;
+}
+
+.pwa-splash-progress-bar {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #00d4ff 0%, #a855f7 50%, #ffd700 100%);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    animation: pwa-splash-progress-fill 2s ease-out forwards;
+}
+
+@keyframes pwa-splash-progress-fill {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@media (max-width: 576px) {
+    .pwa-splash-panel {
+        padding: 2rem 1.5rem;
+    }
+
+    .pwa-splash-logo {
+        font-size: 1.5rem;
+    }
+}
+
 /* Overlay orientación (PWA) */
 .orientation-overlay {
     position: fixed;

@@ -4,6 +4,7 @@ import { registerServiceWorker, setupPWAInstall } from '../ui/pwa.js';
 import { setupScrollToTop } from '../ui/scrollToTop.js';
 import { requirePwaOrRedirect } from '../ui/requirePwa.js';
 import { installOrientationLock } from '../ui/orientationLock.js';
+import { setupSplashScreen } from '../ui/splashScreen.js';
 
 (async () => {
   const whenReady = (fn) => {
@@ -22,6 +23,9 @@ import { installOrientationLock } from '../ui/orientationLock.js';
   setupPWAInstall();
   registerServiceWorker('./sw.js');
   installOrientationLock();
+
+  // Splash estilo juego: solo PWA + cold start (usa sessionStorage internamente)
+  setupSplashScreen({ splashId: 'pwaSplash', durationMs: 2000 });
 
   // --- Funciones de la página (expuestas en window por los onclick existentes) ---
   function calcularTiempoTranscurrido(fechaInicio) {
