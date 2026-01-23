@@ -15,6 +15,11 @@ export function setupSplashScreen({ splashId = 'pwaSplash', durationMs = 2000 } 
     const alreadyShown = sessionStorage.getItem(SESSION_KEY) === '1';
     if (alreadyShown) return; // Solo en cold start
 
+    // Si el timer ya fue iniciado por el script bloqueante, no hacer nada
+    if (window.__pwaSplashTimerStarted === true) {
+      return;
+    }
+
     const splashEl = document.getElementById(splashId);
     if (!splashEl) return;
 
@@ -24,9 +29,13 @@ export function setupSplashScreen({ splashId = 'pwaSplash', durationMs = 2000 } 
     // Mostrar splash encima de todo
     splashEl.classList.remove('pwa-splash-hidden');
 
+    // Marcar que el timer está iniciado
+    window.__pwaSplashTimerStarted = true;
+
     // La barra tiene animación CSS de 2s; ocultamos el overlay al terminar
     setTimeout(() => {
       splashEl.classList.add('pwa-splash-hidden');
+      window.__pwaSplashTimerStarted = false;
     }, durationMs);
   } catch (error) {
     // Si algo falla, no bloqueamos la app

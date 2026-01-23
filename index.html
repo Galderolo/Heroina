@@ -35,20 +35,33 @@
         // Verificar si es cold start
         var alreadyShown = sessionStorage.getItem('pwa_splash_shown') === '1';
         
-        // Si es PWA y cold start, mostrar splash inmediatamente
+        // Si es PWA y cold start, mostrar splash inmediatamente y iniciar timer
         if (isStandalone && !alreadyShown) {
-          // Función para quitar la clase cuando el elemento exista
-          function showSplash() {
+          // Marcar como mostrado para esta sesión
+          sessionStorage.setItem('pwa_splash_shown', '1');
+          
+          // Función para mostrar splash e iniciar timer
+          function showSplashAndStartTimer() {
             var splash = document.getElementById('pwaSplash');
             if (splash) {
+              // Mostrar splash
               splash.classList.remove('pwa-splash-hidden');
+              
+              // Marcar que el timer ya está iniciado (para evitar que setupSplashScreen lo reinicie)
+              window.__pwaSplashTimerStarted = true;
+              
+              // Iniciar timer de 2 segundos
+              setTimeout(function() {
+                splash.classList.add('pwa-splash-hidden');
+                window.__pwaSplashTimerStarted = false;
+              }, 2000);
             } else {
               // Si aún no existe, intentar de nuevo en el siguiente tick
-              setTimeout(showSplash, 0);
+              setTimeout(showSplashAndStartTimer, 0);
             }
           }
           // Intentar inmediatamente (el elemento puede estar siendo parseado)
-          showSplash();
+          showSplashAndStartTimer();
         }
       })();
     </script>
