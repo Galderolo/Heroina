@@ -341,7 +341,7 @@ function getCharacterSummary() {
 function validateCharacterExists() {
   const data = getState();
   if (!data.character.name || data.character.name.trim() === '') {
-    window.location.href = 'index.html';
+    window.location.href = 'personaje.html';
     return false;
   }
   return true;

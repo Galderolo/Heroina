@@ -7,6 +7,7 @@ const FILES_TO_CHECK = [
   'instalar.html',
   'perfiles.html',
   'index.html',
+  'personaje.html',
   'misiones.html',
   'tienda.html',
   'custom.html',
