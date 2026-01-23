@@ -26,6 +26,32 @@
     <link rel="apple-touch-icon" href="./img/icon-192.svg">
 </head>
 <body>
+    <!-- Script bloqueante para mostrar splash antes del render -->
+    <script>
+      (function() {
+        // Detectar modo PWA standalone
+        var isStandalone = (window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches)) || window.navigator.standalone === true;
+        
+        // Verificar si es cold start
+        var alreadyShown = sessionStorage.getItem('pwa_splash_shown') === '1';
+        
+        // Si es PWA y cold start, mostrar splash inmediatamente
+        if (isStandalone && !alreadyShown) {
+          // Función para quitar la clase cuando el elemento exista
+          function showSplash() {
+            var splash = document.getElementById('pwaSplash');
+            if (splash) {
+              splash.classList.remove('pwa-splash-hidden');
+            } else {
+              // Si aún no existe, intentar de nuevo en el siguiente tick
+              setTimeout(showSplash, 0);
+            }
+          }
+          // Intentar inmediatamente (el elemento puede estar siendo parseado)
+          showSplash();
+        }
+      })();
+    </script>
     <!-- Splash PWA estilo videojuego -->
     <div id="pwaSplash" class="pwa-splash pwa-splash-hidden">
         <div class="pwa-splash-backdrop"></div>
