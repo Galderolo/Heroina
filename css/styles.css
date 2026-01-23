@@ -1345,6 +1345,16 @@ h1, h2, h3, h4, h5, h6, p, span {
     pointer-events: auto;
 }
 
+/* Ocultar contenido del body cuando el splash está visible */
+.body-hidden-during-splash {
+    overflow: hidden;
+}
+
+.body-hidden-during-splash > *:not(#pwaSplash) {
+    visibility: hidden;
+    opacity: 0;
+}
+
 .pwa-splash-backdrop {
     position: absolute;
     inset: 0;
