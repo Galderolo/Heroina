@@ -73,25 +73,24 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Filtros
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SingleChildScrollView(
+          // Filtros con scroll horizontal sin recorte
+          SizedBox(
+            height: 40,
+            child: ListView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _FilterChip(
-                    label: 'Todas',
-                    selected: _selectedCategory == null,
-                    onTap: () => setState(() => _selectedCategory = null),
-                  ),
-                  ...RewardCategory.values.map((cat) => _FilterChip(
-                        label: cat.displayName,
-                        selected: _selectedCategory == cat,
-                        onTap: () => setState(() => _selectedCategory = cat),
-                      )),
-                ],
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                _FilterChip(
+                  label: 'Todas',
+                  selected: _selectedCategory == null,
+                  onTap: () => setState(() => _selectedCategory = null),
+                ),
+                ...RewardCategory.values.map((cat) => _FilterChip(
+                      label: cat.displayName,
+                      selected: _selectedCategory == cat,
+                      onTap: () => setState(() => _selectedCategory = cat),
+                    )),
+              ],
             ),
           ),
           const SizedBox(height: 12),
@@ -107,24 +106,65 @@ class _ShopScreenState extends State<ShopScreen> {
                   )
                 : RefreshIndicator(
                     onRefresh: _loadRewards,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _filteredRewards.length + 1,
-                      itemBuilder: (ctx, idx) {
-                        if (idx == _filteredRewards.length) {
-                          return const SizedBox(height: 80);
-                        }
-                        final reward = _filteredRewards[idx];
-                        return _RewardCard(
-                          reward: reward,
-                          onPurchase: () => _buyReward(reward),
-                        );
-                      },
-                    ),
+                    child: _selectedCategory == null
+                        ? _buildSectionedList()
+                        : _buildSimpleList(_filteredRewards),
                   ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSimpleList(List<Reward> rewards) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: rewards.length + 1,
+      itemBuilder: (ctx, idx) {
+        if (idx == rewards.length) return const SizedBox(height: 80);
+        final reward = rewards[idx];
+        return _RewardCard(
+          reward: reward,
+          onPurchase: () => _buyReward(reward),
+        );
+      },
+    );
+  }
+
+  Widget _buildSectionedList() {
+    final consumables = _allRewards.where((r) => r.isPotion).toList();
+    final rewards = _allRewards.where((r) => !r.isPotion).toList();
+
+    // Construimos los items con cabeceras de sección
+    final List<Widget> items = [];
+
+    if (consumables.isNotEmpty) {
+      items.add(_SectionHeader(
+        icon: '\u{2728}',
+        label: 'Consumibles',
+        subtitle: 'Pociones y objetos de un solo uso',
+      ));
+      for (final r in consumables) {
+        items.add(_RewardCard(reward: r, onPurchase: () => _buyReward(r)));
+      }
+    }
+
+    if (rewards.isNotEmpty) {
+      items.add(_SectionHeader(
+        icon: '\u{1F3C6}',
+        label: 'Recompensas',
+        subtitle: 'Caprichos y premios para ti',
+      ));
+      for (final r in rewards) {
+        items.add(_RewardCard(reward: r, onPurchase: () => _buyReward(r)));
+      }
+    }
+
+    items.add(const SizedBox(height: 80));
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: items,
     );
   }
 
@@ -172,6 +212,69 @@ class _ShopScreenState extends State<ShopScreen> {
         showGameSnackBar(context, result.message, isError: true);
       }
     }
+  }
+}
+
+// === Section Header ===
+class _SectionHeader extends StatelessWidget {
+  final String icon;
+  final String label;
+  final String subtitle;
+
+  const _SectionHeader({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xE60F3460), Color(0xE6162140)],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.goldBright.withValues(alpha: 0.25),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.medievalSharp(
+                      color: AppColors.goldBright,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

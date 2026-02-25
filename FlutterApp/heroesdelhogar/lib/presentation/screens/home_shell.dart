@@ -11,6 +11,24 @@ import 'customize/customize_screen.dart';
 import 'character/character_creation_screen.dart';
 import 'profiles/profiles_screen.dart';
 
+/// InheritedWidget para propagar callbacks del Shell a widgets descendientes.
+class ShellScope extends InheritedWidget {
+  final VoidCallback onGoToProfiles;
+
+  const ShellScope({
+    super.key,
+    required this.onGoToProfiles,
+    required super.child,
+  });
+
+  static ShellScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ShellScope>();
+
+  @override
+  bool updateShouldNotify(ShellScope old) =>
+      onGoToProfiles != old.onGoToProfiles;
+}
+
 /// Shell principal con BottomNavigationBar de 5 pestañas.
 /// Orden: Misiones | Tienda | Personaje (centro) | WIP | Personalizar
 class HomeShell extends StatefulWidget {
@@ -58,16 +76,9 @@ class _HomeShellState extends State<HomeShell> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: kBackgroundGradient),
-        child: Stack(
-          children: [
-            _screens[_currentIndex],
-            // Botón "Cambiar perfil" flotante arriba-derecha
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 8,
-              right: 12,
-              child: _ProfileSwitchButton(onTap: _goToProfiles),
-            ),
-          ],
+        child: ShellScope(
+          onGoToProfiles: _goToProfiles,
+          child: _screens[_currentIndex],
         ),
       ),
       bottomNavigationBar: Container(
@@ -141,63 +152,6 @@ class _HomeShellState extends State<HomeShell> {
   }
 }
 
-// ─────────────────────────────────────────────
-// Botón cambiar perfil (arriba derecha)
-// ─────────────────────────────────────────────
-class _ProfileSwitchButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _ProfileSwitchButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xCC0F3460), Color(0xCC0A0E27)],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.goldBright.withValues(alpha: 0.35),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.people_alt_outlined,
-                color: AppColors.goldBright,
-                size: 17,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                'Perfiles',
-                style: TextStyle(
-                  color: AppColors.goldBright,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────
 // WIP Screen placeholder

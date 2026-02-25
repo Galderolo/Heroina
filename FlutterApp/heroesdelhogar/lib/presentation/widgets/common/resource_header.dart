@@ -3,11 +3,15 @@ import 'package:provider/provider.dart';
 
 import '../../../app/theme/app_theme.dart';
 import '../../providers/game_provider.dart';
+import '../../screens/home_shell.dart';
 
 /// Header reutilizable estilo HUD de juego que muestra
 /// Nivel, Vidas, Energia, Oro y barra de XP.
+/// Si se pasa [onProfilesTap], muestra el botón de cambio de perfil
+/// integrado en la esquina superior derecha del HUD.
 class ResourceHeader extends StatelessWidget {
-  const ResourceHeader({super.key});
+  final VoidCallback? onProfilesTap;
+  const ResourceHeader({super.key, this.onProfilesTap});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +20,9 @@ class ResourceHeader extends StatelessWidget {
         final character = game.state.character;
         final progress = game.levelProgress;
         final timerInfo = game.energyTimerInfo;
+        // Usar callback explícito o buscarlo en el ShellScope
+        final profilesCb =
+            onProfilesTap ?? ShellScope.maybeOf(context)?.onGoToProfiles;
 
         return Container(
           padding: const EdgeInsets.all(14),
@@ -42,7 +49,7 @@ class ResourceHeader extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Row de recursos
+              // Row de recursos + botón perfiles
               Row(
                 children: [
                   _HudChip(
@@ -79,6 +86,13 @@ class ResourceHeader extends StatelessWidget {
                     value: '${character.gold}',
                     color: AppColors.goldBright,
                   ),
+                  // Botón de perfiles integrado
+                  if (profilesCb != null) ...[
+                    const SizedBox(width: 8),
+                    _HudSeparator(),
+                    const SizedBox(width: 8),
+                    _ProfilesButton(onTap: profilesCb),
+                  ],
                 ],
               ),
               const SizedBox(height: 10),
@@ -92,6 +106,48 @@ class ResourceHeader extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _ProfilesButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _ProfilesButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.goldBright.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: AppColors.goldBright.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.people_alt_outlined,
+              color: AppColors.goldBright,
+              size: 15,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Perfiles',
+              style: TextStyle(
+                color: AppColors.goldBright,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
