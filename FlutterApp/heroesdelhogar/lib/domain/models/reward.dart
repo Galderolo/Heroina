@@ -8,15 +8,15 @@ enum RewardCategory {
   String get displayName {
     switch (this) {
       case RewardCategory.pequena:
-        return 'Pequena';
+        return 'Diaria';
       case RewardCategory.media:
-        return 'Media';
+        return 'Mágica';
       case RewardCategory.grande:
-        return 'Grande';
+        return 'Rara';
       case RewardCategory.epica:
-        return 'Epica';
+        return 'Épica';
       case RewardCategory.potion:
-        return 'Pocion';
+        return 'Consumible';
     }
   }
 

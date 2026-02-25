@@ -73,22 +73,28 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Filtros con scroll horizontal sin recorte
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+          // Filtros con scroll horizontal
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            physics: const BouncingScrollPhysics(),
+            child: Row(
               children: [
                 _FilterChip(
                   label: 'Todas',
                   selected: _selectedCategory == null,
+                  categoryColor: AppColors.goldBright,
                   onTap: () => setState(() => _selectedCategory = null),
                 ),
-                ...RewardCategory.values.map((cat) => _FilterChip(
-                      label: cat.displayName,
-                      selected: _selectedCategory == cat,
-                      onTap: () => setState(() => _selectedCategory = cat),
+                const SizedBox(width: 8),
+                ...RewardCategory.values.map((cat) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _FilterChip(
+                        label: cat.displayName,
+                        selected: _selectedCategory == cat,
+                        categoryColor: _rarityColor(cat),
+                        onTap: () => setState(() => _selectedCategory = cat),
+                      ),
                     )),
               ],
             ),
@@ -114,6 +120,22 @@ class _ShopScreenState extends State<ShopScreen> {
         ],
       ),
     );
+  }
+
+  /// Paleta de colores estilo ARPG (Diablo-like) por rareza
+  static Color _rarityColor(RewardCategory cat) {
+    switch (cat) {
+      case RewardCategory.pequena:
+        return const Color(0xFF9E9E9E); // Gris - común
+      case RewardCategory.media:
+        return const Color(0xFF4FC3F7); // Azul claro - mágico
+      case RewardCategory.grande:
+        return const Color(0xFFFFD700); // Oro - raro
+      case RewardCategory.epica:
+        return const Color(0xFFA855F7); // Morado - épico/legendario
+      case RewardCategory.potion:
+        return const Color(0xFF4CAF50); // Verde - consumible
+    }
   }
 
   Widget _buildSimpleList(List<Reward> rewards) {
@@ -282,56 +304,59 @@ class _SectionHeader extends StatelessWidget {
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
+  final Color categoryColor;
   final VoidCallback onTap;
 
   const _FilterChip({
     required this.label,
     required this.selected,
+    required this.categoryColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              gradient: selected
-                  ? const LinearGradient(
-                      colors: [AppColors.accent, Color(0xFF7C3AED)],
-                    )
-                  : null,
-              color: selected ? null : AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected
-                    ? AppColors.goldBright.withValues(alpha: 0.5)
-                    : AppColors.goldBright.withValues(alpha: 0.1),
-                width: selected ? 1.5 : 1,
-              ),
-              boxShadow: selected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.accent.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                      ),
-                    ]
-                  : null,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: selected
+                ? LinearGradient(
+                    colors: [
+                      categoryColor.withValues(alpha: 0.8),
+                      categoryColor.withValues(alpha: 0.5),
+                    ],
+                  )
+                : null,
+            color: selected ? null : AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected
+                  ? categoryColor
+                  : categoryColor.withValues(alpha: 0.3),
+              width: selected ? 2 : 1,
             ),
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : AppColors.textSecondary,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 13,
-              ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: categoryColor.withValues(alpha: 0.4),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.white : categoryColor,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+              fontSize: 13,
             ),
           ),
         ),
@@ -347,20 +372,22 @@ class _RewardCard extends StatelessWidget {
 
   const _RewardCard({required this.reward, required this.onPurchase});
 
-  Color get _categoryColor {
+  /// Colores ARPG (Diablo-like) por rareza
+  Color get _rarityColor {
     switch (reward.category) {
       case RewardCategory.pequena:
-        return Colors.cyan;
+        return const Color(0xFF9E9E9E); // Gris - común
       case RewardCategory.media:
-        return Colors.green;
+        return const Color(0xFF4FC3F7); // Azul - mágico
       case RewardCategory.grande:
-        return Colors.orange;
+        return const Color(0xFFFFD700); // Oro - raro
       case RewardCategory.epica:
-        return AppColors.legendary;
+        return const Color(0xFFA855F7); // Morado - épico/legendario
       case RewardCategory.potion:
-        return AppColors.purpleGlow;
+        return const Color(0xFF4CAF50); // Verde - consumible
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -370,6 +397,8 @@ class _RewardCard extends StatelessWidget {
     final cooldown = game.getRewardCooldownInfo(reward.id);
     final canAfford = character.gold >= reward.price;
     final isDisabled = locked || cooldown.onCooldown;
+
+    final rarity = _rarityColor;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -390,7 +419,7 @@ class _RewardCard extends StatelessWidget {
             border: Border.all(
               color: locked
                   ? Colors.grey.withValues(alpha: 0.15)
-                  : AppColors.goldBright.withValues(alpha: 0.1),
+                  : rarity.withValues(alpha: 0.35),
               width: 1.5,
             ),
             boxShadow: [
@@ -399,6 +428,12 @@ class _RewardCard extends StatelessWidget {
                 blurRadius: 15,
                 offset: const Offset(0, 6),
               ),
+              if (!locked)
+                BoxShadow(
+                  color: rarity.withValues(alpha: 0.08),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                ),
             ],
           ),
           child: Column(
@@ -406,21 +441,35 @@ class _RewardCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // Icon container
+                  // Icon container con gradiente de rareza ARPG
                   Container(
-                    width: 52,
-                    height: 52,
+                    width: 56,
+                    height: 56,
                     decoration: BoxDecoration(
-                      color: _categoryColor.withValues(alpha: 0.15),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          rarity.withValues(alpha: 0.35),
+                          rarity.withValues(alpha: 0.15),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: _categoryColor.withValues(alpha: 0.25),
-                        width: 1.5,
+                        color: rarity.withValues(alpha: 0.6),
+                        width: 2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: rarity.withValues(alpha: 0.25),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(reward.icon,
-                          style: const TextStyle(fontSize: 26)),
+                          style: const TextStyle(fontSize: 28)),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -468,7 +517,7 @@ class _RewardCard extends StatelessWidget {
                   ),
                   _Badge(
                     text: reward.category.displayName,
-                    color: _categoryColor,
+                    color: rarity,
                   ),
                   if (locked)
                     _Badge(
