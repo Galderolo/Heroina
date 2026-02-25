@@ -113,158 +113,79 @@ class CharacterScreen extends StatelessWidget {
     dynamic progress,
     GameProvider game,
   ) {
+    final avatarWidget = _buildAvatar(character.avatar);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xD9162140),
-            Color(0xD90A0E27),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.goldBright.withValues(alpha: 0.2),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.45),
-            blurRadius: 25,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
+      decoration: AppDecorations.characterCard(),
       child: Column(
         children: [
-          // Avatar (tappable) with golden glow
-          GestureDetector(
+          // Avatar con brillo pulsante estilo web
+          _PulsingAvatar(
+            child: avatarWidget,
             onTap: () => _pickAvatar(context),
-            child: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.goldBright.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        spreadRadius: 4,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 15,
-                      ),
-                    ],
-                    border: Border.all(
-                      color: AppColors.goldBright.withValues(alpha: 0.6),
-                      width: 3,
-                    ),
-                  ),
-                  child: _buildAvatar(character.avatar),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.accent, Color(0xFF7C3AED)],
-                    ),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.goldBright.withValues(alpha: 0.4),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 6,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.camera_alt,
-                      size: 14, color: Colors.white),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 14),
 
-          // Name
+          // Nombre del personaje en amarillo con glow
           Text(
             character.name,
             style: GoogleFonts.medievalSharp(
               fontSize: 26,
               color: AppColors.goldBright,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+              letterSpacing: 1.4,
               shadows: [
                 Shadow(
-                  color: AppColors.goldBright.withValues(alpha: 0.25),
-                  blurRadius: 15,
+                  color: AppColors.goldBright.withValues(alpha: 0.4),
+                  blurRadius: 20,
                 ),
-                const Shadow(color: Colors.black, blurRadius: 4),
+                const Shadow(color: Colors.black, blurRadius: 6),
               ],
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
 
-          // Class + Title
+          // Título de clase en botón dorado tipo web
+          GoldButton(
+            text: title,
+            onPressed: null,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            fontSize: 14,
+            icon: Icons.emoji_events_outlined,
+          ),
+          const SizedBox(height: 6),
+
+          // Clase del personaje en pill azul
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.blueGlow.withValues(alpha: 0.15),
-                  AppColors.purpleGlow.withValues(alpha: 0.1),
+                  AppColors.blueGlow.withValues(alpha: 0.25),
+                  AppColors.purpleGlow.withValues(alpha: 0.18),
                 ],
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: AppColors.blueGlow.withValues(alpha: 0.25),
+                color: AppColors.blueGlow.withValues(alpha: 0.45),
               ),
             ),
             child: Text(
-              '$className  \u{2022}  $title',
+              className,
               style: TextStyle(
-                color: AppColors.blueGlow,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-
-          // Level badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xF20F3460), Color(0xF20A0E27)],
-              ),
-              borderRadius: BorderRadius.circular(99),
-              border: Border.all(
-                color: AppColors.goldBright.withValues(alpha: 0.5),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.goldBright.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: Text(
-              '\u{2694}\u{FE0F}  Nivel ${character.level}',
-              style: TextStyle(
-                color: AppColors.goldBright.withValues(alpha: 0.95),
+                color: AppColors.textPrimary,
                 fontSize: 13,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
               ),
             ),
           ),
+          const SizedBox(height: 10),
+
+          // Nivel con texto grande y brillo pulsante
+          _PulsingLevelTitle(level: character.level),
           const SizedBox(height: 18),
           AppDecorations.goldenDivider(),
           const SizedBox(height: 14),
@@ -675,6 +596,174 @@ class CharacterScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Avatar con brillo pulsante (latido) similar a la web.
+class _PulsingAvatar extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _PulsingAvatar({
+    required this.child,
+    required this.onTap,
+  });
+
+  @override
+  State<_PulsingAvatar> createState() => _PulsingAvatarState();
+}
+
+class _PulsingAvatarState extends State<_PulsingAvatar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _glow;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+
+    final curve = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _glow = Tween<double>(begin: 0.25, end: 0.6).animate(curve);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.goldBright.withValues(alpha: _glow.value),
+                      blurRadius: 26,
+                      spreadRadius: 6,
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.55),
+                      blurRadius: 18,
+                    ),
+                  ],
+                  border: Border.all(
+                    color: AppColors.goldBright.withValues(alpha: 0.85),
+                    width: 3,
+                  ),
+                ),
+                child: widget.child,
+              ),
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.accent, Color(0xFF7C3AED)],
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.goldBright.withValues(alpha: 0.6),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Título de nivel con brillo pulsante (latido) y glow amarillo.
+class _PulsingLevelTitle extends StatefulWidget {
+  final int level;
+
+  const _PulsingLevelTitle({required this.level});
+
+  @override
+  State<_PulsingLevelTitle> createState() => _PulsingLevelTitleState();
+}
+
+class _PulsingLevelTitleState extends State<_PulsingLevelTitle>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _glow;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+
+    final curve = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _glow = Tween<double>(begin: 0.35, end: 0.75).animate(curve);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return Text(
+          'Nivel ${widget.level}',
+          style: GoogleFonts.medievalSharp(
+            color: AppColors.goldBright,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+            shadows: [
+              Shadow(
+                color: AppColors.goldBright.withValues(alpha: _glow.value),
+                blurRadius: 24,
+              ),
+              const Shadow(
+                color: Colors.black,
+                blurRadius: 6,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

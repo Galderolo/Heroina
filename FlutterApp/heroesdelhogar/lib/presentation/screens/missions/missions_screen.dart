@@ -706,10 +706,13 @@ class _MissionCard extends StatelessWidget {
                       )
                     else
                       _MissionActionButton(
-                        label: '\u{25B6}\u{FE0F}  Iniciar Mision',
+                        label: '\u{25B6} INICIAR MISIÓN (-1 \u{26A1})',
                         onPressed: onStart,
                         color: Colors.green.shade400,
                         filled: true,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                        fontSize: 15,
                       ),
                   ],
                 ),
@@ -848,6 +851,8 @@ class _MissionActionButton extends StatelessWidget {
   final Color color;
   final bool outlined;
   final bool filled;
+  final EdgeInsetsGeometry? padding;
+  final double? fontSize;
 
   const _MissionActionButton({
     required this.label,
@@ -855,6 +860,8 @@ class _MissionActionButton extends StatelessWidget {
     required this.color,
     this.outlined = false,
     this.filled = false,
+    this.padding,
+    this.fontSize,
   });
 
   @override
@@ -863,12 +870,13 @@ class _MissionActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: padding ??
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: filled ? color.withValues(alpha: 0.18) : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: outlined
                   ? color.withValues(alpha: 0.3)
@@ -880,7 +888,7 @@ class _MissionActionButton extends StatelessWidget {
             label,
             style: TextStyle(
               color: color,
-              fontSize: 13,
+              fontSize: fontSize ?? 13,
               fontWeight: FontWeight.w700,
             ),
           ),
