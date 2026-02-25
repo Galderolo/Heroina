@@ -7,8 +7,10 @@ import 'package:provider/provider.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/constants/game_data.dart';
 import '../../providers/game_provider.dart';
+import '../../widgets/common/app_title_bar.dart';
 import '../../widgets/common/resource_header.dart';
 import '../../widgets/common/game_dialogs.dart';
+import '../home_shell.dart';
 
 class CharacterScreen extends StatelessWidget {
   const CharacterScreen({super.key});
@@ -50,7 +52,7 @@ class CharacterScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const ResourceHeader(),
+                const AppTitleBar(),
                 const SizedBox(height: 16),
 
                 // === Character Card (incluye ORO/ENERGÍA/VIDAS) ===
@@ -118,14 +120,17 @@ class CharacterScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       decoration: AppDecorations.characterCard(),
-      child: Column(
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          // Avatar con brillo pulsante estilo web
-          _PulsingAvatar(
-            child: avatarWidget,
-            onTap: () => _pickAvatar(context),
-          ),
-          const SizedBox(height: 14),
+          Column(
+            children: [
+              // Avatar centrado
+              _PulsingAvatar(
+                child: avatarWidget,
+                onTap: () => _pickAvatar(context),
+              ),
+              const SizedBox(height: 14),
 
           // Nombre del personaje en amarillo con glow
           Text(
@@ -190,14 +195,28 @@ class CharacterScreen extends StatelessWidget {
           AppDecorations.goldenDivider(),
           const SizedBox(height: 14),
 
-          // XP Bar
-          _buildXPBar(progress),
+          // XP Bar (mismo ancho que las tarjetas ORO/ENERGÍA/VIDAS)
+          SizedBox(
+            width: double.infinity,
+            child: _buildXPBar(progress),
+          ),
           const SizedBox(height: 16),
           AppDecorations.goldenDivider(),
           const SizedBox(height: 14),
 
           // Recursos: ORO / ENERGÍA / VIDAS dentro de la tarjeta
           _buildResourceRows(character, game),
+            ],
+          ),
+          // Botón Perfiles dentro de la tarjeta, arriba a la derecha
+          if (ShellScope.maybeOf(context)?.onGoToProfiles != null)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: ProfilesButton(
+                onTap: ShellScope.maybeOf(context)!.onGoToProfiles,
+              ),
+            ),
         ],
       ),
     );
@@ -214,17 +233,18 @@ class CharacterScreen extends StatelessWidget {
           label: 'ORO',
           value: '${character.gold}',
           subtitle: 'Lo puedes gastar en la tienda',
+          valueHighlight: true,
         ),
         const SizedBox(height: 8),
         _ResourceRow(
           icon: '\u{26A1}',
-          iconColor: Colors.amberAccent,
+          iconColor: AppColors.blueGlow,
           label: 'ENERG\u{00CD}A',
           value: '${character.energy}/${character.maxEnergy}',
           subtitle: timerInfo.isFull
               ? 'Energ\u{00ED}a completa'
               : 'Recarga en ${timerInfo.minutesRemaining}m',
-          badge: 'Misiones: ${character.energy} \u{26A1}',
+          badge: 'Misiones: 1 \u{26A1}',
         ),
         const SizedBox(height: 8),
         _ResourceRow(
@@ -548,54 +568,110 @@ class CharacterScreen extends StatelessWidget {
   Widget _buildXPBar(
       ({int currentXP, int requiredXP, double percentage, int level})
           progress) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text(
-              '\u{2B50}  XP',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Spacer(),
-            Text(
-              '${progress.currentXP} / ${progress.requiredXP}',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
+    final value = (progress.percentage / 100).clamp(0.0, 1.0);
+    const barHeight = 33.0; // 1/4 menos que 44
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final barWidth = constraints.maxWidth;
+        final fillWidth = barWidth * value;
+        return Container(
+          height: barHeight,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(barHeight / 2),
             border: Border.all(
-              color: AppColors.goldBright.withValues(alpha: 0.15),
+              color: AppColors.dark.withValues(alpha: 0.8),
+              width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.green.withValues(alpha: 0.15),
+                color: Colors.black.withValues(alpha: 0.35),
                 blurRadius: 8,
               ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: progress.percentage / 100,
-              minHeight: 14,
-              backgroundColor: AppColors.dark,
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Colors.green.shade400),
+            borderRadius: BorderRadius.circular(barHeight / 2),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Fondo oscuro (parte no rellenada)
+                Positioned.fill(
+                  child: Container(
+                    color: const Color(0xFF0D1320),
+                  ),
+                ),
+                // Parte rellenada con gradiente cyan → púrpura → cyan (borde derecho redondeado + efecto brillo)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: fillWidth,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.horizontal(
+                        left: Radius.circular(barHeight / 2),
+                        right: Radius.circular(barHeight / 2),
+                      ),
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFF00D4FF),
+                          Color(0xFFA855F7),
+                          Color(0xFF00D4FF),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blueGlow.withValues(alpha: 0.5),
+                          blurRadius: 14,
+                          spreadRadius: 0,
+                        ),
+                        BoxShadow(
+                          color: AppColors.purpleGlow.withValues(alpha: 0.35),
+                          blurRadius: 20,
+                          spreadRadius: -2,
+                        ),
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          blurRadius: 6,
+                          offset: const Offset(0, -1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Texto "X / Y XP" con sombra paralela para mejor lectura
+                Text(
+                  '${progress.currentXP} / ${progress.requiredXP} XP',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.9),
+                        offset: const Offset(1, 1),
+                        blurRadius: 0,
+                      ),
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.8),
+                        offset: const Offset(2, 2),
+                        blurRadius: 2,
+                      ),
+                      Shadow(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -1047,7 +1123,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// === Resource Row (compacto, para interior de la character card) ===
+// === Resource Row (layout como la web: icono | label + subtítulo en fila | valor grande abajo) ===
 class _ResourceRow extends StatelessWidget {
   final String icon;
   final Color iconColor;
@@ -1055,6 +1131,8 @@ class _ResourceRow extends StatelessWidget {
   final String value;
   final String subtitle;
   final String? badge;
+  /// Si true, el valor se muestra en amarillo con brillo (ORO). Si false, en blanco.
+  final bool valueHighlight;
 
   const _ResourceRow({
     required this.icon,
@@ -1063,62 +1141,91 @@ class _ResourceRow extends StatelessWidget {
     required this.value,
     required this.subtitle,
     this.badge,
+    this.valueHighlight = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final String topRightText = badge ?? subtitle;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.dark.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: iconColor.withValues(alpha: 0.18),
+          color: iconColor.withValues(alpha: 0.2),
           width: 1.2,
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 10),
+          // Icono en círculo (estilo web)
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.25),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: iconColor.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
+            ),
+            child: Center(
+              child: Text(icon, style: const TextStyle(fontSize: 22)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Columna: fila superior (label + texto derecho) y valor grande debajo
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (badge != null)
-                  Text(
-                    badge!,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
+                Row(
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                      ),
                     ),
-                  ),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.1,
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        topRightText,
+                        style: TextStyle(
+                          color: AppColors.textSecondary.withValues(alpha: 0.9),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  subtitle,
+                  value,
                   style: TextStyle(
-                    color: AppColors.textSecondary.withValues(alpha: 0.6),
-                    fontSize: 10,
+                    color: valueHighlight ? AppColors.goldBright : AppColors.textPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    shadows: valueHighlight
+                        ? [
+                            Shadow(
+                              color: AppColors.goldBright.withValues(alpha: 0.5),
+                              blurRadius: 10,
+                            ),
+                          ]
+                        : null,
                   ),
                 ),
               ],
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              color: iconColor,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
             ),
           ),
         ],

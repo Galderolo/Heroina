@@ -91,7 +91,7 @@ class ResourceHeader extends StatelessWidget {
                     const SizedBox(width: 8),
                     _HudSeparator(),
                     const SizedBox(width: 8),
-                    _ProfilesButton(onTap: profilesCb),
+                    ProfilesButton(onTap: profilesCb),
                   ],
                 ],
               ),
@@ -110,9 +110,10 @@ class ResourceHeader extends StatelessWidget {
   }
 }
 
-class _ProfilesButton extends StatelessWidget {
+/// Botón "Perfiles" reutilizable (header o junto al avatar en Personaje).
+class ProfilesButton extends StatelessWidget {
   final VoidCallback onTap;
-  const _ProfilesButton({required this.onTap});
+  const ProfilesButton({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
