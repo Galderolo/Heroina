@@ -15,6 +15,86 @@ import '../home_shell.dart';
 class CharacterScreen extends StatelessWidget {
   const CharacterScreen({super.key});
 
+  Future<void> _showEditNameDialog(
+      BuildContext context, String currentName) async {
+    final controller = TextEditingController(text: currentName);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(
+            color: AppColors.gold.withValues(alpha: 0.5),
+            width: 2,
+          ),
+        ),
+        title: Text(
+          'Cambiar nombre',
+          style: TextStyle(
+            color: AppColors.goldBright,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 24,
+          style: const TextStyle(color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'Nombre del personaje',
+            hintStyle:
+                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.6)),
+            filled: true,
+            fillColor: AppColors.dark.withValues(alpha: 0.5),
+            counterStyle:
+                TextStyle(color: AppColors.textSecondary),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  BorderSide(color: AppColors.gold.withValues(alpha: 0.3)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide:
+                  BorderSide(color: AppColors.goldBright.withValues(alpha: 0.7)),
+            ),
+          ),
+          onSubmitted: (v) {
+            final trimmed = v.trim();
+            if (trimmed.isNotEmpty) Navigator.pop(ctx, trimmed);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final trimmed = controller.text.trim();
+              if (trimmed.isNotEmpty) Navigator.pop(ctx, trimmed);
+            },
+            child: Text(
+              'Guardar',
+              style: TextStyle(
+                color: AppColors.goldBright,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (newName != null && context.mounted) {
+      await context.read<GameProvider>().updateCharacterName(newName);
+    }
+  }
+
   Future<void> _pickAvatar(BuildContext context) async {
     final picker = ImagePicker();
     final image = await picker.pickImage(
@@ -59,11 +139,9 @@ class CharacterScreen extends StatelessWidget {
                 _buildCharacterCard(context, character, className, title, progress, game),
                 const SizedBox(height: 14),
 
-                // === Inventario (pociones primero) ===
-                if (inventory.potions.isNotEmpty) ...[
-                  _buildInventorySection(context, game, inventory),
-                  const SizedBox(height: 14),
-                ],
+                // === Inventario (siempre visible) ===
+                _buildInventorySection(context, game, inventory),
+                const SizedBox(height: 14),
 
                 // === Misiones activas ===
                 if (activeMissions.isNotEmpty) ...[
@@ -96,6 +174,48 @@ class CharacterScreen extends StatelessWidget {
                     _StatData('\u{1FA99}', 'Oro\nGanado', '${game.state.stats.totalGold}', const Color(0xFFFFB300)),
                     _StatData('\u{1F6CD}\u{FE0F}', 'Oro\nGastado', '${game.state.stats.totalSpent}', const Color(0xFFEF4444)),
                   ],
+                ),
+
+                // === Botón Reiniciar Progreso (siempre al final) ===
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final confirm = await showConfirmDialog(
+                        context,
+                        title: 'Reiniciar Progreso',
+                        message:
+                            'Se borrarán nivel, XP, oro, misiones completadas y compras. '
+                            'El nombre y la clase del personaje se conservan. '
+                            '¿Continuar?',
+                        confirmText: 'Reiniciar',
+                        confirmColor: Colors.red,
+                      );
+                      if (confirm && context.mounted) {
+                        await game.resetProgress();
+                      }
+                    },
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text('REINICIAR PROGRESO'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red.shade300,
+                      side: BorderSide(
+                        color: Colors.red.withValues(alpha: 0.4),
+                        width: 1.5,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 80),
@@ -132,22 +252,37 @@ class CharacterScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
 
-          // Nombre del personaje en amarillo con glow
-          Text(
-            character.name,
-            style: GoogleFonts.medievalSharp(
-              fontSize: 26,
-              color: AppColors.goldBright,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.4,
-              shadows: [
-                Shadow(
-                  color: AppColors.goldBright.withValues(alpha: 0.4),
-                  blurRadius: 20,
+          // Nombre del personaje en amarillo con glow + lápiz para editar
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                character.name,
+                style: GoogleFonts.medievalSharp(
+                  fontSize: 26,
+                  color: AppColors.goldBright,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.4,
+                  shadows: [
+                    Shadow(
+                      color: AppColors.goldBright.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                    ),
+                    const Shadow(color: Colors.black, blurRadius: 6),
+                  ],
                 ),
-                const Shadow(color: Colors.black, blurRadius: 6),
-              ],
-            ),
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => _showEditNameDialog(context, character.name),
+                child: Icon(
+                  Icons.edit_outlined,
+                  size: 18,
+                  color: AppColors.blueGlow.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 6),
 
@@ -335,10 +470,10 @@ class CharacterScreen extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: GoogleFonts.medievalSharp(
+                  style: TextStyle(
                     color: headerColor,
                     fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -512,14 +647,24 @@ class CharacterScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '\u{1F392}  Inventario',
+            '\u{1F392}  Inventario de Pociones',
             style: GoogleFonts.medievalSharp(
               color: AppColors.goldBright,
               fontSize: 17,
               fontWeight: FontWeight.bold,
             ),
           ),
+          AppDecorations.goldenDivider(),
           const SizedBox(height: 14),
+          if (inventory.potions.isEmpty)
+            Text(
+              'No tienes pociones. ¡Cómpralas en la tienda!',
+              style: TextStyle(
+                color: AppColors.blueGlow.withValues(alpha: 0.85),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ...inventory.potions.map((p) {
             final potionReward =
                 kRewards.where((r) => r.id == p.id).firstOrNull;

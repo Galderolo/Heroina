@@ -43,8 +43,8 @@ class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 2;
 
   final List<Widget> _screens = const [
-    MissionsScreen(),
     ShopScreen(),
+    MissionsScreen(),
     CharacterScreen(),
     _WipScreen(),
     CustomizeScreen(),
@@ -112,14 +112,14 @@ class _HomeShellState extends State<HomeShell> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavItem(
-                  icon: Icons.assignment,
-                  label: 'Misiones',
+                  icon: Icons.store,
+                  label: 'Tienda',
                   isActive: _currentIndex == 0,
                   onTap: () => setState(() => _currentIndex = 0),
                 ),
                 _NavItem(
-                  icon: Icons.store,
-                  label: 'Tienda',
+                  icon: Icons.assignment,
+                  label: 'Misiones',
                   isActive: _currentIndex == 1,
                   onTap: () => setState(() => _currentIndex = 1),
                 ),
