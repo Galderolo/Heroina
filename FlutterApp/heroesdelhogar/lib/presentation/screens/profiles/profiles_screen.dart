@@ -82,12 +82,18 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.dark,
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(gradient: kBackgroundGradient),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
               children: [
                 const SizedBox(height: 8),
                 // === Hero Frame ===
@@ -117,6 +123,8 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
+            ),
+          ),
             ),
           ),
         ),

@@ -57,6 +57,16 @@ class CharacterScreen extends StatelessWidget {
                 _buildCharacterCard(context, character, className, title, progress),
                 const SizedBox(height: 14),
 
+                // === Misiones activas (justo debajo del personaje) ===
+                if (activeMissions.isNotEmpty) ...[
+                  _buildActiveMissionsSection(context, game, activeMissions),
+                  const SizedBox(height: 14),
+                ],
+
+                // === Recursos: ORO / ENERGÍA / VIDAS ===
+                _buildResourceCards(context, character, game),
+                const SizedBox(height: 14),
+
                 // === Stats de hoy ===
                 _buildStatsSection(
                   context,
@@ -82,12 +92,6 @@ class CharacterScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 14),
-
-                // === Misiones activas ===
-                if (activeMissions.isNotEmpty) ...[
-                  _buildActiveMissionsSection(context, game, activeMissions),
-                  const SizedBox(height: 14),
-                ],
 
                 // === Inventario ===
                 if (inventory.potions.isNotEmpty) ...[
@@ -270,6 +274,44 @@ class CharacterScreen extends StatelessWidget {
           _buildXPBar(progress),
         ],
       ),
+    );
+  }
+
+  Widget _buildResourceCards(
+    BuildContext context,
+    dynamic character,
+    GameProvider game,
+  ) {
+    final timerInfo = game.energyTimerInfo;
+    return Column(
+      children: [
+        _ResourceCard(
+          icon: '\u{1FA99}',
+          iconColor: AppColors.goldBright,
+          label: 'ORO',
+          value: '${character.gold}',
+          subtitle: 'Lo puedes gastar en la tienda',
+        ),
+        const SizedBox(height: 10),
+        _ResourceCard(
+          icon: '\u{26A1}',
+          iconColor: Colors.amberAccent,
+          label: 'ENERG\u{00CD}A',
+          value: '${character.energy}/${character.maxEnergy}',
+          subtitle: timerInfo.isFull
+              ? 'Energ\u{00ED}a completa'
+              : 'Recarga en ${timerInfo.minutesRemaining}m',
+          extra: 'Misiones: ${character.energy} \u{26A1}',
+        ),
+        const SizedBox(height: 10),
+        _ResourceCard(
+          icon: '\u{2764}\u{FE0F}',
+          iconColor: AppColors.light,
+          label: 'VIDAS',
+          value: '${character.lives}/${character.maxLives}',
+          subtitle: 'Se pierden al fracasar',
+        ),
+      ],
     );
   }
 
@@ -823,6 +865,117 @@ class _ActionButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// === Resource Card (ORO / ENERGÍA / VIDAS) ===
+class _ResourceCard extends StatelessWidget {
+  final String icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+  final String subtitle;
+  final String? extra;
+
+  const _ResourceCard({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    required this.subtitle,
+    this.extra,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xE0162140),
+            Color(0xE60A0E27),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.goldBright.withValues(alpha: 0.12),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Icon circle
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: iconColor.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Center(
+              child: Text(icon, style: const TextStyle(fontSize: 22)),
+            ),
+          ),
+          const SizedBox(width: 14),
+          // Label + subtitle
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (extra != null)
+                  Text(
+                    extra!,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Value
+          Text(
+            value,
+            style: TextStyle(
+              color: iconColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
       ),
     );
   }
