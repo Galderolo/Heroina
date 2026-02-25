@@ -490,10 +490,10 @@ class _MissionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isActive
-                ? AppColors.goldBright.withValues(alpha: 0.45)
+                ? AppColors.blueGlow.withValues(alpha: 0.7)
                 : isStartBlocked
-                    ? Colors.grey.withValues(alpha: 0.12)
-                    : AppColors.goldBright.withValues(alpha: 0.1),
+                    ? Colors.grey.withValues(alpha: 0.2)
+                    : AppColors.blueGlow.withValues(alpha: 0.6),
             width: isActive ? 2 : 1.5,
           ),
           boxShadow: [
@@ -705,14 +705,13 @@ class _MissionCard extends StatelessWidget {
                         ),
                       )
                     else
-                      _MissionActionButton(
-                        label: '\u{25B6} INICIAR MISIÓN (-1 \u{26A1})',
+                      GradientButton(
+                        text: '\u{25B6} INICIAR MISIÓN (-1 \u{26A1})',
                         onPressed: onStart,
-                        color: Colors.green.shade400,
-                        filled: true,
+                        gradient: AppColors.purpleButtonGradient,
+                        textColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
-                        fontSize: 15,
                       ),
                   ],
                 ),

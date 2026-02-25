@@ -177,9 +177,8 @@ class CharacterScreen extends StatelessWidget {
                 ),
 
                 // === Botón Reiniciar Progreso (siempre al final) ===
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: 28),
+                Center(
                   child: OutlinedButton.icon(
                     onPressed: () async {
                       final confirm = await showConfirmDialog(
@@ -190,7 +189,7 @@ class CharacterScreen extends StatelessWidget {
                             'El nombre y la clase del personaje se conservan. '
                             '¿Continuar?',
                         confirmText: 'Reiniciar',
-                        confirmColor: Colors.red,
+                        confirmColor: const Color.fromARGB(255, 255, 23, 6),
                       );
                       if (confirm && context.mounted) {
                         await game.resetProgress();
@@ -199,7 +198,7 @@ class CharacterScreen extends StatelessWidget {
                     icon: const Icon(Icons.refresh, size: 18),
                     label: const Text('REINICIAR PROGRESO'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red.shade300,
+                      foregroundColor: const Color.fromARGB(255, 236, 37, 37),
                       side: BorderSide(
                         color: Colors.red.withValues(alpha: 0.4),
                         width: 1.5,
@@ -218,7 +217,7 @@ class CharacterScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 80),
+                const SizedBox(height: 32),
               ],
             ),
           ),
