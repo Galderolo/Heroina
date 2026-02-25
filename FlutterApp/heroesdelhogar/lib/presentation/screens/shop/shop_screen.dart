@@ -75,7 +75,8 @@ class _ShopScreenState extends State<ShopScreen> {
           const SizedBox(height: 12),
 
           // Filtros con scroll horizontal (incluye drag con ratón en web)
-          ScrollConfiguration(
+          ClipRect(
+            child: ScrollConfiguration(
             behavior: ScrollConfiguration.of(context).copyWith(
               dragDevices: {
                 PointerDeviceKind.touch,
@@ -84,8 +85,9 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               physics: const BouncingScrollPhysics(),
+              clipBehavior: Clip.hardEdge,
               child: Row(
                 children: [
                   _FilterChip(
@@ -108,6 +110,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ],
               ),
             ),
+          ),
           ),
           const SizedBox(height: 12),
 
@@ -149,12 +152,23 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Widget _buildSimpleList(List<Reward> rewards) {
+    // Cabecera de sección según la categoría filtrada
+    final isPotion = _selectedCategory == RewardCategory.potion;
+    final header = _SectionHeader(
+      icon: isPotion ? '\u{2728}' : '\u{1F3C6}',
+      label: isPotion ? 'Consumibles' : 'Recompensas',
+      subtitle: isPotion
+          ? 'Pociones y objetos de un solo uso'
+          : '${_selectedCategory?.displayName ?? ''} \u2022 Caprichos y premios para ti',
+    );
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: rewards.length + 1,
+      itemCount: rewards.length + 2, // +1 header, +1 spacer
       itemBuilder: (ctx, idx) {
-        if (idx == rewards.length) return const SizedBox(height: 80);
-        final reward = rewards[idx];
+        if (idx == 0) return header;
+        if (idx == rewards.length + 1) return const SizedBox(height: 80);
+        final reward = rewards[idx - 1];
         return _RewardCard(
           reward: reward,
           onPurchase: () => _buyReward(reward),
@@ -642,7 +656,9 @@ class _BuyButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
-        child: AnimatedContainer(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 90),
+          child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
           decoration: BoxDecoration(
@@ -685,6 +701,7 @@ class _BuyButton extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );
