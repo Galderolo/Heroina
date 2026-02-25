@@ -72,12 +72,13 @@ class CharacterScreen extends StatelessWidget {
                 // === Stats de hoy ===
                 _buildStatsSection(
                   context,
-                  title: '\u{1F4C5}  Hoy',
+                  title: 'Estadísticas de Hoy',
+                  headerColor: const Color(0xFF4FC3F7),
                   stats: [
-                    _StatData('\u{2694}\u{FE0F}', 'Misiones', '${todayStats.missions}'),
-                    _StatData('\u{2B50}', 'XP', '${todayStats.xp}'),
-                    _StatData('\u{1FA99}', 'Oro', '${todayStats.gold}'),
-                    _StatData('\u{1F525}', 'Racha', '$streak dia(s)'),
+                    _StatData('\u{2694}\u{FE0F}', 'Misiones\nCompletadas', '${todayStats.missions}', const Color(0xFF4FC3F7)),
+                    _StatData('\u{2B50}', 'XP\nGanada', '${todayStats.xp}', const Color(0xFFFFD700)),
+                    _StatData('\u{1FA99}', 'Oro\nGanado', '${todayStats.gold}', const Color(0xFFFFB300)),
+                    _StatData('\u{1F525}', 'Racha\nActual', '$streak d', const Color(0xFFFF6B35)),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -85,12 +86,13 @@ class CharacterScreen extends StatelessWidget {
                 // === Total stats ===
                 _buildStatsSection(
                   context,
-                  title: '\u{1F4CA}  Totales',
+                  title: 'Estadísticas Totales',
+                  headerColor: const Color(0xFFA855F7),
                   stats: [
-                    _StatData('\u{2694}\u{FE0F}', 'Misiones', '${game.state.stats.totalMissions}'),
-                    _StatData('\u{2B50}', 'XP', '${game.state.stats.totalXP}'),
-                    _StatData('\u{1FA99}', 'Oro', '${game.state.stats.totalGold}'),
-                    _StatData('\u{1F6CD}\u{FE0F}', 'Gastado', '${game.state.stats.totalSpent}'),
+                    _StatData('\u{1F3C6}', 'Misiones\nTotales', '${game.state.stats.totalMissions}', const Color(0xFF4FC3F7)),
+                    _StatData('\u{2B50}', 'XP\nTotal', '${game.state.stats.totalXP}', const Color(0xFFFFD700)),
+                    _StatData('\u{1FA99}', 'Oro\nGanado', '${game.state.stats.totalGold}', const Color(0xFFFFB300)),
+                    _StatData('\u{1F6CD}\u{FE0F}', 'Oro\nGastado', '${game.state.stats.totalSpent}', const Color(0xFFEF4444)),
                   ],
                 ),
 
@@ -318,25 +320,27 @@ class CharacterScreen extends StatelessWidget {
   Widget _buildStatsSection(
     BuildContext context, {
     required String title,
+    required Color headerColor,
     required List<_StatData> stats,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xE0162140),
-            Color(0xE60A0E27),
-          ],
+          colors: [Color(0xE0162140), Color(0xE60A0E27)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.goldBright.withValues(alpha: 0.12),
+          color: headerColor.withValues(alpha: 0.25),
           width: 1.5,
         ),
         boxShadow: [
+          BoxShadow(
+            color: headerColor.withValues(alpha: 0.08),
+            blurRadius: 18,
+            spreadRadius: 1,
+          ),
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.35),
             blurRadius: 15,
@@ -347,24 +351,76 @@ class CharacterScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.medievalSharp(
-              color: AppColors.goldBright,
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
+          // Cabecera degradada estilo Blizzard
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  headerColor.withValues(alpha: 0.25),
+                  headerColor.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(14),
+                topRight: Radius.circular(14),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: headerColor.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: headerColor,
+                    borderRadius: BorderRadius.circular(2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: headerColor.withValues(alpha: 0.6),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: GoogleFonts.medievalSharp(
+                    color: headerColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: stats
-                .map((s) => _StatItem(
-                      icon: s.icon,
-                      label: s.label,
-                      value: s.value,
-                    ))
-                .toList(),
+
+          // Grid de stats
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            child: Row(
+              children: stats
+                  .map((s) => Expanded(
+                        child: _StatItem(
+                          icon: s.icon,
+                          label: s.label,
+                          value: s.value,
+                          color: s.color,
+                        ),
+                      ))
+                  .toList(),
+            ),
           ),
         ],
       ),
@@ -628,7 +684,8 @@ class _StatData {
   final String icon;
   final String label;
   final String value;
-  const _StatData(this.icon, this.label, this.value);
+  final Color color;
+  const _StatData(this.icon, this.label, this.value, this.color);
 }
 
 // === Stat Item Widget ===
@@ -636,46 +693,77 @@ class _StatItem extends StatelessWidget {
   final String icon;
   final String label;
   final String value;
+  final Color color;
 
   const _StatItem({
     required this.icon,
     required this.label,
     required this.value,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.dark.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.goldBright.withValues(alpha: 0.08),
+    return Column(
+      children: [
+        // Icono con fondo degradado de color
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withValues(alpha: 0.35),
+                color.withValues(alpha: 0.12),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: color.withValues(alpha: 0.55),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.2),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(icon, style: const TextStyle(fontSize: 22)),
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 22)),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
-              fontSize: 16,
-            ),
+        const SizedBox(height: 8),
+        // Valor grande y brillante
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            color: color,
+            fontSize: 20,
+            shadows: [
+              Shadow(
+                color: color.withValues(alpha: 0.5),
+                blurRadius: 8,
+              ),
+            ],
           ),
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            height: 1.2,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
