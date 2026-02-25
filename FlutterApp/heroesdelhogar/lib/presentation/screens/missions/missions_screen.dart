@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,20 @@ class _MissionsScreenState extends State<MissionsScreen> {
   List<Mission> get _filteredMissions {
     final game = context.read<GameProvider>();
     return game.filterMissions(_selectedType, _allMissions);
+  }
+
+  /// Colores por tipo de misión
+  static Color _typeColor(MissionType? type) {
+    switch (type) {
+      case MissionType.diaria:
+        return const Color(0xFF4FC3F7); // Azul
+      case MissionType.ayuda:
+        return const Color(0xFFFFD700); // Amarillo
+      case MissionType.epica:
+        return const Color(0xFFA855F7); // Morado
+      case null:
+        return AppColors.goldBright;
+    }
   }
 
   /// Check if a mission is currently active
@@ -89,24 +104,42 @@ class _MissionsScreenState extends State<MissionsScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Filtros
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _FilterChip(
-                    label: 'Todas',
-                    selected: _selectedType == null,
-                    onTap: () => setState(() => _selectedType = null),
-                  ),
-                  ...MissionType.values.map((type) => _FilterChip(
-                        label: type.displayName,
-                        selected: _selectedType == type,
-                        onTap: () => setState(() => _selectedType = type),
-                      )),
-                ],
+          // Filtros con scroll horizontal (funciona con ratón en web)
+          ClipRect(
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                },
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 4),
+                physics: const BouncingScrollPhysics(),
+                clipBehavior: Clip.hardEdge,
+                child: Row(
+                  children: [
+                    _FilterChip(
+                      label: 'Todas',
+                      selected: _selectedType == null,
+                      typeColor: AppColors.goldBright,
+                      onTap: () => setState(() => _selectedType = null),
+                    ),
+                    const SizedBox(width: 8),
+                    ...MissionType.values.map((type) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _FilterChip(
+                            label: type.displayName,
+                            selected: _selectedType == type,
+                            typeColor: _typeColor(type),
+                            onTap: () =>
+                                setState(() => _selectedType = type),
+                          ),
+                        )),
+                  ],
+                ),
               ),
             ),
           ),
@@ -126,41 +159,79 @@ class _MissionsScreenState extends State<MissionsScreen> {
                       final missions = _filteredMissions;
                       return RefreshIndicator(
                         onRefresh: _loadMissions,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: missions.length + 1, // +1 for bottom spacer
-                          itemBuilder: (ctx, idx) {
-                            if (idx == missions.length) {
-                              return const SizedBox(height: 80);
-                            }
-                            final mission = missions[idx];
-                            final isActive = _isMissionActive(mission.id);
-                            final activeMission =
-                                isActive ? _getActiveMission(mission.id) : null;
-
-                            return _MissionCard(
-                              mission: mission,
-                              isActive: isActive,
-                              activeMission: activeMission,
-                              onStart: () => _startMission(mission),
-                              onComplete: isActive
-                                  ? () => _completeMission(mission, game)
-                                  : null,
-                              onFail: isActive
-                                  ? () => _failMission(mission, game)
-                                  : null,
-                              onCancel: isActive
-                                  ? () => _cancelMission(mission, game)
-                                  : null,
-                            );
-                          },
-                        ),
+                        child: _selectedType == null
+                            ? _buildSectionedList(missions, game)
+                            : _buildSimpleList(missions, game,
+                                _selectedType),
                       );
                     },
                   ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionedList(List<Mission> all, GameProvider game) {
+    final diarias =
+        all.where((m) => m.type == MissionType.diaria).toList();
+    final ayuda = all.where((m) => m.type == MissionType.ayuda).toList();
+    final epicas =
+        all.where((m) => m.type == MissionType.epica).toList();
+
+    final List<Widget> items = [];
+
+    void addSection(MissionType type, List<Mission> missions) {
+      if (missions.isEmpty) return;
+      items.add(_SectionHeader(
+        typeColor: _typeColor(type),
+        label: type.displayName,
+      ));
+      for (final m in missions) {
+        items.add(_buildMissionCard(m, game));
+      }
+    }
+
+    addSection(MissionType.diaria, diarias);
+    addSection(MissionType.ayuda, ayuda);
+    addSection(MissionType.epica, epicas);
+    items.add(const SizedBox(height: 80));
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: items,
+    );
+  }
+
+  Widget _buildSimpleList(
+      List<Mission> missions, GameProvider game, MissionType? type) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: missions.length + 2,
+      itemBuilder: (ctx, idx) {
+        if (idx == 0) {
+          return _SectionHeader(
+            typeColor: _typeColor(type),
+            label: type?.displayName ?? 'Todas',
+          );
+        }
+        if (idx == missions.length + 1) return const SizedBox(height: 80);
+        return _buildMissionCard(missions[idx - 1], game);
+      },
+    );
+  }
+
+  Widget _buildMissionCard(Mission mission, GameProvider game) {
+    final isActive = _isMissionActive(mission.id);
+    final activeMission = isActive ? _getActiveMission(mission.id) : null;
+    return _MissionCard(
+      mission: mission,
+      isActive: isActive,
+      activeMission: activeMission,
+      onStart: () => _startMission(mission),
+      onComplete: isActive ? () => _completeMission(mission, game) : null,
+      onFail: isActive ? () => _failMission(mission, game) : null,
+      onCancel: isActive ? () => _cancelMission(mission, game) : null,
     );
   }
 
@@ -241,59 +312,116 @@ class _MissionsScreenState extends State<MissionsScreen> {
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
+  final Color typeColor;
   final VoidCallback onTap;
 
   const _FilterChip({
     required this.label,
     required this.selected,
+    required this.typeColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              gradient: selected
-                  ? const LinearGradient(
-                      colors: [AppColors.accent, Color(0xFF7C3AED)],
-                    )
-                  : null,
-              color: selected ? null : AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected
-                    ? AppColors.goldBright.withValues(alpha: 0.5)
-                    : AppColors.goldBright.withValues(alpha: 0.1),
-                width: selected ? 1.5 : 1,
-              ),
-              boxShadow: selected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.accent.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                      ),
-                    ]
-                  : null,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: selected
+                ? LinearGradient(colors: [
+                    typeColor.withValues(alpha: 0.35),
+                    typeColor.withValues(alpha: 0.15),
+                  ])
+                : null,
+            color: selected ? null : AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected
+                  ? typeColor.withValues(alpha: 0.7)
+                  : typeColor.withValues(alpha: 0.2),
+              width: selected ? 1.5 : 1,
             ),
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : AppColors.textSecondary,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 13,
-              ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: typeColor.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? typeColor : AppColors.textSecondary,
+              fontWeight:
+                  selected ? FontWeight.w700 : FontWeight.w500,
+              fontSize: 13,
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// === Section Header ===
+class _SectionHeader extends StatelessWidget {
+  final Color typeColor;
+  final String label;
+
+  const _SectionHeader({required this.typeColor, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 20,
+            decoration: BoxDecoration(
+              color: typeColor,
+              borderRadius: BorderRadius.circular(2),
+              boxShadow: [
+                BoxShadow(
+                  color: typeColor.withValues(alpha: 0.4),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: TextStyle(
+              color: typeColor,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  typeColor.withValues(alpha: 0.3),
+                  Colors.transparent,
+                ]),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -322,11 +450,11 @@ class _MissionCard extends StatelessWidget {
   Color get _typeColor {
     switch (mission.type) {
       case MissionType.diaria:
-        return Colors.cyan;
+        return const Color(0xFF4FC3F7); // Azul
       case MissionType.ayuda:
-        return Colors.orange;
+        return const Color(0xFFFFD700); // Amarillo dorado
       case MissionType.epica:
-        return AppColors.legendary;
+        return const Color(0xFFA855F7); // Morado épico
     }
   }
 
@@ -376,27 +504,31 @@ class _MissionCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                // Icon container
+                // Icon container con gradiente de rareza
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
-                    color: _typeColor.withValues(alpha: 0.15),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _typeColor.withValues(alpha: 0.35),
+                        _typeColor.withValues(alpha: 0.15),
+                      ],
+                    ),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: isActive
-                          ? _typeColor.withValues(alpha: 0.5)
-                          : _typeColor.withValues(alpha: 0.2),
-                      width: 1.5,
+                      color: _typeColor.withValues(alpha: 0.6),
+                      width: 2,
                     ),
-                    boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                              color: _typeColor.withValues(alpha: 0.15),
-                              blurRadius: 10,
-                            ),
-                          ]
-                        : null,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _typeColor.withValues(alpha: 0.25),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(mission.icon,

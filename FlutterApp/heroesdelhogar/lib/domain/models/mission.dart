@@ -10,7 +10,7 @@ enum MissionType {
       case MissionType.ayuda:
         return 'Ayuda';
       case MissionType.epica:
-        return 'Epica';
+        return '\u{00C9}pica';
     }
   }
 
