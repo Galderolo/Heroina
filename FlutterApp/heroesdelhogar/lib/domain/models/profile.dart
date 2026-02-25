@@ -54,6 +54,7 @@ class ProfileSummary {
   final String title;
   final String? className;
   final String displayTitle;
+  final String? avatar;
 
   const ProfileSummary({
     required this.level,
@@ -61,5 +62,6 @@ class ProfileSummary {
     required this.title,
     this.className,
     required this.displayTitle,
+    this.avatar,
   });
 }

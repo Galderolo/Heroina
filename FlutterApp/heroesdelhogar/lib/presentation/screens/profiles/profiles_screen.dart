@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -308,6 +310,31 @@ class _ProfileCardState extends State<_ProfileCard> {
     if (mounted) setState(() => _summary = summary);
   }
 
+  Widget _buildAvatarContent(String? avatar, String displayName) {
+    if (avatar != null && avatar.isNotEmpty) {
+      try {
+        final bytes = base64Decode(avatar);
+        return Image.memory(
+          bytes,
+          fit: BoxFit.cover,
+          width: 60,
+          height: 60,
+        );
+      } catch (_) {}
+    }
+    // Fallback: inicial del nombre
+    return Center(
+      child: Text(
+        displayName.substring(0, 1).toUpperCase(),
+        style: GoogleFonts.medievalSharp(
+          fontSize: 26,
+          color: AppColors.goldBright,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final displayName =
@@ -344,33 +371,33 @@ class _ProfileCardState extends State<_ProfileCard> {
           ),
           child: Row(
             children: [
-              // Avatar
+              // Avatar (imagen real o inicial)
               Container(
-                width: 56,
-                height: 56,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.goldBright.withValues(alpha: 0.35),
+                    color: AppColors.goldBright.withValues(alpha: 0.45),
                     width: 2,
                   ),
                   boxShadow: [
+                    BoxShadow(
+                      color: AppColors.goldBright.withValues(alpha: 0.15),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.4),
                       blurRadius: 10,
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Text(
-                    displayName.substring(0, 1).toUpperCase(),
-                    style: GoogleFonts.medievalSharp(
-                      fontSize: 24,
-                      color: AppColors.goldBright,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: _buildAvatarContent(
+                      _summary?.avatar, displayName),
                 ),
               ),
               const SizedBox(width: 14),

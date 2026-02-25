@@ -121,6 +121,7 @@ class GameService {
       final title = getTitleByLevel(level);
       final displayTitle =
           classInfo != null ? '${classInfo.name} $title' : title;
+      final avatar = character['avatar'] as String?;
 
       return ProfileSummary(
         level: level,
@@ -128,6 +129,7 @@ class GameService {
         title: title,
         className: classInfo?.name,
         displayTitle: displayTitle,
+        avatar: avatar,
       );
     } catch (_) {
       return null;
