@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -73,30 +74,39 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Filtros con scroll horizontal
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                _FilterChip(
-                  label: 'Todas',
-                  selected: _selectedCategory == null,
-                  categoryColor: AppColors.goldBright,
-                  onTap: () => setState(() => _selectedCategory = null),
-                ),
-                const SizedBox(width: 8),
-                ...RewardCategory.values.map((cat) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _FilterChip(
-                        label: cat.displayName,
-                        selected: _selectedCategory == cat,
-                        categoryColor: _rarityColor(cat),
-                        onTap: () => setState(() => _selectedCategory = cat),
-                      ),
-                    )),
-              ],
+          // Filtros con scroll horizontal (incluye drag con ratón en web)
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: [
+                  _FilterChip(
+                    label: 'Todas',
+                    selected: _selectedCategory == null,
+                    categoryColor: AppColors.goldBright,
+                    onTap: () => setState(() => _selectedCategory = null),
+                  ),
+                  const SizedBox(width: 8),
+                  ...RewardCategory.values.map((cat) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _FilterChip(
+                          label: cat.displayName,
+                          selected: _selectedCategory == cat,
+                          categoryColor: _rarityColor(cat),
+                          onTap: () =>
+                              setState(() => _selectedCategory = cat),
+                        ),
+                      )),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -557,69 +567,120 @@ class _RewardCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: isDisabled ? null : onPurchase,
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 10),
-                          decoration: BoxDecoration(
-                            gradient: isDisabled
-                                ? null
-                                : LinearGradient(
-                                    colors: [
-                                      AppColors.goldBright
-                                          .withValues(alpha: 0.2),
-                                      AppColors.gold.withValues(alpha: 0.15),
-                                    ],
-                                  ),
-                            color: isDisabled
-                                ? AppColors.surface.withValues(alpha: 0.5)
-                                : null,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: isDisabled
-                                  ? Colors.grey.withValues(alpha: 0.3)
-                                  : AppColors.goldBright
-                                      .withValues(alpha: 0.5),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                reward.isPotion
-                                    ? Icons.science
-                                    : Icons.shopping_cart,
-                                size: 16,
-                                color: isDisabled
-                                    ? AppColors.textSecondary
-                                    : AppColors.goldBright,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                locked
-                                    ? 'Bloqueado'
-                                    : cooldown.onCooldown
-                                        ? 'En enfriamiento'
-                                        : 'Comprar',
-                                style: TextStyle(
-                                  color: isDisabled
-                                      ? AppColors.textSecondary
-                                      : AppColors.goldBright,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    _BuyButton(
+                      locked: locked,
+                      onCooldown: cooldown.onCooldown,
+                      hoursRemaining: cooldown.hoursRemaining,
+                      minutesRemaining: cooldown.minutesRemaining,
+                      price: reward.price,
+                      canAfford: canAfford,
+                      requiredLevel: reward.requiredLevel,
+                      onTap: isDisabled ? null : onPurchase,
                     ),
                   ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// === Buy Button ===
+class _BuyButton extends StatelessWidget {
+  final bool locked;
+  final bool onCooldown;
+  final int hoursRemaining;
+  final int minutesRemaining;
+  final int price;
+  final bool canAfford;
+  final int requiredLevel;
+  final VoidCallback? onTap;
+
+  const _BuyButton({
+    required this.locked,
+    required this.onCooldown,
+    required this.hoursRemaining,
+    required this.minutesRemaining,
+    required this.price,
+    required this.canAfford,
+    required this.requiredLevel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Determinar estado y apariencia
+    final Color btnColor;
+    final String label;
+    final String emoji;
+
+    if (locked) {
+      btnColor = Colors.grey;
+      emoji = '\u{1F512}';
+      label = 'Lv $requiredLevel';
+    } else if (onCooldown) {
+      btnColor = Colors.orangeAccent;
+      emoji = '\u{23F3}';
+      label = '${hoursRemaining}h ${minutesRemaining}m';
+    } else if (!canAfford) {
+      btnColor = Colors.red.shade400;
+      emoji = '\u{1FA99}';
+      label = '$price';
+    } else {
+      btnColor = AppColors.goldBright;
+      emoji = '\u{1FA99}';
+      label = '$price';
+    }
+
+    final isDisabled = onTap == null;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          decoration: BoxDecoration(
+            gradient: isDisabled
+                ? null
+                : LinearGradient(
+                    colors: [
+                      btnColor.withValues(alpha: 0.25),
+                      btnColor.withValues(alpha: 0.12),
+                    ],
+                  ),
+            color: isDisabled ? AppColors.surface.withValues(alpha: 0.4) : null,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: btnColor.withValues(alpha: isDisabled ? 0.25 : 0.6),
+              width: 1.5,
+            ),
+            boxShadow: isDisabled
+                ? null
+                : [
+                    BoxShadow(
+                      color: btnColor.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                    ),
+                  ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: btnColor.withValues(alpha: isDisabled ? 0.5 : 1.0),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
