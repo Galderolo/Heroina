@@ -224,10 +224,12 @@ class _MissionsScreenState extends State<MissionsScreen> {
   Widget _buildMissionCard(Mission mission, GameProvider game) {
     final isActive = _isMissionActive(mission.id);
     final activeMission = isActive ? _getActiveMission(mission.id) : null;
+    final maxReached = game.state.activeMissions.length >= 3;
     return _MissionCard(
       mission: mission,
       isActive: isActive,
       activeMission: activeMission,
+      isStartBlocked: !isActive && maxReached,
       onStart: () => _startMission(mission),
       onComplete: isActive ? () => _completeMission(mission, game) : null,
       onFail: isActive ? () => _failMission(mission, game) : null,
@@ -431,6 +433,7 @@ class _SectionHeader extends StatelessWidget {
 class _MissionCard extends StatelessWidget {
   final Mission mission;
   final bool isActive;
+  final bool isStartBlocked;
   final ActiveMission? activeMission;
   final VoidCallback onStart;
   final VoidCallback? onComplete;
@@ -440,6 +443,7 @@ class _MissionCard extends StatelessWidget {
   const _MissionCard({
     required this.mission,
     required this.isActive,
+    this.isStartBlocked = false,
     this.activeMission,
     required this.onStart,
     this.onComplete,
@@ -473,16 +477,23 @@ class _MissionCard extends StatelessWidget {
                     AppColors.accent.withValues(alpha: 0.3),
                     AppColors.primary.withValues(alpha: 0.45),
                   ]
-                : [
-                    const Color(0xE0162140),
-                    const Color(0xE60A0E27),
-                  ],
+                : isStartBlocked
+                    ? [
+                        const Color(0xE00D1020),
+                        const Color(0xE6080B18),
+                      ]
+                    : [
+                        const Color(0xE0162140),
+                        const Color(0xE60A0E27),
+                      ],
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isActive
                 ? AppColors.goldBright.withValues(alpha: 0.45)
-                : AppColors.goldBright.withValues(alpha: 0.1),
+                : isStartBlocked
+                    ? Colors.grey.withValues(alpha: 0.12)
+                    : AppColors.goldBright.withValues(alpha: 0.1),
             width: isActive ? 2 : 1.5,
           ),
           boxShadow: [
@@ -660,12 +671,46 @@ class _MissionCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    _MissionActionButton(
-                      label: '\u{25B6}\u{FE0F}  Iniciar Mision',
-                      onPressed: onStart,
-                      color: Colors.green.shade400,
-                      filled: true,
-                    ),
+                    if (isStartBlocked)
+                      // Botón deshabilitado: límite de misiones alcanzado
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.grey.withValues(alpha: 0.25),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.lock_outline,
+                                size: 14,
+                                color: AppColors.textSecondary
+                                    .withValues(alpha: 0.5)),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Límite alcanzado',
+                              style: TextStyle(
+                                color: AppColors.textSecondary
+                                    .withValues(alpha: 0.5),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      _MissionActionButton(
+                        label: '\u{25B6}\u{FE0F}  Iniciar Mision',
+                        onPressed: onStart,
+                        color: Colors.green.shade400,
+                        filled: true,
+                      ),
                   ],
                 ),
               ),
